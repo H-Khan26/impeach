@@ -5,6 +5,9 @@ use std::collections::HashSet;
 use indexmap::{IndexMap, IndexSet};
 use serde::Deserialize;
 
+/// Suffix of `model_mappings` keys after the model name (`gliner_to_entity_type`).
+const MODEL_MAPPING_SUFFIX: &str = "_to_entity_type";
+
 /// Canonical entity types and how model labels map onto them.
 #[derive(Debug, Clone, PartialEq, Default, Deserialize)]
 #[serde(default, deny_unknown_fields)]
@@ -57,8 +60,9 @@ impl EntityTypes {
     /// Maps a model-specific label via `{model}_to_entity_type`; unknown labels pass through.
     pub fn map_model_label<'a>(&'a self, model: &str, label: &'a str) -> &'a str {
         self.model_mappings
-            .get(&format!("{model}_to_entity_type"))
-            .and_then(|map| map.get(label))
+            .iter()
+            .find(|(key, _)| key.strip_suffix(MODEL_MAPPING_SUFFIX) == Some(model))
+            .and_then(|(_, map)| map.get(label))
             .map_or(label, String::as_str)
     }
 

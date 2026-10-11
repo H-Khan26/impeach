@@ -43,14 +43,24 @@ pub fn token_set<S>(
 where
     S: Borrow<str> + Eq + Hash,
 {
+    token_set_by(text, |token| stopwords.contains(token), min_token_length, lowercase)
+}
+
+/// [`token_set`] with the stopword test supplied as a predicate, for stopword collections
+/// other than a `HashSet`.
+#[must_use]
+pub fn token_set_by(
+    text: &str,
+    is_stopword: impl Fn(&str) -> bool,
+    min_token_length: usize,
+    lowercase: bool,
+) -> HashSet<String> {
     let processed: Cow<'_, str> =
         if lowercase { Cow::Owned(text.to_lowercase()) } else { Cow::Borrowed(text) };
     processed
         .split(|c: char| !c.is_alphanumeric())
         .filter(|token| {
-            !token.is_empty()
-                && !stopwords.contains(*token)
-                && token.chars().count() >= min_token_length
+            !token.is_empty() && !is_stopword(token) && token.chars().count() >= min_token_length
         })
         .map(str::to_owned)
         .collect()

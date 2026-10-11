@@ -30,5 +30,5 @@ pub use fuzzy::{partial_ratio, ratio, sequence_matcher_ratio, token_set_ratio, t
 pub use normalize::{normalize_entity_name, normalize_whitespace, normalize_whitespace_lower};
 pub use retry::{RetryPolicy, Sleeper};
 pub use side::normalize_side;
-pub use tokenize::{jaccard, keyword_overlap, token_set};
+pub use tokenize::{jaccard, keyword_overlap, token_set, token_set_by};
 pub use values::{extract_values, values_compatible, Value};

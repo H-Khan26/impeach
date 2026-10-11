@@ -40,40 +40,25 @@ impl Default for Normalization {
 }
 
 impl Normalization {
-    /// Lowercases and trims `name`, then strips each configured prefix and suffix in order.
+    /// Lowercases (if configured) and strips `name`, then removes each configured prefix and
+    /// suffix in order (see [`ce_text::normalize_entity_name`]).
     pub fn normalize_entity_name(&self, name: &str) -> String {
-        if name.is_empty() {
-            return String::new();
-        }
-        let mut normalized = if self.lowercase {
-            name.to_lowercase().trim().to_owned()
-        } else {
-            name.trim().to_owned()
-        };
-        for prefix in &self.entity_name_prefixes {
-            if let Some(rest) = normalized.strip_prefix(prefix.as_str()) {
-                normalized = rest.to_owned();
-            }
-        }
-        for suffix in &self.entity_name_suffixes {
-            if let Some(rest) = normalized.strip_suffix(suffix.as_str()) {
-                normalized = rest.to_owned();
-            }
-        }
-        normalized.trim().to_owned()
+        ce_text::normalize_entity_name(
+            name,
+            &self.entity_name_prefixes,
+            &self.entity_name_suffixes,
+            self.lowercase,
+        )
     }
 
-    /// Splits on non-alphanumeric characters, dropping stopwords and short tokens.
+    /// Splits on non-alphanumeric characters, dropping stopwords and short tokens (see
+    /// [`ce_text::token_set_by`]).
     pub fn tokenize(&self, text: &str) -> HashSet<String> {
-        let processed = if self.lowercase { text.to_lowercase() } else { text.to_owned() };
-        processed
-            .split(|c: char| !c.is_alphanumeric())
-            .filter(|token| {
-                !token.is_empty()
-                    && !self.stopwords.contains(*token)
-                    && token.chars().count() >= self.min_token_length
-            })
-            .map(str::to_owned)
-            .collect()
+        ce_text::token_set_by(
+            text,
+            |token| self.stopwords.contains(token),
+            self.min_token_length,
+            self.lowercase,
+        )
     }
 }

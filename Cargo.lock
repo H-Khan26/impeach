@@ -53,6 +53,7 @@ name = "ce-config"
 version = "0.1.0"
 dependencies = [
  "ce-core",
+ "ce-text",
  "include_dir",
  "indexmap",
  "pretty_assertions",

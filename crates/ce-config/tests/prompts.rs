@@ -105,6 +105,22 @@ fn combined_template_rules() {
 }
 
 #[test]
+fn ed_prompt_with_only_one_template_is_detected() {
+    let user_only = r#"{"user_template": "U {payload_json}"}"#;
+    let expected =
+        EdPrompt { system_template: String::new(), user_template: "U {payload_json}".into() };
+    assert_eq!(
+        PromptTemplate::from_json_str(user_only, "x.json").expect("user_template only"),
+        PromptTemplate::Ed(expected)
+    );
+    let system_only = r#"{"system_template": "S"}"#;
+    assert!(matches!(
+        PromptTemplate::from_json_str(system_only, "x.json"),
+        Ok(PromptTemplate::Ed(EdPrompt { .. }))
+    ));
+}
+
+#[test]
 fn malformed_prompts_fail() {
     assert!(matches!(
         PromptTemplate::from_json_str(r#"{"foo": 1}"#, "x.json"),

@@ -3,7 +3,8 @@
 //! Three shapes exist: the ED disambiguation prompt (`system_template` / `user_template`),
 //! fact extraction prompts (single-pass and multi-pass: `system_messages`,
 //! `user_prompt_template`, optional examples) and the Qwen judge prompt (`system` /
-//! `user_template`). [`PromptTemplate`] detects the shape from its keys. Example outputs
+//! `user_template`). [`PromptTemplate`] detects the shape from its keys: extraction keys
+//! first, then `system` (judge), then `system_template` or `user_template` (ED). Example outputs
 //! stay as raw JSON until the fact extractor types them.
 
 use std::path::Path;
@@ -34,10 +35,10 @@ impl PromptTemplate {
         let has = |key: &str| value.get(key).is_some();
         if has("system_messages") || has("user_prompt_template") {
             serde_json::from_value(value).map(Self::Extraction).map_err(json_error)
-        } else if has("system_template") {
-            serde_json::from_value(value).map(Self::Ed).map_err(json_error)
         } else if has("system") {
             serde_json::from_value(value).map(Self::Judge).map_err(json_error)
+        } else if has("system_template") || has("user_template") {
+            serde_json::from_value(value).map(Self::Ed).map_err(json_error)
         } else {
             Err(ConfigError::PromptKind { path: origin.to_owned(), expected: "a known" })
         }

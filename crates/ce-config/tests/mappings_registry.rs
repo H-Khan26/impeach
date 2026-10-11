@@ -408,6 +408,7 @@ fn normalize_entity_name() {
         ("The Acme Corporation", "acme"),
         ("", ""),
         ("   ", ""),
+        ("\u{1c}The Acme Inc\u{1c}", "acme"),
     ] {
         assert_eq!(n.normalize_entity_name(input), expected, "{input:?}");
     }
@@ -465,6 +466,8 @@ fn normalize_mention_name() {
     assert_eq!(q.normalize_mention_name("John\nSmith"), "John Smith");
     assert_eq!(q.normalize_mention_name("John   Smith"), "John Smith");
     assert_eq!(q.normalize_mention_name("  John Smith  "), "John Smith");
+    // Python str.split() treats the information separators U+001C..U+001F as whitespace.
+    assert_eq!(q.normalize_mention_name("John\u{1c}Smith\u{1f}"), "John Smith");
 }
 
 // ---------------------------------------------------------------------------

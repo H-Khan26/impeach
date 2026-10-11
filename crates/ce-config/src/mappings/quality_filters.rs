@@ -140,11 +140,12 @@ impl QualityFilters {
         self.additional_regexes.iter().any(|re| re.is_match(name))
     }
 
-    /// Replaces newlines with spaces and collapses whitespace (when `normalize_names` is set).
+    /// Collapses whitespace runs to one space and strips the ends (when `normalize_names` is
+    /// set), with Python `str.split()` whitespace semantics.
     pub fn normalize_mention_name(&self, name: &str) -> String {
         if !self.normalize_names {
             return name.to_owned();
         }
-        name.replace('\n', " ").split_whitespace().collect::<Vec<_>>().join(" ")
+        ce_text::normalize_whitespace(name)
     }
 }
