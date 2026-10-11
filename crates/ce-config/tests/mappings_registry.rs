@@ -293,6 +293,31 @@ fn every_shipped_pattern_compiles() {
 }
 
 #[test]
+fn malformed_pattern_fails_at_load() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    for file in MAPPING_FILES {
+        std::fs::copy(assets_mappings_dir().join(file), dir.path().join(file)).expect("copy");
+    }
+    let patterns = dir.path().join("detection_patterns.yaml");
+    let text = std::fs::read_to_string(&patterns).expect("read");
+    let broken = text.replacen(
+        "ed_patterns:
+",
+        "ed_patterns:
+  broken_key:
+    pattern: '(unclosed'
+",
+        1,
+    );
+    assert_ne!(broken, text, "ed_patterns section found");
+    std::fs::write(&patterns, broken).expect("write");
+    match MappingsRegistry::from_dir(dir.path()) {
+        Err(ConfigError::Regex { name, .. }) => assert_eq!(name, "ed_patterns.broken_key"),
+        other => panic!("expected a regex error, got {other:?}"),
+    }
+}
+
+#[test]
 fn compiled_patterns_are_cached() {
     let d = &registry().detection_patterns;
     let a = d.get_compiled_pattern("docket_entry").expect("docket_entry");

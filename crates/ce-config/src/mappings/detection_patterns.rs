@@ -1,14 +1,13 @@
 //! Regex detector and ED structured-key patterns (`detection_patterns.yaml`).
 
-use std::sync::OnceLock;
-
 use indexmap::IndexMap;
 use regex::Regex;
 use serde::Deserialize;
 
 use super::{build_regex, RegexFlag};
+use crate::error::{ConfigError, Result};
 
-/// Named regex patterns, compiled lazily on first use and cached.
+/// Named regex patterns, compiled once when the registry loads.
 #[derive(Debug, Clone, PartialEq, Default, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct DetectionPatterns {
@@ -42,7 +41,7 @@ pub struct PatternDef {
     #[serde(default)]
     pub description: Option<String>,
     #[serde(skip)]
-    compiled: OnceLock<Option<Regex>>,
+    compiled: Option<Regex>,
 }
 
 impl PartialEq for PatternDef {
@@ -57,21 +56,32 @@ impl PartialEq for PatternDef {
 }
 
 impl PatternDef {
-    /// The compiled regex, or `None` (logged once) if the pattern does not compile.
-    pub fn compiled(&self, name: &str) -> Option<&Regex> {
-        self.compiled
-            .get_or_init(|| match build_regex(&self.pattern, self.flags, false) {
-                Ok(regex) => Some(regex),
-                Err(err) => {
-                    tracing::error!("Invalid regex pattern '{name}': {err}");
-                    None
-                }
-            })
-            .as_ref()
+    /// The compiled regex; `None` only for a definition that was not loaded through the
+    /// registry.
+    pub fn compiled(&self) -> Option<&Regex> {
+        self.compiled.as_ref()
     }
 }
 
 impl DetectionPatterns {
+    /// Compiles every detection and ED pattern; `file` names the source in errors.
+    pub(crate) fn compile(&mut self, file: &str) -> Result<()> {
+        let sections = [("patterns", &mut self.patterns), ("ed_patterns", &mut self.ed_patterns)];
+        for (section, defs) in sections {
+            for (name, def) in defs.iter_mut() {
+                let regex = build_regex(&def.pattern, def.flags, false).map_err(|source| {
+                    ConfigError::Regex {
+                        file: file.to_owned(),
+                        name: format!("{section}.{name}"),
+                        source: Box::new(source),
+                    }
+                })?;
+                def.compiled = Some(regex);
+            }
+        }
+        Ok(())
+    }
+
     /// Pattern definition by name; detection patterns shadow ED patterns.
     pub fn get_pattern_def(&self, name: &str) -> Option<&PatternDef> {
         self.patterns.get(name).or_else(|| self.ed_patterns.get(name))
@@ -79,7 +89,7 @@ impl DetectionPatterns {
 
     /// Compiled regex by name (detection patterns first, then ED patterns).
     pub fn get_compiled_pattern(&self, name: &str) -> Option<&Regex> {
-        self.get_pattern_def(name).and_then(|def| def.compiled(name))
+        self.get_pattern_def(name).and_then(PatternDef::compiled)
     }
 
     /// Entity type of a pattern.

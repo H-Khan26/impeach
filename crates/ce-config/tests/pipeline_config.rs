@@ -547,3 +547,26 @@ fn service_config_defaults_match_python() {
     assert_eq!(d.intra_doc_filter.quantitative_relationships.len(), 11);
     assert_eq!(d.intra_doc_filter.role_relationships.len(), 13);
 }
+
+#[test]
+fn mappings_block_is_required_but_its_paths_are_not_read() {
+    let text = v17_text()
+        .replace(
+            "contradiction_engine/config/mappings/entity_types.yaml",
+            "does/not/exist/entity_types.yaml",
+        )
+        .replace(
+            "contradiction_engine/config/mappings/relationship_types.yaml",
+            "does/not/exist/relationship_types.yaml",
+        );
+    let config = parse(&text).expect("mapping paths are not resolved at load time");
+    config.validate().expect("mapping paths are not validated");
+    assert_eq!(config.mappings.entity_mappings, "does/not/exist/entity_types.yaml");
+
+    let without_block = replace_once(
+        &v17_text(),
+        "  relationship_types: \"contradiction_engine/config/mappings/relationship_types.yaml\"",
+        "",
+    );
+    assert!(parse_error(&without_block).contains("relationship_types"));
+}

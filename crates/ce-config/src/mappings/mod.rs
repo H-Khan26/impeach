@@ -152,7 +152,9 @@ impl MappingsRegistry {
         let (taxonomy, _) = load(&read, "fact_categorization.yaml")?;
         let (entity_types, _) = load(&read, "entity_types.yaml")?;
         let (relationship_types, _) = load(&read, "relationship_types.yaml")?;
-        let (detection_patterns, _) = load(&read, "detection_patterns.yaml")?;
+        let (mut detection_patterns, patterns_origin): (DetectionPatterns, _) =
+            load(&read, "detection_patterns.yaml")?;
+        detection_patterns.compile(&patterns_origin)?;
         let (detector_config, _) = load(&read, "detector_config.yaml")?;
         let (normalization, _) = load(&read, "normalization.yaml")?;
         let (mut quality_filters, quality_origin): (QualityFilters, _) =

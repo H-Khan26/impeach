@@ -12,7 +12,6 @@ use serde::{Deserialize, Deserializer};
 
 use crate::de::{deserialize_tagged, parse_yaml, NoFields, TaggedUnion};
 use crate::error::{ConfigError, Result};
-use crate::mappings::MappingsRegistry;
 
 /// Config versions this implementation accepts.
 pub const SUPPORTED_CONFIG_VERSIONS: &[&str] = &["2.0"];
@@ -66,11 +65,6 @@ impl PipelineConfig {
     /// First stage whose `type` equals `stage_type` (e.g. `"CoreferenceStage"`).
     pub fn get_stage_config(&self, stage_type: &str) -> Option<&StageConfig> {
         self.stages.iter().find(|stage| stage.type_name() == stage_type)
-    }
-
-    /// The process-wide mappings registry (see [`MappingsRegistry::load`]).
-    pub fn get_mappings_registry(&self) -> Result<&'static MappingsRegistry> {
-        MappingsRegistry::load()
     }
 
     /// Reproduces the Pydantic validators; returns the first violation.
@@ -1174,6 +1168,11 @@ pub struct RagConfig {
 }
 
 /// `mappings:` block (paths to mapping files).
+///
+/// Parsed and required for YAML compatibility only; nothing reads these paths. The Python
+/// prototype consults them only as a fallback when its mappings registry fails to load, and here
+/// a registry load failure is an error. Mappings come from [`crate::MappingsRegistry`], which
+/// always loads the ten files from `config/mappings/`.
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct MappingsPaths {
