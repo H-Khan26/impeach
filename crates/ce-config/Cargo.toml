@@ -15,6 +15,8 @@ yaml_serde.workspace = true
 thiserror.workspace = true
 regex.workspace = true
 include_dir.workspace = true
+indexmap.workspace = true
+tracing.workspace = true
 
 [dev-dependencies]
 pretty_assertions.workspace = true
