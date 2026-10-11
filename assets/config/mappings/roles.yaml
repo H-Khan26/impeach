@@ -1,0 +1,123 @@
+# Role and Definition Configuration
+# Used by DefinitionExtractor to identify and bind role terms to entities
+
+# Known role terms by category
+# These are used to identify potential role references in documents
+role_seed_list:
+  litigation:
+    - "Plaintiff"
+    - "Defendant"
+    - "Appellant"
+    - "Appellee"
+    - "Petitioner"
+    - "Respondent"
+    - "Claimant"
+    - "Counter-Claimant"
+    - "Third-Party Defendant"
+    
+  transactional:
+    - "Buyer"
+    - "Seller"
+    - "Purchaser"
+    - "Vendor"
+    - "Landlord"
+    - "Tenant"
+    - "Lessor"
+    - "Lessee"
+    - "Lender"
+    - "Borrower"
+    - "Grantor"
+    - "Grantee"
+    - "Mortgagor"
+    - "Mortgagee"
+    - "Licensor"
+    - "Licensee"
+    
+  corporate:
+    - "Company"
+    - "Corporation"
+    - "Board"
+    - "Manager"
+    - "Director"
+    - "Officer"
+    - "Shareholder"
+    - "Member"
+    - "Partner"
+    - "Agent"
+    - "Principal"
+    
+  employment:
+    - "Employer"
+    - "Employee"
+    - "Worker"
+    - "Contractor"
+    - "Consultant"
+
+# Regex patterns for explicit definition extraction
+# Each pattern should have named groups: entity_name and defined_term
+definition_patterns:
+  # Pattern: John Smith ("Plaintiff")
+  - name: "parenthetical_quoted"
+    pattern: '(?P<entity_name>[A-Z][a-zA-Z\s,\.]+?)\s*\(\s*["\"](?:the\s+)?(?P<defined_term>[A-Z][a-zA-Z\-]+)["\"]?\s*\)'
+    confidence: 0.95
+    description: 'Matches: John Smith ("Plaintiff") or Jane Doe ("the Tenant")'
+    
+  # Pattern: Acme Corporation (the "Company")
+  - name: "parenthetical_with_article"
+    pattern: '(?P<entity_name>[A-Z][a-zA-Z\s,\.]+?(?:Inc|LLC|Corp|Ltd|Co|Company|Corporation)?\.?)\s*\(\s*the\s+["\"](?P<defined_term>[A-Z][a-zA-Z\-]+)["\"]?\s*\)'
+    confidence: 0.95
+    description: 'Matches: Acme Inc. (the "Company")'
+    
+  # Pattern: John Smith, hereinafter "Plaintiff"
+  - name: "hereinafter_quoted"
+    pattern: '(?P<entity_name>[A-Z][a-zA-Z\s,\.]+?),?\s+hereinafter\s+(?:referred to as\s+)?["\"](?:the\s+)?(?P<defined_term>[A-Z][a-zA-Z\-]+)["\"]?'
+    confidence: 0.90
+    description: 'Matches: John Smith, hereinafter "Plaintiff"'
+    
+  # Pattern: John Smith, hereinafter referred to as the Plaintiff
+  - name: "hereinafter_unquoted"
+    pattern: '(?P<entity_name>[A-Z][a-zA-Z\s,\.]+?),?\s+hereinafter\s+referred to as\s+(?:the\s+)?(?P<defined_term>[A-Z][a-zA-Z\-]+)'
+    confidence: 0.85
+    description: "Matches: John Smith, hereinafter referred to as the Plaintiff"
+    
+  # Pattern: John Smith (hereafter "Plaintiff")
+  - name: "hereafter_quoted"
+    pattern: '(?P<entity_name>[A-Z][a-zA-Z\s,\.]+?)\s*\(\s*hereafter\s+["\"](?:the\s+)?(?P<defined_term>[A-Z][a-zA-Z\-]+)["\"]?\s*\)'
+    confidence: 0.90
+    description: 'Matches: John Smith (hereafter "Plaintiff")'
+    
+  # Pattern: defined as quotes - "Plaintiff" defined as John Smith
+  - name: "defined_as"
+    pattern: '["\"](?:the\s+)?(?P<defined_term>[A-Z][a-zA-Z\-]+)["\"]?\s+(?:is\s+)?defined\s+as\s+(?P<entity_name>[A-Z][a-zA-Z\s,\.]+)'
+    confidence: 0.85
+    description: 'Matches: "Plaintiff" defined as John Smith'
+
+# Normalization rules for role terms
+# Convert variations to canonical forms
+role_normalization:
+  "PLAINTIFFS": "PLAINTIFF"
+  "DEFENDANTS": "DEFENDANT"
+  "APPELLANTS": "APPELLANT"
+  "APPELLEES": "APPELLEE"
+  "BUYERS": "BUYER"
+  "SELLERS": "SELLER"
+  "LANDLORDS": "LANDLORD"
+  "TENANTS": "TENANT"
+  "LESSORS": "LESSOR"
+  "LESSEES": "LESSEE"
+  "LENDERS": "LENDER"
+  "BORROWERS": "BORROWER"
+
+# Exclusion patterns - terms that look like roles but aren't
+# These are common false positives
+exclusions:
+  - "Board of Directors"  # Too generic
+  - "Management"  # Too generic
+  - "Court"  # Not a party
+  - "Judge"  # Not a party
+  - "Jury"  # Not a party
+  - "Witness"  # Not a party (usually)
+  
+# Minimum confidence threshold for accepting a definition
+min_confidence: 0.75
+

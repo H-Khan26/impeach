@@ -1,0 +1,124 @@
+# Relationship Type Configuration
+# Defines valid relationship types and their semantic classifications.
+#
+# Used for:
+# - Fact extraction validation
+# - Intra-document contradiction filtering (only compare facts with compatible relationships)
+# - Knowledge graph edge types
+
+# Valid relationship types for fact extraction
+# These are the normalized relationship predicates used in assertion triples
+relationship_types:
+  - FOUNDED_BY
+  - EMPLOYED_BY
+  - LOCATED_IN
+  - PART_OF
+  - MENTIONS
+  - RELATED_TO
+  - OCCURRED_ON
+  - OCCURRED_AT
+  - HAS_PROPERTY
+  - CAUSED_BY
+  - RESULTED_IN
+  - OTHER
+
+# Relationship classifications for intra-document contradiction filtering
+# Facts with relationships in the SAME category can potentially contradict each other
+# Facts with relationships in DIFFERENT categories are unlikely to contradict
+relationship_classifications:
+  # Temporal relationships - dates, events, state transitions
+  # These facts about timing can contradict each other
+  temporal:
+    - hired
+    - started
+    - joined
+    - left
+    - terminated
+    - resigned
+    - founded
+    - established
+    - created
+    - dissolved
+    - closed
+    - occurred
+    - happened
+    - began
+    - ended
+    - completed
+    - born
+    - died
+    - married
+    - divorced
+    - arrived
+    - departed
+    - commenced
+    - concluded
+
+  # Quantitative relationships - numbers, amounts, counts, measurements
+  # These facts about quantities can contradict each other
+  quantitative:
+    - earned
+    - paid
+    - cost
+    - valued
+    - worth
+    - employed
+    - counted
+    - numbered
+    - measured
+    - weighed
+    - sized
+    - totaled
+    - amounted
+    - priced
+    - charged
+    - invoiced
+
+  # Role relationships - positions, titles, reporting structures
+  # These facts about roles can contradict each other
+  role:
+    - ceo
+    - president
+    - director
+    - manager
+    - supervisor
+    - employee
+    - contractor
+    - owner
+    - founder
+    - partner
+    - reports_to
+    - supervised_by
+    - managed_by
+    - works_for
+    - leads
+    - heads
+    - chairs
+
+  # Location relationships - where things are/were
+  # These facts about location can contradict each other
+  location:
+    - located_at
+    - situated_in
+    - positioned_at
+    - placed_in
+    - moved_to
+    - transferred_to
+    - based_in
+    - headquartered_in
+
+  # State relationships - conditions, statuses
+  # These facts about state can contradict each other
+  state:
+    - was_restrained
+    - was_not_restrained
+    - was_injured
+    - was_not_injured
+    - was_present
+    - was_absent
+    - was_aware
+    - was_unaware
+
+# Default relationship type when extraction produces unknown type
+defaults:
+  relationship_type: OTHER

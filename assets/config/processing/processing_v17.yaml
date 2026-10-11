@@ -1,0 +1,229 @@
+# Processing v17 Pipeline Configuration
+# ======================================
+
+# Usage:
+#   from contradiction_engine.api import run_processing
+#   result = run_processing("ingested.jsonl", config_path="contradiction_engine/config/processing/processing_v17.yaml")
+
+config_version: "2.0"
+
+pipeline:
+  name: "processing_v17"
+
+# Stages are processed in order. Disable stages by setting enabled: false
+stages:
+  - type: RAGIndexStage
+    name: rag_index
+    enabled: true
+    offline: false
+
+  - type: MentionStage
+    name: mention_detection
+    enabled: true
+    min_mention_length: 3
+    short_confidence_threshold: 0.75
+    filter_partial_words: true
+    normalize_names: true
+    detectors:
+      - type: "eyecite"
+      - type: "regex"
+      - type: "gliner2"
+        model_name_suffix: "gliner2"
+        min_score: 0.4
+        label_set: "legal_entities"
+
+  - type: DefinitionStage
+    name: definition_extraction
+    enabled: true
+
+  - type: CoreferenceStage
+    name: coreference
+    enabled: true
+    model_name_suffix: "coref"
+    max_doc_chars: 100000
+    eligible_types:
+      - "PER"
+      - "ORG"
+      - "LOC"
+    min_overlap_fraction: 0.5
+    max_mentions_per_span: 1
+    cluster_jaccard_threshold: 0.8
+    merge_overlapping_clusters: true
+    incompatible_type_groups:
+      - ["PER"]
+      - ["PRODUCT", "FACILITY"]
+      - ["DATE", "TIME"]
+    max_type_groups_per_cluster: 1
+    drop_mixed_type_clusters: true
+    synthesize_pronoun_mentions: true
+    pronoun_confidence: 0.85
+
+  - type: EDStage
+    name: ed_resolution
+    enabled: true
+    allow_llm: true
+    llm_only: false
+    create_if_missing: true
+    prompt_file: "contradiction_engine/prompts/ed/disambiguation.json"
+    max_candidates: 10
+    enable_intra_doc_matching: true
+    min_embedding_similarity: 0.55
+    hybrid_similarity_threshold: 0.72
+    reuse_similarity_threshold: 0.72
+    enable_similarity_retrieval: true
+    cross_doc_reuse_boost: 0.05
+    entity_retrieval_strategy: "bm25"
+    vector_fuzzy_overfetch_multiplier: 3
+    vector_fuzzy_min_similarity: 0.5
+    vector_fuzzy_vector_weight: 0.4
+    vector_fuzzy_fuzzy_weight: 0.6
+
+  - type: RelationStage
+    name: relation_extraction
+    enabled: true
+    model_name_suffix: "gliner2"
+    relation_label_set: "legal_relations"
+
+  - type: FactStage
+    name: fact_extraction
+    enabled: true
+    extraction_mode: "processing"
+    commit_facts: false
+    prompt_files:
+      - "contradiction_engine/prompts/processing/singlepass/processing_single_v3.json"
+    parallel: false
+    max_workers: 1
+    model_type: "ollama"
+    use_resolved_text_view: true
+
+  - type: ContradictionCheckStage
+    name: contradiction_check
+    enabled: true
+    
+    # NEW: Verification Strategy Configuration
+    # ========================================
+    # This block enables configurable contradiction detection strategies.
+    # You can switch between NLI and Qwen judges, and between dual-path
+    # and permissive gating, without changing any other code.
+    verification:
+      # Judge model selection: "nli" (DeBERTa) or "qwen" (Ollama LLM)
+      judge_model: "nli"
+      
+      # Gating strategy: "dual_path" (Path A/B OR Logic) or "permissive" (new)
+      gating_strategy: "dual_path"
+      
+      # Hard filter settings (permissive gating only)
+      # These immediately reject clearly unrelated pairs
+      allow_text_value_type_mismatch: true  # Allow TEXT to pair with any type
+      require_entity_id_match: false  # Don't require same subject entity IDs
+      
+      # Permissive trigger thresholds (permissive gating only)
+      # Pass pair to judge if ANY trigger fires
+      semantic_proximity_threshold: 0.60  # Embedding similarity threshold
+      keyword_overlap_threshold: 0.30  # Jaccard token overlap threshold
+      
+      # Qwen-specific settings (used when judge_model = "qwen")
+      qwen_prompt_file: "contradiction_engine/prompts/processing/qwen_judge.json"
+      qwen_batch_size: 5  # Batch pairs for efficiency (future optimization)
+    
+    # Existing configuration (still used for retrieval and backward compatibility)
+    retrieval:
+      bm25_limit: 8
+      vector_limit: 8
+      max_candidates: 25
+      graph_weight: 1.0
+      bm25_weight: 0.9
+      vector_weight: 0.8
+      multi_source_boost: 1.2
+      min_score: 0.0
+      fact_retrieval_strategy: "vector"
+    
+    # Pre-filter settings (used when gating_strategy = "dual_path")
+    # These are ignored when using permissive gating
+    pre_filter:
+      min_text_overlap: 0.15
+      require_entity_overlap: false
+      use_assertion_boost: true
+      enable_text_overlap_fallback: true
+      use_semantic_similarity_fallback: true
+      semantic_similarity_threshold: 0.60
+      subject_overlap_threshold: 0.4
+      predicate_similarity_threshold: 0.6
+      fuzzy_match_threshold: 0.6
+    
+    # Intra-document filter settings
+    intra_doc_filter:
+      min_text_overlap: 0.15
+      require_assertion_overlap: true
+    
+    # NLI settings (used when judge_model = "nli")
+    nli:
+      model_name_suffix: "deberta_nli"
+      contradiction_threshold: 0.80
+      review_threshold: 0.60
+    
+    intra_document:
+      enabled: true
+      commit_as_we_go: false
+    
+    # SQLite review store is off by default. run_processing(db_path=...)
+    # force-enables it with the given path.
+    review_store:
+      db_path: "data/output/contradiction_review.sqlite3"
+      enabled: false
+      fail_on_sqlite_error: true
+
+# Model configurations - all fields required
+models:
+  ollama:
+    model: "qwen2.5:7b-instruct-q4_K_M"
+    base_url: "http://localhost:11434"
+    temperature: 0.2
+    num_ctx: 16384
+
+  coref:
+    backend: "fastcoref"
+    device: "cpu"
+
+  bge:
+    model: "BAAI/bge-small-en-v1.5"
+    device: "cpu"
+    normalize_embeddings: true
+    batch_size: 64
+
+  deberta_nli:
+    model: "cross-encoder/nli-deberta-v3-large"
+    device: "cpu"
+
+  gliner2:
+    model: "fastino/gliner2-base-v1"
+    device: "cpu"
+    threshold: 0.4
+
+# Helix database configuration (HelixDB v3)
+#   mode: embedded = on-disk database under data_dir (one writer process at a time)
+#         memory   = in-process database, discarded at exit
+#         server   = remote HelixDB server at url
+helix:
+  mode: "embedded"
+  data_dir: "data/helix"
+  url: null
+  namespace: "processing_v17"
+  api_key: ""
+  batch_size: 50
+  embedding_dim: 384
+
+# RAG pipeline configuration
+rag:
+  chunking:
+    strategy: "sentence"
+    chunk_size: 1500
+    chunk_overlap: 150
+    include_sentence_spans: true
+
+# Mapping files
+mappings:
+  entity_mappings: "contradiction_engine/config/mappings/entity_types.yaml"
+  domain_mappings: "contradiction_engine/config/mappings/entity_types.yaml"
+  relationship_types: "contradiction_engine/config/mappings/relationship_types.yaml"
+

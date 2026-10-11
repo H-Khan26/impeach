@@ -1,0 +1,69 @@
+[
+  {
+    "speaker": "Attorney Smith",
+    "role": "attorney",
+    "text": "Good morning. Can you please state your name for the record?",
+    "timestamp": "2024-01-15T09:00:00Z"
+  },
+  {
+    "speaker": "Jane Doe",
+    "role": "witness",
+    "text": "My name is Jane Doe.",
+    "timestamp": "2024-01-15T09:00:05Z"
+  },
+  {
+    "speaker": "Attorney Smith",
+    "role": "attorney",
+    "text": "Ms. Doe, were you the CEO of Acme Corporation from 2010 until 2015?",
+    "timestamp": "2024-01-15T09:00:10Z"
+  },
+  {
+    "speaker": "Jane Doe",
+    "role": "witness",
+    "text": "I was never the CEO of that company.",
+    "timestamp": "2024-01-15T09:00:15Z"
+  },
+  {
+    "speaker": "Attorney Smith",
+    "role": "attorney",
+    "text": "So you're saying you were never the CEO of Acme Corporation?",
+    "timestamp": "2024-01-15T09:00:20Z"
+  },
+  {
+    "speaker": "Jane Doe",
+    "role": "witness",
+    "text": "That's correct. I was never the CEO.",
+    "timestamp": "2024-01-15T09:00:25Z"
+  },
+  {
+    "speaker": "Attorney Smith",
+    "role": "attorney",
+    "text": "Can you tell me about your role at Acme Corporation during that time period?",
+    "timestamp": "2024-01-15T09:00:30Z"
+  },
+  {
+    "speaker": "Jane Doe",
+    "role": "witness",
+    "text": "I was the Chief Operating Officer from 2012 to 2016.",
+    "timestamp": "2024-01-15T09:00:35Z"
+  },
+  {
+    "speaker": "Attorney Smith",
+    "role": "attorney",
+    "text": "And when did you first join Acme Corporation?",
+    "timestamp": "2024-01-15T09:00:40Z"
+  },
+  {
+    "speaker": "Jane Doe",
+    "role": "witness",
+    "text": "I joined the company in 2010 as a senior executive.",
+    "timestamp": "2024-01-15T09:00:45Z"
+  },
+  {
+    "speaker": "Attorney Smith",
+    "role": "attorney",
+    "text": "Thank you. That's all for now.",
+    "timestamp": "2024-01-15T09:00:50Z"
+  }
+]
+

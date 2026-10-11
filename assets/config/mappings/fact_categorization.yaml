@@ -1,0 +1,165 @@
+# Fact Taxonomy Configuration
+# Defines structural types and temporal contexts for the contradiction engine.
+#
+# NOTE: Domain-specific fact categories have been REMOVED (2025-01).
+# The previous categories (INCIDENT_DATE, SPEED, WEATHER, etc.) were overfitted
+# to a specific test case (vehicle incidents) and caused poor generalization.
+#
+# Contradiction detection now uses domain-agnostic structural types (value_type
+# and property_type) combined with subject/entity matching for gating.
+
+# Temporal context values for fact classification
+# Determines whether a fact relates to the current incident or prior events
+temporal_contexts:
+  - current_incident    # Fact relates to the incident being litigated
+  - prior_incident      # Fact relates to a previous event
+  - general_claim       # General statement not tied to specific incident
+
+# =============================================================================
+# Domain-agnostic structural types for fact pairing
+# =============================================================================
+# These enable contradiction detection across any domain without requiring
+# domain-specific category lists. Facts are classified by their STRUCTURE
+# (what kind of value and property) rather than their TOPIC.
+value_types:
+  # NUMERIC: Pure numbers (optionally with units) expressing an amount, rate, or score.
+  # Use when the core value is a number, even if written in words ("three", "ten").
+  # Examples: "35 mph", "$2,000", "3 passengers", "70%", "ten days".
+  - NUMERIC
+
+  # TEMPORAL_POINT: A single point in time (even if approximate).
+  # Answers "WHEN (exactly)?" for an event or state.
+  # Examples: "March 5, 2023", "5:30 p.m.", "2021", "Q1 2024".
+  - TEMPORAL_POINT
+
+  # TEMPORAL_INTERVAL: A duration or span between two times.
+  # Answers "HOW LONG?" or "DURING WHAT PERIOD?" rather than just "when?".
+  # Examples: "for three hours", "from 2018 to 2020", "during the past 10 years".
+  - TEMPORAL_INTERVAL
+
+  # LOCATION: Physical, geographic, or spatial locations.
+  # Answers "WHERE?" (place/position), not "what type/state?".
+  # Examples: "San Francisco", "123 Main St", "northbound on Highway 101",
+  #           "second-floor hallway", "intersection of A and B".
+  - LOCATION
+
+  # BOOLEAN: Yes/no, presence/absence, or true/false facts.
+  # Use when the claim could naturally be expressed as "X is true" or "X is false".
+  # Examples: "seatbelt was worn", "seatbelt was not worn",
+  #           "no prior accidents", "feature is enabled", "product was not recalled".
+  # DO NOT use BOOLEAN when the value is a descriptive label like "clear", "red", "dry" —
+  # those should be CATEGORICAL.
+  - BOOLEAN
+
+  # CATEGORICAL: Discrete labels, roles, types, or statuses.
+  # Use for SHORT LABELS chosen from a conceptual set (color, role, severity, type, status).
+  # Examples: "clear weather", "red light", "full-time", "gold tier",
+  #           "critical severity", "manager", "passenger".
+  # If the value is a longer description or sentence, prefer TEXT instead.
+  - CATEGORICAL
+
+  # ENTITY_REF: Reference to another entity in the knowledge graph (person, org, product, case, etc.).
+  # Use when the value IS another entity, not a descriptive label.
+  # Prefer the resolved entity name/ID when available.
+  # Examples: "Maria Lopez", "Green Valley Trucking", "Server A",
+  #           "Case 21-CV-0042", "Building 2".
+  - ENTITY_REF
+
+  # TEXT: Free-form descriptive text that does NOT clearly fit any more specific value type.
+  # Use as a fallback for richer descriptions that are not just a label/number/time/place.
+  # Examples: "cluttered with boxes and loose cables",
+  #           "user reported intermittent lag when streaming video".
+  # Avoid TEXT for short labels that could be CATEGORICAL, or for numeric/time/location values.
+  - TEXT
+property_types:
+  # TEMPORAL: When something happened OR how long it lasted.
+  # Answers "WHEN?" or "FOR HOW LONG?" about the subject.
+  # Examples (predicates): occurred_on, occurred_at, started_at, ended_at,
+  #                        lasted_for, was_valid_during.
+  # Typical pairs:
+  #   TEMPORAL_POINT + TEMPORAL      ("occurred_on March 5, 2023")
+  #   TEMPORAL_INTERVAL + TEMPORAL   ("lasted for three hours").
+  - TEMPORAL
+
+  # QUANTITATIVE: Numeric magnitudes, counts, or rates.
+  # Answers "HOW MUCH?", "HOW MANY?", or "WHAT SCORE/RATE?" about the subject.
+  # Examples (predicates): traveled_at_speed, had_amount, had_count, had_score,
+  #                        weighed, cost_amount.
+  # Typical pairs:
+  #   NUMERIC + QUANTITATIVE         ("speed was 45 mph", "had 3 prior accidents").
+  # Do NOT use QUANTITATIVE for durations like "four weeks" — use TEMPORAL instead.
+  - QUANTITATIVE
+
+  # LOCATION: Where the subject was or where an event occurred.
+  # Answers "WHERE?" (place/position) and uses a LOCATION value.
+  # Examples (predicates): was_at, occurred_at, lived_in, resided_in,
+  #                        headquartered_in, stored_at.
+  # Use LOCATION whenever the core information is a place (incident location,
+  # residence, workplace, storage location), even if the sentence also implies
+  # that something happened there.
+  - LOCATION
+
+  # ATTRIBUTE: Types, categories, roles, states, conditions, or statuses OF THE SUBJECT.
+  # Answers "WHAT KIND?", "WHAT STATE/CONDITION/STATUS?" about the subject itself.
+  # Examples (predicates): is_type, has_role, has_color, had_state, had_status,
+  #                        had_condition, had_severity.
+  # Typical uses: job titles, weather type, injury severity, product tier,
+  #               system state, device condition ("was active", "was disabled").
+  # Do NOT use ATTRIBUTE when the value is a place — use LOCATION instead.
+  - ATTRIBUTE
+
+  # RELATION: Roles and relationships BETWEEN ENTITIES (subject ↔ other entity),
+  # including identity/equivalence.
+  # Answers "HOW IS THIS ENTITY RELATED TO THAT ENTITY?".
+  # Examples (predicates): is_employee_of, is_owner_of, is_member_of, represents,
+  #                        is_parent_of, is_supplier_for, is_driver_of,
+  #                        is_same_person_as.
+  # Typical pattern: subject is one entity, value_type is ENTITY_REF.
+  # If there is no second entity (only a label like "manager"), prefer ATTRIBUTE instead.
+  - RELATION
+
+  # EXISTENCE: Whether something existed, occurred, or was present/absent.
+  # Answers "DID THIS HAPPEN/EXIST/SHOW UP?".
+  # Examples (predicates): occurred, existed, was_present, did_not_occur,
+  #                        was_not_present.
+  # Use EXISTENCE when the main claim is purely existence or non-existence
+  # (e.g., "no collision occurred", "no warning signs were present"),
+  # not when focusing on where or when it happened (those should use LOCATION or TEMPORAL).
+  - EXISTENCE
+
+  # MODALITY: Obligations, permissions, abilities, requirements, or possibilities.
+  # Answers "WHAT MUST/MAY/CAN HAPPEN?" for the subject.
+  # Examples (predicates): must_pay, is_required_to, is_allowed_to, may, may_not,
+  #                        can_do, could_access, must_not.
+  # Typical uses: contract duties, policy requirements, permissions, capabilities.
+  - MODALITY
+
+
+# =============================================================================
+# Gating Strategy for Contradiction Detection
+# =============================================================================
+# Fact pairs must pass pre-filtering before being sent to NLI. The gating
+# strategy uses a dual-path OR logic:
+#
+# PATH A (Structural + Subject):
+#   1. value_type must match (e.g., both NUMERIC)
+#   2. property_type must match (e.g., both QUANTITATIVE)
+#   3. Subjects must have sufficient overlap (fuzzy match >= 0.5)
+#   4. Predicate embedding similarity > 0.7
+#
+# PATH B (Entity/Triple):
+#   1. Facts share at least one linked entity (subject_entity_id or object_entity_id)
+#   2. Subject AND object fuzzy match (Jaccard > 0.6)
+#
+# A pair is valid for NLI if EITHER path validates.
+#
+# KEY INSIGHT: Path A now requires SUBJECT OVERLAP, not just structural type
+# matching. This prevents false positives like:
+#   - "Plaintiff resides in San Francisco" vs "Defendant resides in Oakland"
+# which previously passed Path A because both are LOCATION/LOCATION.
+
+# Default values used when classification fails or is ambiguous
+defaults:
+  temporal_context: current_incident
+  value_type: TEXT
+  property_type: ATTRIBUTE

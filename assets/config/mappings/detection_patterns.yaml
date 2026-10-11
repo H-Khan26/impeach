@@ -1,0 +1,150 @@
+# Detection Patterns Configuration
+# Regex patterns for entity detection and resolution.
+#
+# Used by:
+# - services/ner/rules.py (RegexMentionDetector)
+# - services/ed/rule_resolvers.py (deterministic entity resolution)
+
+# Entity detection patterns
+# Each pattern defines how to find specific entity types in text
+patterns:
+  # Docket/Case Number patterns
+  # Matches: 2:23-cv-01492, No. 21-55555, 1:20-cr-123, Case No. 123-456
+  docket_entry:
+    pattern: '(?:No\.|Case No\.|Case\s*#?)\s*(\d+[:\-][\w\-]+)'
+    flags: IGNORECASE
+    entity_type: DOCKET_ENTRY
+    capture_group: 1
+    description: "Case/docket numbers in legal documents"
+
+  # Exhibit references
+  # Matches: Exhibit 12, Ex. 12A, Exh. 3, Deposition Exhibit 3
+  exhibit:
+    pattern: '(?:Exhibit|Ex\.|Exh\.)\s*([A-Za-z0-9\-]+)'
+    flags: IGNORECASE
+    entity_type: EXHIBIT_ID
+    capture_group: 1
+    description: "Trial exhibit references"
+
+  # Statute citations
+  # Matches: 42 U.S.C. 1983, 18 USC 1001(a), 28 U.S.C. 1332
+  statute:
+    pattern: '\d+\s+U\.?S\.?C\.?\s*(?:§|[Ss]ec(?:tion)?\.?)?\s*\d+(?:\s*\([a-z]\))?'
+    flags: IGNORECASE
+    entity_type: STATUTE
+    capture_group: 0
+    description: "United States Code citations"
+
+  # Federal Rule citations
+  # Matches: Fed. R. Civ. P. 12(b)(6), FRCP 56
+  federal_rule:
+    pattern: '(?:Fed\.?\s*R\.?\s*(?:Civ\.?|Crim\.?|App\.?|Evid\.?)\s*P\.?|FRCP|FRCRP|FRAP|FRE)\s*(\d+(?:\([a-z]\))?(?:\(\d+\))?)'
+    flags: IGNORECASE
+    entity_type: STATUTE
+    capture_group: 0
+    description: "Federal Rules citations"
+
+  # Money amounts
+  # Matches: $1,234.56, $1000, $1.5 million
+  money:
+    pattern: '\$[\d,]+(?:\.\d{2})?(?:\s*(?:million|billion|thousand|M|B|K))?'
+    flags: IGNORECASE
+    entity_type: MONEY
+    capture_group: 0
+    description: "Monetary amounts"
+
+  # Date patterns (basic)
+  # Matches: January 15, 2023, 01/15/2023, 2023-01-15
+  date:
+    pattern: '(?:(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}|\d{1,2}/\d{1,2}/\d{2,4}|\d{4}-\d{2}-\d{2})'
+    flags: IGNORECASE
+    entity_type: DATE
+    capture_group: 0
+    description: "Date references"
+
+# Order in which patterns are applied during detection
+# Earlier patterns take precedence for overlapping matches
+detection_order:
+  - docket_entry
+  - exhibit
+  - statute
+  - federal_rule
+  - money
+  - date
+
+# ED-specific patterns for rule resolvers
+# These may be more permissive or have different groupings than detection patterns
+ed_patterns:
+  # Case docket lookup pattern
+  case_docket:
+    pattern: '(?:No\.|Case No\.|Case\s*#?)\s*(\d+[:\-][\w\-]+)'
+    flags: IGNORECASE
+    description: "Extract docket number for case lookup"
+
+  # Exhibit ID extraction (captures: exhibit_id, optional party attribution)
+  exhibit_id:
+    pattern: "(?:(Plaintiff(?:'s)?|Defendant(?:'s)?|Defense|Government(?:'s)?)\\s+)?(?:Exhibit|Ex\\.|Exh\\.)\\s*([A-Za-z0-9\\-]+)"
+    flags: IGNORECASE
+    capture_groups:
+      1: party_attribution
+      2: exhibit_id
+    description: "Extract exhibit ID and party attribution for exhibit lookup"
+
+  # Simple exhibit ID (no party attribution)
+  exhibit_id_simple:
+    pattern: '(?:Exhibit|Ex\.|Exh\.)\s*([A-Za-z0-9\-]+)'
+    flags: IGNORECASE
+    description: "Extract exhibit ID for exhibit lookup"
+
+  # Statute normalization pattern - U.S. Code
+  statute_usc:
+    pattern: '(\d+)\s+U\.?S\.?C\.?\s*(?:§|[Ss]ec(?:tion)?\.?)?\s*(\d+)(?:\s*\(([a-z])\))?'
+    flags: IGNORECASE
+    capture_groups:
+      1: title
+      2: section
+      3: subsection
+    description: "Extract title, section, and subsection for USC citations"
+
+  # Federal Rules pattern
+  federal_rule:
+    pattern: '(?:Fed(?:eral)?\.?\s*R(?:ule)?\.?\s*(Civ(?:il)?|Crim(?:inal)?|App(?:ellate)?|Evid(?:ence)?)\.?\s*P(?:roc(?:edure)?)?\.?|FRCP|FRCRP|FRAP|FRE)\s*(\d+)(?:\s*\(([a-z])\))?(?:\s*\((\d+)\))?'
+    flags: IGNORECASE
+    capture_groups:
+      1: rule_type
+      2: rule_number
+      3: subdivision_letter
+      4: subdivision_number
+    description: "Extract federal rule type, number and subdivisions"
+
+  # Case citation pattern (e.g., 123 F.3d 456 (9th Cir. 2020))
+  case_citation:
+    pattern: '(\d+)\s+([A-Z][a-z]*\.?\s*(?:\d+[a-z]*\.?)?\s*(?:Supp\.?\s*(?:\d+[a-z]*)?)?)\s*(\d+)(?:\s*\(([^)]+)\s+(\d{4})\))?'
+    flags: IGNORECASE
+    capture_groups:
+      1: volume
+      2: reporter
+      3: page
+      4: court
+      5: year
+    description: "Extract volume, reporter, page, court, and year from case citations"
+
+  # Case caption pattern (e.g., Smith v. Jones)
+  case_caption:
+    pattern: '([A-Z][a-zA-Z\-'' ]+(?:\s+[A-Z][a-zA-Z\-'' ]+)*)\s+v\.?\s+([A-Z][a-zA-Z\-'' ]+(?:\s+[A-Z][a-zA-Z\-'' ]+)*)'
+    flags: NONE
+    capture_groups:
+      1: plaintiff
+      2: defendant
+    description: "Extract plaintiff and defendant from case caption"
+
+  # State statute pattern (e.g., Cal. Civ. Code 1234)
+  state_statute:
+    pattern: '([A-Z][a-z]{1,3})\.?\s+((?:Civ(?:il)?|Crim(?:inal)?|Pen(?:al)?|Bus(?:iness)?|Lab(?:or)?|Fam(?:ily)?|Prob(?:ate)?|Gov(?:ernment)?|Evid(?:ence)?|Health|Welf(?:are)?|Veh(?:icle)?|Ins(?:urance)?|Corp(?:orations)?|Com(?:mercial)?)\.?\s*(?:&\s*[A-Z][a-z]+\.?\s*)?(?:Code|Proc(?:edure)?)?\.?)\s*(?:§|[Ss]ec(?:tion)?\.?)?\s*(\d+(?:\.\d+)?)'
+    flags: IGNORECASE
+    capture_groups:
+      1: state
+      2: code_name
+      3: section
+    description: "Extract state, code type, and section from state statutes"
+

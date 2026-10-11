@@ -1,0 +1,77 @@
+{
+  "doc_id": "scenario_negation_001",
+  "title": "Negation Contradiction Test Scenarios",
+  "doc_type": "test_scenario",
+  "description": "Facts with explicit negation contradictions",
+  "ground_truth": [
+    {
+      "id": "neg_truth_1",
+      "text": "James Carter attended the board meeting on March 5th.",
+      "expected_contradiction_with": "neg_test_1"
+    },
+    {
+      "id": "neg_truth_2",
+      "text": "The safety report was submitted to the city inspector.",
+      "expected_contradiction_with": "neg_test_2"
+    },
+    {
+      "id": "neg_truth_3",
+      "text": "Sarah Miller confirmed the accuracy of the financial statements.",
+      "expected_contradiction_with": "neg_test_3"
+    },
+    {
+      "id": "neg_truth_4",
+      "text": "The defendant was present at the construction site that day.",
+      "expected_contradiction_with": "neg_test_4"
+    },
+    {
+      "id": "neg_truth_5",
+      "text": "The company approved the budget for Project Atlas.",
+      "expected_contradiction_with": "neg_test_5"
+    }
+  ],
+  "test_facts": [
+    {
+      "id": "neg_test_1",
+      "text": "James Carter did not attend the board meeting on March 5th.",
+      "expected_status": "contradiction",
+      "contradiction_type": "NEGATION",
+      "notes": "Explicit negation with 'did not'"
+    },
+    {
+      "id": "neg_test_2",
+      "text": "The safety report was never submitted to the city inspector.",
+      "expected_status": "contradiction",
+      "contradiction_type": "NEGATION",
+      "notes": "Negation with 'never'"
+    },
+    {
+      "id": "neg_test_3",
+      "text": "Sarah Miller denied the accuracy of the financial statements.",
+      "expected_status": "contradiction",
+      "contradiction_type": "NEGATION",
+      "notes": "Semantic negation: confirmed vs denied"
+    },
+    {
+      "id": "neg_test_4",
+      "text": "The defendant was absent from the construction site that day.",
+      "expected_status": "contradiction",
+      "contradiction_type": "NEGATION",
+      "notes": "Semantic negation: present vs absent"
+    },
+    {
+      "id": "neg_test_5",
+      "text": "The company rejected the budget for Project Atlas.",
+      "expected_status": "contradiction",
+      "contradiction_type": "NEGATION",
+      "notes": "Semantic negation: approved vs rejected"
+    }
+  ],
+  "metadata": {
+    "test_type": "negation_contradictions",
+    "expected_contradictions": 5,
+    "expected_needs_review": 0,
+    "expected_clean": 0
+  }
+}
+
