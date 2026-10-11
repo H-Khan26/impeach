@@ -1,0 +1,73 @@
+{
+  "doc_id": "scenario_entailment_001",
+  "title": "Entailment (Non-Contradiction) Test Scenarios",
+  "doc_type": "test_scenario",
+  "description": "Facts that are paraphrases or entailments - should NOT be flagged as contradictions",
+  "ground_truth": [
+    {
+      "id": "ent_truth_1",
+      "text": "Meridian Construction was founded in 2005 by a group of engineers."
+    },
+    {
+      "id": "ent_truth_2",
+      "text": "James Carter is the CEO of Meridian Construction."
+    },
+    {
+      "id": "ent_truth_3",
+      "text": "The company employs 500 people across three offices."
+    },
+    {
+      "id": "ent_truth_4",
+      "text": "Sarah Miller was hired as a Safety Inspector in March 2020."
+    },
+    {
+      "id": "ent_truth_5",
+      "text": "The project was completed on time and under budget."
+    }
+  ],
+  "test_facts": [
+    {
+      "id": "ent_test_1",
+      "text": "The founding of Meridian Construction took place in 2005.",
+      "expected_status": "clean",
+      "contradiction_type": null,
+      "notes": "Paraphrase of the founding - same meaning, different structure"
+    },
+    {
+      "id": "ent_test_2",
+      "text": "James Carter serves as Chief Executive Officer at Meridian Construction.",
+      "expected_status": "clean",
+      "contradiction_type": null,
+      "notes": "CEO = Chief Executive Officer - same meaning"
+    },
+    {
+      "id": "ent_test_3",
+      "text": "500 employees work for the company in three different locations.",
+      "expected_status": "clean",
+      "contradiction_type": null,
+      "notes": "Same facts rephrased - employees, offices/locations"
+    },
+    {
+      "id": "ent_test_4",
+      "text": "Sarah Miller joined Meridian as Safety Inspector in spring 2020.",
+      "expected_status": "clean",
+      "contradiction_type": null,
+      "notes": "hired = joined, March = spring - same meaning"
+    },
+    {
+      "id": "ent_test_5",
+      "text": "The project finished by the deadline without exceeding the allocated budget.",
+      "expected_status": "clean",
+      "contradiction_type": null,
+      "notes": "Same meaning with different words"
+    }
+  ],
+  "metadata": {
+    "test_type": "entailment_non_contradictions",
+    "expected_contradictions": 0,
+    "expected_needs_review": 0,
+    "expected_clean": 5,
+    "notes": "These are false positive tests - none should be flagged as contradictions"
+  }
+}
+

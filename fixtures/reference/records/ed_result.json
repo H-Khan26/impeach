@@ -1,0 +1,21 @@
+{
+  "mention_id": "m1",
+  "chosen_entity_id": "entity-1",
+  "candidates": [
+    {
+      "entity_id": "entity-1",
+      "canonical_name": "Maria Lopez",
+      "label": "PERSON",
+      "aliases": [
+        "Ms. Lopez"
+      ],
+      "description": null,
+      "score": 0.92,
+      "source": "exact",
+      "metadata": {}
+    }
+  ],
+  "resolved_by_llm": false,
+  "confidence": 0.9,
+  "strategy_used": "rule"
+}

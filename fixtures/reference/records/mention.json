@@ -1,0 +1,29 @@
+{
+  "id": "m1",
+  "type": "PERSON",
+  "name": "Maria Lopez",
+  "span": {
+    "start": 0,
+    "end": 11
+  },
+  "score": 0.97,
+  "source": "gliner2",
+  "sources": [
+    {
+      "name": "gliner2",
+      "label": "person",
+      "score": 0.97
+    },
+    {
+      "name": "regex_detector",
+      "label": "PERSON",
+      "score": null
+    }
+  ],
+  "metadata": {
+    "normalized": "maria lopez"
+  },
+  "doc_id": "doc-1",
+  "chunk_id": "doc-1:chunk-00",
+  "sentence_index": 0
+}

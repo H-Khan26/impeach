@@ -1,0 +1,65 @@
+{
+  "doc_id": "scenario_temporal_001",
+  "title": "Temporal Contradiction Test Scenarios",
+  "doc_type": "test_scenario",
+  "description": "Facts with temporal contradictions - different dates for same events",
+  "ground_truth": [
+    {
+      "id": "temporal_truth_1",
+      "text": "Meridian Construction was founded in 2005 by a group of engineers.",
+      "expected_contradiction_with": "temporal_test_1"
+    },
+    {
+      "id": "temporal_truth_2",
+      "text": "James Carter became CEO of Meridian on January 15, 2018.",
+      "expected_contradiction_with": "temporal_test_2"
+    },
+    {
+      "id": "temporal_truth_3",
+      "text": "The merger was finalized on December 31, 2021.",
+      "expected_contradiction_with": "temporal_test_3"
+    },
+    {
+      "id": "temporal_truth_4",
+      "text": "The safety inspection was conducted in Q1 2023.",
+      "expected_contradiction_with": "temporal_test_4"
+    }
+  ],
+  "test_facts": [
+    {
+      "id": "temporal_test_1",
+      "text": "Meridian Construction was established in 2010.",
+      "expected_status": "contradiction",
+      "contradiction_type": "TEMPORAL",
+      "notes": "Different founding year (2005 vs 2010)"
+    },
+    {
+      "id": "temporal_test_2",
+      "text": "James Carter took over as CEO in March 2019.",
+      "expected_status": "contradiction",
+      "contradiction_type": "TEMPORAL",
+      "notes": "Different CEO start date (Jan 2018 vs Mar 2019)"
+    },
+    {
+      "id": "temporal_test_3",
+      "text": "The merger was completed in early 2022.",
+      "expected_status": "needs_review",
+      "contradiction_type": "TEMPORAL",
+      "notes": "Slightly different dates (Dec 31, 2021 vs early 2022) - may be ambiguous"
+    },
+    {
+      "id": "temporal_test_4",
+      "text": "The safety inspection occurred in Q4 2023.",
+      "expected_status": "contradiction",
+      "contradiction_type": "TEMPORAL",
+      "notes": "Different quarters (Q1 vs Q4 2023)"
+    }
+  ],
+  "metadata": {
+    "test_type": "temporal_contradictions",
+    "expected_contradictions": 3,
+    "expected_needs_review": 1,
+    "expected_clean": 0
+  }
+}
+

@@ -1,0 +1,33 @@
+{
+  "mention": {
+    "id": "m1",
+    "type": "PERSON",
+    "name": "Maria Lopez",
+    "span": {
+      "start": 0,
+      "end": 11
+    },
+    "score": null,
+    "source": null,
+    "sources": [],
+    "metadata": {},
+    "doc_id": null,
+    "chunk_id": null,
+    "sentence_index": null
+  },
+  "local_context": {
+    "sentence_text": "Maria Lopez did something.",
+    "prev_sentence_text": null,
+    "next_sentence_text": null,
+    "chunk_text": "Maria Lopez did something."
+  },
+  "doc_context": {
+    "doc_id": "doc-1",
+    "doc_type": "complaint",
+    "case_id": "case-1",
+    "jurisdiction": null,
+    "party_names": []
+  },
+  "span_label": "PERSON",
+  "normalized_key": null
+}

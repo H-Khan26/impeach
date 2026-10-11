@@ -1,0 +1,69 @@
+{
+  "doc_id": "scenario_unrelated_001",
+  "title": "Unrelated Facts Test Scenarios",
+  "doc_type": "test_scenario",
+  "description": "Facts about different topics - should be neutral, NOT contradictions",
+  "ground_truth": [
+    {
+      "id": "unrel_truth_1",
+      "text": "Meridian Construction was founded in 2005."
+    },
+    {
+      "id": "unrel_truth_2",
+      "text": "James Carter became CEO in January 2018."
+    },
+    {
+      "id": "unrel_truth_3",
+      "text": "The company headquarters is located in Seattle, Washington."
+    },
+    {
+      "id": "unrel_truth_4",
+      "text": "Project Atlas began construction on June 10, 2022."
+    }
+  ],
+  "test_facts": [
+    {
+      "id": "unrel_test_1",
+      "text": "The weather in Chicago was unusually cold last winter.",
+      "expected_status": "clean",
+      "contradiction_type": null,
+      "notes": "Completely unrelated topic - weather vs company founding"
+    },
+    {
+      "id": "unrel_test_2",
+      "text": "Sarah Miller enjoys hiking on weekends.",
+      "expected_status": "clean",
+      "contradiction_type": null,
+      "notes": "Personal hobby vs CEO appointment - unrelated"
+    },
+    {
+      "id": "unrel_test_3",
+      "text": "The stock market experienced volatility in Q3 2023.",
+      "expected_status": "clean",
+      "contradiction_type": null,
+      "notes": "Stock market vs company location - unrelated"
+    },
+    {
+      "id": "unrel_test_4",
+      "text": "New environmental regulations were passed by Congress.",
+      "expected_status": "clean",
+      "contradiction_type": null,
+      "notes": "Legislation vs project start date - unrelated"
+    },
+    {
+      "id": "unrel_test_5",
+      "text": "The cafeteria serves lunch from 11am to 2pm daily.",
+      "expected_status": "clean",
+      "contradiction_type": null,
+      "notes": "Cafeteria schedule - completely unrelated to any ground truth"
+    }
+  ],
+  "metadata": {
+    "test_type": "unrelated_neutral_facts",
+    "expected_contradictions": 0,
+    "expected_needs_review": 0,
+    "expected_clean": 5,
+    "notes": "These are false positive tests - unrelated facts should not be flagged"
+  }
+}
+

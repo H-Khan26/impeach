@@ -1,0 +1,148 @@
+# NER Detector Configuration
+# Priority settings for merging overlapping mentions from multiple detectors.
+#
+# Used by:
+# - services/ner/merging.py (merge_mentions function)
+#
+# When multiple detectors find overlapping entities, these settings determine
+# which detector's output to trust based on label type and source.
+
+# Label-specific source priority
+# For each label type, lists detectors in order of trust (most trusted first)
+# When merging overlapping mentions, the detector higher in the list wins
+label_priority:
+  # Legal citations - specialized tools are most trusted
+  CASE_CITATION:
+    - eyecite
+    - regex_detector
+    - legal_bert_ner
+    - spacy_ner
+
+  STATUTE_CITATION:
+    - eyecite
+    - regex_detector
+    - lexnlp
+
+  STATUTE:
+    - eyecite
+    - regex_detector
+    - lexnlp
+
+  RULE_CITATION:
+    - eyecite
+    - regex_detector
+
+  # Document references - regex is most reliable
+  EXHIBIT:
+    - regex_detector
+    - spacy_ner
+
+  EXHIBIT_ID:
+    - regex_detector
+    - spacy_ner
+
+  DOCKET_ENTRY:
+    - regex_detector
+    - spacy_ner
+
+  # People - 3-layer priority: Legal > General
+  PERSON:
+    - legal_bert_ner
+    - gliner
+    - spacy_ner
+
+  PER:
+    - legal_bert_ner
+    - gliner
+    - spacy_ner
+
+  # Organizations - 3-layer priority: Legal > General
+  ORG:
+    - legal_bert_ner
+    - gliner
+    - spacy_ner
+
+  ORGANIZATION:
+    - legal_bert_ner
+    - gliner
+    - spacy_ner
+
+  # Locations - 3-layer priority: Legal > General
+  LOC:
+    - legal_bert_ner
+    - gliner
+    - spacy_ner
+
+  LOCATION:
+    - legal_bert_ner
+    - gliner
+    - spacy_ner
+
+  # Facilities
+  FACILITY:
+    - gliner
+    - spacy_ner
+
+  # Courts and Cases
+  COURT:
+    - eyecite
+    - legal_bert_ner
+    - gliner
+
+  CASE:
+    - eyecite
+    - legal_bert_ner
+    - gliner
+
+  GPE:
+    - spacy_ner
+    - gliner
+
+  # Dates and times
+  DATE:
+    - regex_detector
+    - spacy_ner
+    - legal_bert_ner
+
+  TIME:
+    - regex_detector
+    - spacy_ner
+
+  # Money
+  MONEY:
+    - regex_detector
+    - spacy_ner
+
+# Default source priority for labels not in label_priority
+# Used when a label type is not explicitly configured above
+# 3-layer architecture: Rules (eyecite/regex) > Legal (legal_bert_ner) > General (gliner)
+default_source_priority:
+  - eyecite
+  - regex_detector
+  - legal_bert_ner
+  - gliner
+  - spacy_ner
+
+# High-precision labels
+# These labels get a significant priority boost (+1000) during merging
+# They represent structured patterns that are unlikely to be false positives
+high_precision_labels:
+  - CASE_CITATION
+  - STATUTE_CITATION
+  - STATUTE
+  - RULE_CITATION
+  - EXHIBIT
+  - EXHIBIT_ID
+  - DOCKET_ENTRY
+  - MONEY
+
+# Priority scoring formula:
+# score = 0
+# if label in high_precision_labels: score += 1000
+# if label in label_priority:
+#     for idx, source in label_priority[label]:
+#         if source in detector_source: score += (len(sources) - idx) * 10
+# else:
+#     for idx, source in default_source_priority:
+#         if source in detector_source: score += (len(sources) - idx)
+

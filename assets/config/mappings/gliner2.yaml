@@ -1,0 +1,103 @@
+# GLiNER2 Configuration
+# Defines label sets for GLiNER2 entity extraction and relation extraction.
+#
+# Used for:
+# - GLiNER2 NER entity extraction (via MentionStage detector type: "gliner2")
+# - GLiNER2 relation extraction (via RelationStage)
+#
+# Label sets are named collections that can be referenced from pipeline configs
+# to avoid hardcoding label lists in YAML files.
+
+# Named label sets for entity extraction (NER)
+# These are natural language descriptions that GLiNER2 understands
+entity_label_sets:
+  # General legal NER label set
+  legal_entities:
+    - "person"
+    - "organization"
+    - "company"
+    - "location"
+    - "address"
+    - "facility"
+    - "building"
+    - "product"
+    - "vehicle"
+    - "money"
+    - "monetary amount"
+    - "date"
+    - "time"
+    - "court"
+    - "legal case"
+    - "judge"
+    - "attorney"
+    - "lawyer"
+
+  # Minimal set for faster extraction
+  minimal:
+    - "person"
+    - "organization"
+    - "location"
+    - "date"
+
+# Named label sets for relation extraction
+relation_label_sets:
+  # Legal relations for employment and organizational contexts
+  legal_relations:
+    - "employed_by"
+    - "works_for"
+    - "located_in"
+    - "filed_against"
+    - "represented_by"
+    - "owns"
+    - "occurred_at"
+    - "witnessed_by"
+    - "supervised_by"
+    - "injured_by"
+
+  # Minimal relation set
+  minimal:
+    - "employed_by"
+    - "located_in"
+    - "occurred_at"
+
+# Optional: Mapping from GLiNER2 relation labels to canonical relationship types
+# This enables normalization to match relationship_types.yaml vocabulary
+relation_to_relationship_type:
+  employed_by: EMPLOYED_BY
+  works_for: EMPLOYED_BY
+  located_in: LOCATED_IN
+  filed_against: RELATED_TO
+  represented_by: RELATED_TO
+  owns: PART_OF
+  occurred_at: OCCURRED_AT
+  witnessed_by: RELATED_TO
+  supervised_by: EMPLOYED_BY
+  injured_by: CAUSED_BY
+
+# Optional: Mapping from GLiNER2 entity labels to canonical entity types
+# This extends entity_types.yaml model_mappings with GLiNER2-specific variants
+gliner2_to_entity_type:
+  person: PER
+  organization: ORG
+  company: ORG
+  location: LOC
+  address: LOC
+  facility: FACILITY
+  building: FACILITY
+  product: PRODUCT
+  vehicle: PRODUCT
+  money: MONEY
+  monetary amount: MONEY
+  date: DATE
+  time: TIME
+  court: COURT
+  legal case: CASE
+  judge: PER
+  attorney: PER
+  lawyer: PER
+
+# Default label sets (referenced when no label_set is specified)
+defaults:
+  entity_label_set: "legal_entities"
+  relation_label_set: "legal_relations"
+

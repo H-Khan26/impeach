@@ -1,0 +1,16 @@
+{
+  "fact_id": "fact_001",
+  "fact_text": "Retrieved fact text",
+  "sources": [
+    "graph",
+    "vector"
+  ],
+  "relevance_score": 1.2,
+  "metadata": {
+    "source": "helix"
+  },
+  "side": "PLAINTIFF",
+  "assertion_subject": "James Carter",
+  "assertion_relationship": "BECAME",
+  "assertion_object": "CEO"
+}

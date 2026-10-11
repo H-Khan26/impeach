@@ -1,0 +1,345 @@
+# Name Matching Configuration for Entity Disambiguation
+# Defines rules for matching PERSON and ORG names with variations.
+#
+# Used by:
+# - services/ed/name_similarity.py (type-aware name matching)
+# - services/ed/service.py (enhanced similarity scoring)
+
+# Titles to strip from PERSON names before comparison
+# These don't affect person identity
+person_titles:
+  # Honorifics
+  - mr
+  - mrs
+  - ms
+  - miss
+  - mx
+  
+  # Professional titles
+  - dr
+  - doctor
+  - prof
+  - professor
+  
+  # Legal titles
+  - judge
+  - justice
+  - hon
+  - honorable
+  - attorney
+  - atty
+  - esq
+  - esquire
+  - counselor
+  - counsel
+  
+  # Military/Law Enforcement
+  - officer
+  - detective
+  - sergeant
+  - sgt
+  - lieutenant
+  - lt
+  - captain
+  - capt
+  - chief
+  - deputy
+  - agent
+  
+  # Medical
+  - nurse
+  - rn
+  - md
+  - do
+  - phd
+
+# Nickname to formal name mappings
+# Maps common nicknames to their canonical formal names
+# Used to match "Bob Smith" with "Robert Smith"
+nickname_mappings:
+  # Robert
+  bob: robert
+  rob: robert
+  robbie: robert
+  bobby: robert
+  bert: robert
+  
+  # William
+  bill: william
+  will: william
+  billy: william
+  willy: william
+  liam: william
+  
+  # James
+  jim: james
+  jimmy: james
+  jamie: james
+  jas: james
+  
+  # Michael
+  mike: michael
+  mick: michael
+  mikey: michael
+  
+  # Thomas
+  tom: thomas
+  tommy: thomas
+  thom: thomas
+  
+  # Richard
+  dick: richard
+  rick: richard
+  rich: richard
+  ricky: richard
+  
+  # Joseph
+  joe: joseph
+  joey: joseph
+  
+  # Daniel
+  dan: daniel
+  danny: daniel
+  
+  # Christopher
+  chris: christopher
+  kit: christopher
+  topher: christopher
+  
+  # Elizabeth
+  liz: elizabeth
+  lizzy: elizabeth
+  beth: elizabeth
+  betty: elizabeth
+  eliza: elizabeth
+  ellie: elizabeth
+  
+  # Katherine/Catherine
+  kate: katherine
+  kathy: katherine
+  katie: katherine
+  cathy: catherine
+  kay: katherine
+  
+  # Margaret
+  maggie: margaret
+  meg: margaret
+  peggy: margaret
+  marge: margaret
+  
+  # Jennifer
+  jen: jennifer
+  jenny: jennifer
+  
+  # Patricia
+  pat: patricia
+  patty: patricia
+  tricia: patricia
+  
+  # Nicholas
+  nick: nicholas
+  nicky: nicholas
+  
+  # Edward
+  ed: edward
+  eddie: edward
+  ted: edward
+  teddy: edward
+  ned: edward
+  
+  # Alexander
+  alex: alexander
+  al: alexander
+  sandy: alexander
+  xander: alexander
+  
+  # Benjamin
+  ben: benjamin
+  benny: benjamin
+  
+  # Andrew
+  andy: andrew
+  drew: andrew
+  
+  # Anthony
+  tony: anthony
+  ant: anthony
+  
+  # Charles
+  charlie: charles
+  chuck: charles
+  chas: charles
+  
+  # David
+  dave: david
+  davey: david
+  
+  # Jonathan
+  jon: jonathan
+  johnny: jonathan
+  
+  # Matthew
+  matt: matthew
+  matty: matthew
+  
+  # Samuel
+  sam: samuel
+  sammy: samuel
+  
+  # Steven/Stephen
+  steve: steven
+  stevie: steven
+  
+  # Timothy
+  tim: timothy
+  timmy: timothy
+  
+  # Deborah
+  deb: deborah
+  debbie: deborah
+  
+  # Rebecca
+  becky: rebecca
+  becca: rebecca
+  
+  # Susan
+  sue: susan
+  susie: susan
+  suzy: susan
+  
+  # Barbara
+  barb: barbara
+  barbie: barbara
+  
+  # Theodore
+  theo: theodore
+  teddy: theodore
+  
+  # Raymond
+  ray: raymond
+  
+  # Lawrence
+  larry: lawrence
+  
+  # Gerald
+  gerry: gerald
+  jerry: gerald
+
+# Organization suffixes to strip before comparison
+# These corporate designators don't affect org identity
+org_suffixes:
+  # Standard corporate
+  - inc
+  - inc.
+  - incorporated
+  - llc
+  - llc.
+  - l.l.c.
+  - corp
+  - corp.
+  - corporation
+  - company
+  - co
+  - co.
+  - ltd
+  - ltd.
+  - limited
+  
+  # Partnerships
+  - lp
+  - l.p.
+  - llp
+  - l.l.p.
+  - pllc
+  - p.l.l.c.
+  
+  # Professional
+  - pc
+  - p.c.
+  - pa
+  - p.a.
+  - plc
+  - plc.
+  
+  # Other
+  - na
+  - n.a.
+  - fsb
+  - f.s.b.
+  - assoc
+  - assoc.
+  - associates
+  - group
+  - holdings
+  - enterprises
+  - international
+  - intl
+  - intl.
+
+# Common organization prefixes to normalize
+org_prefixes:
+  - the
+  - a
+  - an
+
+# Acronym expansions for common legal/government entities
+# Used to match "FBI" with "Federal Bureau of Investigation"
+org_acronyms:
+  fbi: federal bureau of investigation
+  cia: central intelligence agency
+  dea: drug enforcement administration
+  atf: bureau of alcohol tobacco firearms and explosives
+  ice: immigration and customs enforcement
+  dhs: department of homeland security
+  doj: department of justice
+  sec: securities and exchange commission
+  ftc: federal trade commission
+  irs: internal revenue service
+  epa: environmental protection agency
+  osha: occupational safety and health administration
+  eeoc: equal employment opportunity commission
+  nlrb: national labor relations board
+  fcc: federal communications commission
+  fda: food and drug administration
+  hud: housing and urban development
+  usps: united states postal service
+  va: veterans affairs
+  sba: small business administration
+  dot: department of transportation
+  dmv: department of motor vehicles
+  nypd: new york police department
+  lapd: los angeles police department
+
+# Similarity thresholds for matching decisions
+thresholds:
+  # Exact match after normalization (name parts match perfectly)
+  exact_match: 0.98
+  
+  # One name is subset of other (e.g., "Smith" vs "John Smith")
+  subset_match_base: 0.80
+  subset_match_bonus: 0.15
+  
+  # Partial overlap in name parts
+  partial_overlap_base: 0.60
+  partial_overlap_bonus: 0.30
+  
+  # Minimum length for fuzzy matching (avoid "Al" matching everything)
+  min_fuzzy_match_length: 4
+  
+  # Minimum word length to consider in name parts
+  min_word_length: 2
+
+# Configuration flags
+settings:
+  # Whether to normalize nicknames to formal names
+  normalize_nicknames: true
+  
+  # Whether to strip titles from person names
+  strip_titles: true
+  
+  # Whether to strip corporate suffixes from org names
+  strip_org_suffixes: true
+  
+  # Case-insensitive matching
+  case_insensitive: true
+

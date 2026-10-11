@@ -1,0 +1,77 @@
+{
+  "doc_id": "scenario_quantitative_001",
+  "title": "Quantitative Contradiction Test Scenarios",
+  "doc_type": "test_scenario",
+  "description": "Facts with quantitative contradictions - different numbers for same metrics",
+  "ground_truth": [
+    {
+      "id": "quant_truth_1",
+      "text": "Meridian Construction employs 500 people.",
+      "expected_contradiction_with": "quant_test_1"
+    },
+    {
+      "id": "quant_truth_2",
+      "text": "The contract was valued at $2.5 million.",
+      "expected_contradiction_with": "quant_test_2"
+    },
+    {
+      "id": "quant_truth_3",
+      "text": "The building has 15 stories.",
+      "expected_contradiction_with": "quant_test_3"
+    },
+    {
+      "id": "quant_truth_4",
+      "text": "Revenue increased by 25% in fiscal year 2023.",
+      "expected_contradiction_with": "quant_test_4"
+    },
+    {
+      "id": "quant_truth_5",
+      "text": "The project required 18 months to complete.",
+      "expected_contradiction_with": "quant_test_5"
+    }
+  ],
+  "test_facts": [
+    {
+      "id": "quant_test_1",
+      "text": "Meridian Construction has only 50 employees.",
+      "expected_status": "contradiction",
+      "contradiction_type": "QUANTITATIVE",
+      "notes": "10x difference in employee count (500 vs 50)"
+    },
+    {
+      "id": "quant_test_2",
+      "text": "The contract was worth $250,000.",
+      "expected_status": "contradiction",
+      "contradiction_type": "QUANTITATIVE",
+      "notes": "10x difference in contract value ($2.5M vs $250K)"
+    },
+    {
+      "id": "quant_test_3",
+      "text": "The building is 40 floors tall.",
+      "expected_status": "contradiction",
+      "contradiction_type": "QUANTITATIVE",
+      "notes": "Different floor counts (15 vs 40)"
+    },
+    {
+      "id": "quant_test_4",
+      "text": "Revenue declined by 10% in 2023.",
+      "expected_status": "contradiction",
+      "contradiction_type": "QUANTITATIVE",
+      "notes": "Opposite direction (increased 25% vs declined 10%)"
+    },
+    {
+      "id": "quant_test_5",
+      "text": "The project was completed in just 6 months.",
+      "expected_status": "contradiction",
+      "contradiction_type": "QUANTITATIVE",
+      "notes": "3x difference in duration (18 months vs 6 months)"
+    }
+  ],
+  "metadata": {
+    "test_type": "quantitative_contradictions",
+    "expected_contradictions": 5,
+    "expected_needs_review": 0,
+    "expected_clean": 0
+  }
+}
+

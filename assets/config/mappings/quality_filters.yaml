@@ -1,0 +1,61 @@
+# Mention Quality Filtering Configuration
+# Settings for filtering low-quality NER mentions.
+#
+# Used by:
+# - stages/mention.py (MentionStage quality filtering)
+
+# Minimum character length for mention names
+# Mentions shorter than this are filtered out
+min_mention_length: 3
+
+# Short mention length threshold
+# Mentions shorter than this need higher confidence to be accepted
+short_mention_length: 6
+
+# Confidence threshold for short mentions
+# Short mentions (< short_mention_length chars) need at least this confidence
+short_mention_confidence_threshold: 0.75
+
+# Partial word patterns - NER artifacts from chunk boundaries
+# These are truncated legal terms that appear when words are split across chunks
+# Matches are filtered out regardless of confidence
+partial_word_patterns:
+  # Regex pattern matching common truncated legal terms
+  regex: '^(Plainti|Defenda|Complai|Petitio|Respon|Appell|Plain|Defen|Compl|Judg|Attorn|Couns|Witne)$'
+  flags: IGNORECASE
+  description: "Truncated legal party/role terms"
+
+# Additional low-quality patterns to filter
+# Add patterns here as new artifacts are discovered
+additional_filter_patterns:
+  # Single characters/digits that shouldn't be entities
+  - pattern: '^[A-Za-z0-9]$'
+    flags: null
+    description: "Single character mentions"
+
+  # Pure punctuation
+  - pattern: '^[\W_]+$'
+    flags: null
+    description: "Punctuation-only mentions"
+
+  # Just whitespace
+  - pattern: '^\s+$'
+    flags: null
+    description: "Whitespace-only mentions"
+
+  # Common abbreviations that aren't entities
+  - pattern: '^(i\.e\.|e\.g\.|etc\.|vs\.|v\.)$'
+    flags: IGNORECASE
+    description: "Common abbreviations"
+
+  # Page/line references
+  - pattern: '^(p\.|pp\.|l\.|ll\.)\s*\d+$'
+    flags: IGNORECASE
+    description: "Page/line references"
+
+# Whether to normalize mention names (remove embedded newlines, collapse spaces)
+normalize_names: true
+
+# Whether to filter partial word patterns
+filter_partial_words: true
+

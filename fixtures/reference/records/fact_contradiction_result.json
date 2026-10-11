@@ -1,0 +1,58 @@
+{
+  "new_fact": {
+    "id": "STATED_FACT_0",
+    "text": "A REL B",
+    "assertion_triple": {
+      "subject": "A",
+      "relationship": "REL",
+      "object": "B"
+    },
+    "certainty": 0.9,
+    "temporal_validity": {
+      "t_valid_from": null,
+      "t_valid_until": null
+    },
+    "metadata": {},
+    "value_type": null,
+    "property_type": null,
+    "slot_name": null,
+    "value_raw": null,
+    "value_normalized": null,
+    "temporal_context": "current_incident",
+    "time_window": null,
+    "is_denial": false,
+    "is_boilerplate": false,
+    "source_chunk_id": null,
+    "source_doc_id": null,
+    "subject_entity_id": null,
+    "object_entity_id": null,
+    "raw_node": {}
+  },
+  "status": "contradiction",
+  "contradicting_pairs": [
+    {
+      "new_fact_text": "New fact text",
+      "new_fact_id": "new_001",
+      "existing_fact_id": "existing_001",
+      "existing_fact_text": "Existing fact text",
+      "nli_label": "contradiction",
+      "nli_confidence": 0.95,
+      "retrieval_sources": [
+        "graph",
+        "bm25"
+      ],
+      "priority_score": 1.5,
+      "shared_entity_ids": [
+        "ent_001",
+        "ent_002"
+      ],
+      "contradiction_source": "cross_document"
+    }
+  ],
+  "retrieval_stats": {
+    "total_candidates": 10,
+    "pairs_after_prefilter": 5,
+    "nli_calls": 5
+  },
+  "helix_fact_id": null
+}

@@ -1,0 +1,59 @@
+{
+  "chunks": [
+    {
+      "doc_id": "test-doc-1",
+      "text": "This is test document text",
+      "sequence_number": 0,
+      "start_char": 0,
+      "end_char": 26,
+      "page_number": 1,
+      "section": "body",
+      "metadata": {
+        "doc_type": "complaint"
+      },
+      "helix_id": null,
+      "sentence_spans": [
+        {
+          "start": 0,
+          "end": 26
+        }
+      ],
+      "neighbors": {
+        "next_chunk_seq": 1
+      },
+      "section_path": []
+    },
+    {
+      "doc_id": "test-doc-1",
+      "text": "for processing.",
+      "sequence_number": 1,
+      "start_char": 27,
+      "end_char": 42,
+      "page_number": null,
+      "section": null,
+      "metadata": {},
+      "helix_id": null,
+      "sentence_spans": [
+        {
+          "start": 27,
+          "end": 42
+        }
+      ],
+      "neighbors": {
+        "prev_chunk_seq": 0
+      },
+      "section_path": []
+    }
+  ],
+  "sentence_spans": [
+    {
+      "chunk_sequence": 0,
+      "start_char": 0,
+      "end_char": 26,
+      "text": "This is test document text",
+      "metadata": {
+        "chunk_sequence": 0
+      }
+    }
+  ]
+}

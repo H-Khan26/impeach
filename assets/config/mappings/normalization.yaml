@@ -1,0 +1,208 @@
+# Text Normalization Configuration
+# Rules for normalizing entity names and tokenizing text for comparison.
+#
+# Used by:
+# - services/contradictions/prefilter.py (Jaccard similarity, entity matching)
+# - services/contradictions/service.py (entity name normalization)
+
+# Prefixes to strip from entity names for comparison
+# These common prefixes don't affect entity identity
+entity_name_prefixes:
+  - "the "
+  - "a "
+  - "an "
+
+# Suffixes to strip from entity names for comparison
+# Corporate suffixes don't affect entity identity
+entity_name_suffixes:
+  - " inc"
+  - " inc."
+  - " llc"
+  - " llc."
+  - " corp"
+  - " corp."
+  - " corporation"
+  - " company"
+  - " co"
+  - " co."
+  - " ltd"
+  - " ltd."
+  - " limited"
+  - " plc"
+  - " plc."
+  - " lp"
+  - " l.p."
+  - " llp"
+  - " l.l.p."
+  - " pllc"
+  - " p.l.l.c."
+  - " pc"
+  - " p.c."
+  - " pa"
+  - " p.a."
+
+# Stopwords for Jaccard similarity computation
+# These common words are excluded from tokenization to focus on content words
+# Kept minimal to avoid over-filtering meaningful terms
+stopwords:
+  # Articles
+  - a
+  - an
+  - the
+
+  # Conjunctions
+  - and
+  - or
+  - but
+  - nor
+  - yet
+  - so
+
+  # Be verbs
+  - is
+  - are
+  - was
+  - were
+  - be
+  - been
+  - being
+  - am
+
+  # Have verbs
+  - have
+  - has
+  - had
+  - having
+
+  # Do verbs
+  - do
+  - does
+  - did
+  - doing
+
+  # Modal verbs
+  - can
+  - could
+  - will
+  - would
+  - shall
+  - should
+  - may
+  - might
+  - must
+
+  # Prepositions
+  - to
+  - of
+  - in
+  - for
+  - "on"  # quoted: bare on/off/yes/no parse as booleans in YAML
+  - with
+  - at
+  - by
+  - from
+  - as
+  - into
+  - through
+  - during
+  - before
+  - after
+  - above
+  - below
+  - between
+  - under
+  - over
+
+  # Pronouns
+  - i
+  - me
+  - my
+  - we
+  - us
+  - our
+  - you
+  - your
+  - he
+  - him
+  - his
+  - she
+  - her
+  - it
+  - its
+  - they
+  - them
+  - their
+
+  # Demonstratives
+  - this
+  - that
+  - these
+  - those
+
+  # Other common words
+  - not
+  - "no"
+  - "yes"
+  - if
+  - then
+  - than
+  - when
+  - where
+  - which
+  - who
+  - whom
+  - whose
+  - what
+  - how
+  - why
+  - all
+  - each
+  - every
+  - both
+  - few
+  - more
+  - most
+  - other
+  - some
+  - such
+  - only
+  - same
+  - just
+  - also
+  - very
+  - too
+
+# Aliases to exclude from entity prompts (e.g. pronouns)
+# These are filtered out to prevent the LLM from over-attributing
+# generic references (like "she", "he") to a specific entity in the chunk context.
+alias_exclusion:
+  - he
+  - she
+  - it
+  - they
+  - him
+  - her
+  - them
+  - his
+  - hers
+  - its
+  - their
+  - theirs
+  - i
+  - me
+  - my
+  - mine
+  - we
+  - us
+  - our
+  - ours
+  - you
+  - your
+  - yours
+
+# Minimum token length to include (shorter tokens are filtered)
+min_token_length: 2
+
+# Whether to lowercase text before tokenization
+lowercase: true
+

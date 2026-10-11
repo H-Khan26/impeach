@@ -1,0 +1,18 @@
+{
+  "new_fact_text": "New fact text",
+  "new_fact_id": "new_001",
+  "existing_fact_id": "existing_001",
+  "existing_fact_text": "Existing fact text",
+  "nli_label": "contradiction",
+  "nli_confidence": 0.95,
+  "retrieval_sources": [
+    "graph",
+    "bm25"
+  ],
+  "priority_score": 1.5,
+  "shared_entity_ids": [
+    "ent_001",
+    "ent_002"
+  ],
+  "contradiction_source": "cross_document"
+}

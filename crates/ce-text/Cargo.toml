@@ -1,0 +1,20 @@
+[package]
+name = "ce-text"
+description = "Pure text utilities: normalization, tokenization, fuzzy similarity, retry policy"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+regex.workspace = true
+serde.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

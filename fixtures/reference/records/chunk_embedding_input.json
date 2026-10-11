@@ -1,0 +1,12 @@
+{
+  "chunk_id": "helix-chunk-0",
+  "embedding": [
+    0.25,
+    -0.5,
+    0.125
+  ],
+  "doc_id": "test-doc-1",
+  "metadata": {
+    "model": "BAAI/bge-small-en-v1.5"
+  }
+}

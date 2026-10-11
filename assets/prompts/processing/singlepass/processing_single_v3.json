@@ -1,0 +1,361 @@
+{
+  "description": "Domain-agnostic fact extraction prompt using structural types (ValueType, PropertyType, slot_name)",
+  "setting": "processing",
+  "version": "v3",
+  "system_messages": [
+    {
+      "role": "system",
+      "content": "Extract ATOMIC facts from documents. Each fact is ONE claim with a subject, predicate, and object.\n\nFor each fact, classify its STRUCTURAL TYPE using three dimensions:\n\n1. VALUE_TYPE (what kind of object/value is being asserted):\n   - NUMERIC: Numeric quantities with optional units (35 mph, $2,000, 3 people, 70%, 10 kg)\n   - TEMPORAL_POINT: A single point in time (March 5, 2023; 5:30 p.m.; 2021)\n   - TEMPORAL_INTERVAL: A duration or time range (for three hours, from 2018 to 2020, during the past 10 years)\n   - LOCATION: Places, addresses, or geographic/physical locations (New York City, Berlin, 123 Main St, second-floor hallway)\n   - BOOLEAN: A yes/no or presence/absence fact (seatbelt was worn, no prior accidents, product was not recalled)\n   - CATEGORICAL: Discrete labels, types, roles, statuses, or classifications (clear weather, red light, full-time, gold tier, critical severity)\n   - ENTITY_REF: A reference to another entity (person, organization, product, case, vehicle, system). Use the exact name/ID from resolved_entities when possible (Maria Lopez, ACME Corp, Server A, Building 2).\n   - TEXT: Free-form descriptive text when nothing else fits (long descriptions, explanations, quotes). Use TEXT only as a fallback if no more specific VALUE_TYPE applies.\n\n2. PROPERTY_TYPE (what kind of relationship is expressed between the subject and the value):\n   - TEMPORAL: When something happened or how long it lasted (occurred_on, occurred_at, started_at, ended_at, lasted_for, was_valid_during)\n   - QUANTITATIVE: Magnitudes, amounts, counts, or rates (traveled_at_speed, had_amount, had_count, had_score, weighed, cost_amount)\n   - LOCATION: Where something was or where it occurred (was_at, occurred_at, lived_in, headquartered_in, stored_at)\n   - ATTRIBUTE: Types, categories, states, conditions, or statuses (is_type, has_role, has_color, had_state, had_status, was_injured, had_severity)\n   - RELATION: Roles and relationships between entities, including identity/equivalence (is_employee_of, is_owner_of, is_member_of, represents, is_parent_of, is_same_person_as, is_supplier_for)\n   - EXISTENCE: Whether something existed, occurred, or was present/absent (occurred, existed, was_present, did_not_occur, was_not_present)\n   - MODALITY: Obligations, permissions, abilities, requirements, or possibilities (must_pay, is_required_to, is_allowed_to, can_do, could_access, must_not)\n\n3. slot_name (which \"slot\" of the subject this fact is filling):\n   - A short, generic, snake_case label that names the property being asserted.\n   - Examples: \"speed\", \"incident_date\", \"employment_status\", \"payment_amount\", \"event_location\", \"primary_physician\", \"product_recall\", \"outage_duration\", \"environment_description\".\n   - Do NOT include entity names or specific values in slot_name. It should describe the kind of property, not the particular instance.\n\nRULES:\n- Each fact must be ATOMIC: exactly one subject–predicate–object claim per fact.\n- Extract DENIALS as facts (\"has not been involved in prior accidents\" -> is_denial: true, PROPERTY_TYPE often EXISTENCE or ATTRIBUTE or RELATION depending on what is being denied).\n- Skip obvious legal boilerplate or generic template language (e.g., standard prayers for relief, jurisdictional recitations) and mark them as is_boilerplate: true if extracted.\n- When an event or condition is clearly about the main incident under discussion, set temporal_context: \"current_incident\".\n- When an event is clearly about past incidents or history, set temporal_context: \"prior_incident\".\n- Use exact entity names (and IDs if provided) from resolved_entities for subjects and ENTITY_REF values whenever possible.\n- Prefer non-TEXT VALUE_TYPE when any specific type applies (NUMERIC, TEMPORAL_POINT, TEMPORAL_INTERVAL, LOCATION, BOOLEAN, CATEGORICAL, ENTITY_REF). Use TEXT only as a last resort.\n- Facts should be concise: keep the \"text\" field under ~30 words.\n- Output valid JSON only."
+    },
+    {
+      "role": "system",
+      "content": "OUTPUT FORMAT:\n{\n  \"nodes\": [\n    {\n      \"node_type\": \"STATED_FACT\",\n      \"id\": \"STATED_FACT_0\",\n      \"text\": \"<fact under 30 words>\",\n      \"value_type\": \"<VALUE_TYPE>\",\n      \"property_type\": \"<PROPERTY_TYPE>\",\n      \"slot_name\": \"<short snake_case label for this property>\",\n      \"value_raw\": \"<exact value text from document>\",\n      \"assertion_triple\": {\n        \"subject\": \"<subject entity or noun phrase>\",\n        \"relationship\": \"<predicate_raw, e.g. traveled_at_speed>\",\n        \"object\": \"<object/value phrase>\"\n      },\n      \"certainty\": \"0.95\",\n      \"temporal_context\": \"current_incident\",\n      \"is_denial\": false,\n      \"is_boilerplate\": false,\n      \"temporal_validity\": {\n        \"t_valid_from\": null,\n        \"t_valid_until\": null\n      },\n      \"metadata\": {}\n    }\n  ],\n  \"edges\": []\n}\n\nCOMMON PREDICATES (examples only, NOT a closed list):\n- TEMPORAL: occurred_on, occurred_at, started_at, ended_at, lasted_for, was_valid_during\n- QUANTITATIVE: traveled_at_speed, cost_amount, had_amount, had_count, had_score, weighed\n- LOCATION: was_at, occurred_at, headquartered_in, lived_in, stored_at\n- ATTRIBUTE: is_type, has_role, has_color, had_state, had_status, had_condition, had_severity\n- RELATION: is_employee_of, is_owner_of, is_member_of, represents, is_parent_of, is_supplier_for, is_same_person_as\n- EXISTENCE: occurred, existed, was_present, did_not_occur, was_not_present\n- MODALITY: must_pay, is_required_to, may, may_not, can_do, could_access, must_not\n\nUse clear, descriptive predicates that match the natural language meaning; these predicate examples are suggestions, not strict requirements."
+    }
+  ],
+  "examples": [
+    {
+      "description": "Traffic speed (NUMERIC + QUANTITATIVE, slot_name = speed)",
+      "segments": "The blue sedan driven by Alex Rivera was traveling at approximately 45 miles per hour.",
+      "resolved_entities": [
+        { "id": "E1", "name": "Alex Rivera", "type": "PER" },
+        { "id": "E2", "name": "blue sedan", "type": "PRODUCT" }
+      ],
+      "output": {
+        "nodes": [
+          {
+            "node_type": "STATED_FACT",
+            "id": "STATED_FACT_0",
+            "text": "The blue sedan was traveling at 45 miles per hour.",
+            "value_type": "NUMERIC",
+            "property_type": "QUANTITATIVE",
+            "slot_name": "speed",
+            "value_raw": "45 miles per hour",
+            "assertion_triple": {
+              "subject": "blue sedan",
+              "relationship": "traveled_at_speed",
+              "object": "45 miles per hour"
+            },
+            "certainty": "0.95",
+            "temporal_context": "current_incident",
+            "is_denial": false,
+            "is_boilerplate": false,
+            "temporal_validity": {
+              "t_valid_from": null,
+              "t_valid_until": null
+            },
+            "metadata": {}
+          }
+        ],
+        "edges": []
+      }
+    },
+    {
+      "description": "Employment status (CATEGORICAL + ATTRIBUTE, slot_name = employment_status)",
+      "segments": "Since 2021, Priya has been working full-time at Northwind Analytics.",
+      "resolved_entities": [
+        { "id": "E10", "name": "Priya", "type": "PER" },
+        { "id": "E11", "name": "Northwind Analytics", "type": "ORG" }
+      ],
+      "output": {
+        "nodes": [
+          {
+            "node_type": "STATED_FACT",
+            "id": "STATED_FACT_0",
+            "text": "Priya is employed full-time at Northwind Analytics.",
+            "value_type": "CATEGORICAL",
+            "property_type": "ATTRIBUTE",
+            "slot_name": "employment_status",
+            "value_raw": "full-time",
+            "assertion_triple": {
+              "subject": "Priya",
+              "relationship": "has_employment_status",
+              "object": "full-time"
+            },
+            "certainty": "0.94",
+            "temporal_context": "current_incident",
+            "is_denial": false,
+            "is_boilerplate": false,
+            "temporal_validity": {
+              "t_valid_from": "2021-01-01",
+              "t_valid_until": null
+            },
+            "metadata": {}
+          }
+        ],
+        "edges": []
+      }
+    },
+    {
+      "description": "Incident date (TEMPORAL_POINT + TEMPORAL, slot_name = incident_date)",
+      "segments": "The incident occurred on March 5, 2023.",
+      "resolved_entities": [
+        { "id": "E20", "name": "March 5, 2023 incident", "type": "EVENT" }
+      ],
+      "output": {
+        "nodes": [
+          {
+            "node_type": "STATED_FACT",
+            "id": "STATED_FACT_0",
+            "text": "The incident occurred on March 5, 2023.",
+            "value_type": "TEMPORAL_POINT",
+            "property_type": "TEMPORAL",
+            "slot_name": "incident_date",
+            "value_raw": "March 5, 2023",
+            "assertion_triple": {
+              "subject": "incident",
+              "relationship": "occurred_on",
+              "object": "March 5, 2023"
+            },
+            "certainty": "0.98",
+            "temporal_context": "current_incident",
+            "is_denial": false,
+            "is_boilerplate": false,
+            "temporal_validity": {
+              "t_valid_from": "2023-03-05",
+              "t_valid_until": "2023-03-05"
+            },
+            "metadata": {}
+          }
+        ],
+        "edges": []
+      }
+    },
+    {
+      "description": "Service outage duration (TEMPORAL_INTERVAL + TEMPORAL, slot_name = outage_duration)",
+      "segments": "The service outage lasted for three hours.",
+      "resolved_entities": [
+        { "id": "E30", "name": "service outage", "type": "OTHER" }
+      ],
+      "output": {
+        "nodes": [
+          {
+            "node_type": "STATED_FACT",
+            "id": "STATED_FACT_0",
+            "text": "The service outage lasted for three hours.",
+            "value_type": "TEMPORAL_INTERVAL",
+            "property_type": "TEMPORAL",
+            "slot_name": "outage_duration",
+            "value_raw": "three hours",
+            "assertion_triple": {
+              "subject": "service outage",
+              "relationship": "lasted_for",
+              "object": "three hours"
+            },
+            "certainty": "0.93",
+            "temporal_context": "current_incident",
+            "is_denial": false,
+            "is_boilerplate": false,
+            "temporal_validity": {
+              "t_valid_from": null,
+              "t_valid_until": null
+            },
+            "metadata": {}
+          }
+        ],
+        "edges": []
+      }
+    },
+    {
+      "description": "Conference location (LOCATION + LOCATION, slot_name = event_location)",
+      "segments": "The annual conference took place in Berlin, Germany.",
+      "resolved_entities": [
+        { "id": "E40", "name": "annual conference", "type": "EVENT" },
+        { "id": "E41", "name": "Berlin, Germany", "type": "LOC" }
+      ],
+      "output": {
+        "nodes": [
+          {
+            "node_type": "STATED_FACT",
+            "id": "STATED_FACT_0",
+            "text": "The annual conference took place in Berlin, Germany.",
+            "value_type": "LOCATION",
+            "property_type": "LOCATION",
+            "slot_name": "event_location",
+            "value_raw": "Berlin, Germany",
+            "assertion_triple": {
+              "subject": "annual conference",
+              "relationship": "occurred_at",
+              "object": "Berlin, Germany"
+            },
+            "certainty": "0.96",
+            "temporal_context": "current_incident",
+            "is_denial": false,
+            "is_boilerplate": false,
+            "temporal_validity": {
+              "t_valid_from": null,
+              "t_valid_until": null
+            },
+            "metadata": {}
+          }
+        ],
+        "edges": []
+      }
+    },
+    {
+      "description": "Product recall denial (BOOLEAN + EXISTENCE, slot_name = product_recall, is_denial = true)",
+      "segments": "The AlphaX heater has never been recalled.",
+      "resolved_entities": [
+        { "id": "E50", "name": "AlphaX heater", "type": "PRODUCT" }
+      ],
+      "output": {
+        "nodes": [
+          {
+            "node_type": "STATED_FACT",
+            "id": "STATED_FACT_0",
+            "text": "The AlphaX heater has never been recalled.",
+            "value_type": "BOOLEAN",
+            "property_type": "EXISTENCE",
+            "slot_name": "product_recall",
+            "value_raw": "never been recalled",
+            "assertion_triple": {
+              "subject": "AlphaX heater",
+              "relationship": "was_recalled",
+              "object": "false"
+            },
+            "certainty": "0.97",
+            "temporal_context": "current_incident",
+            "is_denial": true,
+            "is_boilerplate": false,
+            "temporal_validity": {
+              "t_valid_from": null,
+              "t_valid_until": null
+            },
+            "metadata": {}
+          }
+        ],
+        "edges": []
+      }
+    },
+    {
+      "description": "Doctor–patient relation (ENTITY_REF + RELATION, slot_name = primary_physician)",
+      "segments": "Dr. Smith is the primary physician for Ellen Lee.",
+      "resolved_entities": [
+        { "id": "E60", "name": "Dr. Smith", "type": "PER" },
+        { "id": "E61", "name": "Ellen Lee", "type": "PER" }
+      ],
+      "output": {
+        "nodes": [
+          {
+            "node_type": "STATED_FACT",
+            "id": "STATED_FACT_0",
+            "text": "Dr. Smith is the primary physician for Ellen Lee.",
+            "value_type": "ENTITY_REF",
+            "property_type": "RELATION",
+            "slot_name": "primary_physician",
+            "value_raw": "Dr. Smith",
+            "assertion_triple": {
+              "subject": "Ellen Lee",
+              "relationship": "has_primary_physician",
+              "object": "Dr. Smith"
+            },
+            "certainty": "0.96",
+            "temporal_context": "current_incident",
+            "is_denial": false,
+            "is_boilerplate": false,
+            "temporal_validity": {
+              "t_valid_from": null,
+              "t_valid_until": null
+            },
+            "metadata": {}
+          }
+        ],
+        "edges": []
+      }
+    },
+    {
+      "description": "Contractual payment obligation and amount (MODALITY + BOOLEAN, QUANTITATIVE + NUMERIC)",
+      "segments": "Under the agreement, Brightline Media must pay a licensing fee of $50,000.",
+      "resolved_entities": [
+        { "id": "E70", "name": "Brightline Media", "type": "ORG" },
+        { "id": "E71", "name": "licensing fee", "type": "OTHER" }
+      ],
+      "output": {
+        "nodes": [
+          {
+            "node_type": "STATED_FACT",
+            "id": "STATED_FACT_0",
+            "text": "Brightline Media is obligated to pay a licensing fee.",
+            "value_type": "BOOLEAN",
+            "property_type": "MODALITY",
+            "slot_name": "payment_obligation",
+            "value_raw": "must pay",
+            "assertion_triple": {
+              "subject": "Brightline Media",
+              "relationship": "is_required_to_pay",
+              "object": "licensing fee"
+            },
+            "certainty": "0.95",
+            "temporal_context": "current_incident",
+            "is_denial": false,
+            "is_boilerplate": false,
+            "temporal_validity": {
+              "t_valid_from": null,
+              "t_valid_until": null
+            },
+            "metadata": {}
+          },
+          {
+            "node_type": "STATED_FACT",
+            "id": "STATED_FACT_1",
+            "text": "The licensing fee amount is $50,000.",
+            "value_type": "NUMERIC",
+            "property_type": "QUANTITATIVE",
+            "slot_name": "payment_amount",
+            "value_raw": "$50,000",
+            "assertion_triple": {
+              "subject": "licensing fee",
+              "relationship": "has_amount",
+              "object": "$50,000"
+            },
+            "certainty": "0.95",
+            "temporal_context": "current_incident",
+            "is_denial": false,
+            "is_boilerplate": false,
+            "temporal_validity": {
+              "t_valid_from": null,
+              "t_valid_until": null
+            },
+            "metadata": {}
+          }
+        ],
+        "edges": []
+      }
+    },
+    {
+      "description": "Free-text environment description (TEXT + ATTRIBUTE, slot_name = environment_description)",
+      "segments": "The hallway was cluttered with boxes and loose cables.",
+      "resolved_entities": [
+        { "id": "E80", "name": "hallway", "type": "FACILITY" }
+      ],
+      "output": {
+        "nodes": [
+          {
+            "node_type": "STATED_FACT",
+            "id": "STATED_FACT_0",
+            "text": "The hallway was cluttered with boxes and loose cables.",
+            "value_type": "TEXT",
+            "property_type": "ATTRIBUTE",
+            "slot_name": "environment_description",
+            "value_raw": "cluttered with boxes and loose cables",
+            "assertion_triple": {
+              "subject": "hallway",
+              "relationship": "had_condition",
+              "object": "cluttered with boxes and loose cables"
+            },
+            "certainty": "0.92",
+            "temporal_context": "current_incident",
+            "is_denial": false,
+            "is_boilerplate": false,
+            "temporal_validity": {
+              "t_valid_from": null,
+              "t_valid_until": null
+            },
+            "metadata": {}
+          }
+        ],
+        "edges": []
+      }
+    }
+  ],
+  "user_prompt_template": "Extract facts from this document. Focus on: dates, times, quantities, locations, states, relationships between entities, modal/obligation language, and denials.\n\n{resolved_entities}\n\n{segments}\n\nReturn JSON:"
+}

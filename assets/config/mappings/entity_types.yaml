@@ -1,0 +1,172 @@
+# Entity Type Configuration
+# Defines entity types, model mappings, and domain classifications.
+#
+# Used for:
+# - Normalizing NER model outputs to canonical types
+# - Mapping entities to Helix Concept domains
+# - Entity disambiguation and resolution
+
+# Canonical entity types used internally
+# These are the normalized types stored in Helix and used throughout the pipeline
+entity_types:
+  # People
+  - PER           # Person (witness, plaintiff, defendant, attorney, etc.)
+
+  # Organizations
+  - ORG           # Organization, company, institution
+
+  # Locations
+  - LOC           # Physical location, address, venue
+
+  # Legal Entities
+  - CASE          # Legal case / matter
+  - STATUTE       # Law, statute, regulation
+  - COURT         # Court or tribunal
+  - DOCKET_ENTRY  # Case docket number
+  - EXHIBIT       # Trial exhibit
+  - EXHIBIT_ID    # Exhibit identifier
+
+  # Temporal
+  - DATE          # Date reference
+  - TIME          # Time reference
+
+  # Documents
+  - DOC_LOCAL     # Document within the current case
+
+  # Other
+  - PRODUCT       # Product or service
+  - FACILITY      # Building, facility, premises
+  - MONEY         # Monetary amount
+  - OTHER         # Fallback / unknown type
+
+# Model output -> canonical type mappings
+# Each NER model may use different label schemes; these mappings normalize them
+model_mappings:
+
+  # LegalBERT model outputs (map if different from canonical)
+  legal_bert_to_entity_type:
+    PERSON: PER
+    ORGANIZATION: ORG
+    LOCATION: LOC
+    DATE: DATE
+    # Most LegalBERT labels match canonical types directly
+
+  # spaCy model outputs
+  spacy_to_entity_type:
+    PERSON: PER
+    ORG: ORG
+    GPE: LOC
+    LOC: LOC
+    DATE: DATE
+    TIME: TIME
+    PRODUCT: PRODUCT
+    FAC: FACILITY
+
+  # GLiNER model outputs (natural language labels -> canonical types)
+  gliner_to_entity_type:
+    person: PER
+    organization: ORG
+    company: ORG
+    location: LOC
+    address: LOC
+    facility: FACILITY
+    building: FACILITY
+    product: PRODUCT
+    vehicle: PRODUCT
+    money: MONEY
+    monetary amount: MONEY
+    date: DATE
+    time: TIME
+    court: COURT
+    legal case: CASE
+
+# Entity type -> Helix domain mapping
+# Used when creating Concept nodes in the knowledge graph
+entity_type_to_domain:
+  PER: person
+  ORG: organization
+  LOC: location
+  CASE: legal
+  STATUTE: legal
+  COURT: legal
+  DOCKET_ENTRY: legal
+  EXHIBIT: legal
+  EXHIBIT_ID: legal
+  DATE: temporal
+  TIME: temporal
+  DOC_LOCAL: document
+  PRODUCT: product
+  FACILITY: location
+  MONEY: finance
+  OTHER: general
+
+# Default values when mapping fails
+defaults:
+  entity_type: OTHER
+  domain: general
+
+# Routing configuration for ED and related services.
+# These label sets define how different entity types are handled in ED.
+#
+# NOTE:
+# - Labels may include both canonical types (PER, ORG, LOC, DATE, CASE, STATUTE, ...)
+#   and routing-only labels (MATTER, RULE, REGULATION, PLEADING_VERSION, JURISDICTION)
+#   that are used in ED logic but may not appear as NER outputs.
+routing:
+  # Labels that should go through rule-first resolution before any hybrid/LLM logic.
+  rule_first_labels:
+    - CASE
+    - MATTER
+    - STATUTE
+    - RULE
+    - REGULATION
+    - DOCKET_ENTRY
+    - EXHIBIT
+    - PLEADING_VERSION
+    - COURT
+    - JURISDICTION
+
+  # Labels that should go through hybrid resolution (retrieval + heuristics).
+  hybrid_labels:
+    - PER
+    - ORG
+    - LOC
+    - DATE
+
+  # Rule resolver routing: which labels should be handled by which ED rule.
+  # Route names correspond to ED rule resolvers:
+  # - "case"    -> resolve_case_rule
+  # - "statute" -> resolve_statute_rule
+  # - "exhibit" -> resolve_exhibit_rule
+  rule_resolvers:
+    CASE: case
+    MATTER: case
+    STATUTE: statute
+    RULE: statute
+    REGULATION: statute
+    EXHIBIT: exhibit
+
+# Entity Disambiguation Configuration
+# Types that should skip ED entirely - treated as values, not entities
+skip_ed_types:
+  - DATE
+  - TIME
+  - MONEY
+
+# Type compatibility groups for ED entity reuse and alias matching.
+# Types in different groups are incompatible and are never merged/reused
+# (e.g. PER "Mercury" vs ORG "Mercury", or PRODUCT -> LOC via substring matches).
+# Types in the same group are mutually compatible. ORG, LOC and FACILITY share a
+# group because NER labels the same venue/organisation inconsistently across
+# documents (e.g. "Riverside Arena" as ORG in one doc, LOC or FACILITY in another).
+# (spaCy GPE is normalised to LOC before this check.)
+# Types not listed here (OTHER, CASE, COURT, ...) are compatible with everything.
+# CoreferenceStage cluster safety uses its own groups from the pipeline YAML.
+incompatible_type_groups:
+  - [PER]
+  - [ORG, LOC, FACILITY]
+  - [PRODUCT]
+  - [DATE, TIME]
+  - [MONEY]
+
+
