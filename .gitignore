@@ -1,0 +1,18 @@
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# Local data and model caches
+/data/
+/.fastembed_cache/
+/.models/
+*.sqlite3
+*.sqlite3-journal
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
