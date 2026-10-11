@@ -7,6 +7,11 @@ license.workspace = true
 publish.workspace = true
 rust-version.workspace = true
 
+[features]
+default = ["pdf"]
+# PDF text extraction through `pdf-extract`; without it `.pdf` inputs are rejected.
+pdf = ["dep:pdf-extract"]
+
 [dependencies]
 ce-core.workspace = true
 ce-text.workspace = true
@@ -14,6 +19,9 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 chrono.workspace = true
+csv.workspace = true
+regex.workspace = true
+pdf-extract = { workspace = true, optional = true }
 
 [dev-dependencies]
 pretty_assertions.workspace = true
