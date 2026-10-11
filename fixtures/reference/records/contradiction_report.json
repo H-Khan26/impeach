@@ -1,0 +1,200 @@
+{
+  "doc_id": "doc-1",
+  "total_facts_extracted": 3,
+  "clean_facts": [
+    {
+      "id": "STATED_FACT_0",
+      "text": "A REL B",
+      "assertion_triple": {
+        "subject": "A",
+        "relationship": "REL",
+        "object": "B"
+      },
+      "certainty": 0.9,
+      "temporal_validity": {
+        "t_valid_from": null,
+        "t_valid_until": null
+      },
+      "metadata": {},
+      "value_type": null,
+      "property_type": null,
+      "slot_name": null,
+      "value_raw": null,
+      "value_normalized": null,
+      "temporal_context": "current_incident",
+      "time_window": null,
+      "is_denial": false,
+      "is_boilerplate": false,
+      "source_chunk_id": null,
+      "source_doc_id": null,
+      "subject_entity_id": null,
+      "object_entity_id": null,
+      "raw_node": {}
+    }
+  ],
+  "committed_fact_ids": [
+    "EXISTING_FACT_1"
+  ],
+  "contradiction_results": [
+    {
+      "new_fact": {
+        "id": "STATED_FACT_0",
+        "text": "A REL B",
+        "assertion_triple": {
+          "subject": "A",
+          "relationship": "REL",
+          "object": "B"
+        },
+        "certainty": 0.9,
+        "temporal_validity": {
+          "t_valid_from": null,
+          "t_valid_until": null
+        },
+        "metadata": {},
+        "value_type": null,
+        "property_type": null,
+        "slot_name": null,
+        "value_raw": null,
+        "value_normalized": null,
+        "temporal_context": "current_incident",
+        "time_window": null,
+        "is_denial": false,
+        "is_boilerplate": false,
+        "source_chunk_id": null,
+        "source_doc_id": null,
+        "subject_entity_id": null,
+        "object_entity_id": null,
+        "raw_node": {}
+      },
+      "status": "contradiction",
+      "contradicting_pairs": [
+        {
+          "new_fact_text": "New fact text",
+          "new_fact_id": "new_001",
+          "existing_fact_id": "existing_001",
+          "existing_fact_text": "Existing fact text",
+          "nli_label": "contradiction",
+          "nli_confidence": 0.95,
+          "retrieval_sources": [
+            "graph",
+            "bm25"
+          ],
+          "priority_score": 1.5,
+          "shared_entity_ids": [
+            "ent_001",
+            "ent_002"
+          ],
+          "contradiction_source": "cross_document"
+        }
+      ],
+      "retrieval_stats": {
+        "total_candidates": 10,
+        "pairs_after_prefilter": 5,
+        "nli_calls": 5
+      },
+      "helix_fact_id": null
+    },
+    {
+      "new_fact": {
+        "id": "STATED_FACT_1",
+        "text": "The light was red",
+        "assertion_triple": {
+          "subject": "Maria Lopez",
+          "relationship": "traveled_at_speed",
+          "object": "35 mph"
+        },
+        "certainty": 0.9,
+        "temporal_validity": {
+          "t_valid_from": "2023-03-04",
+          "t_valid_until": null
+        },
+        "metadata": {},
+        "value_type": null,
+        "property_type": null,
+        "slot_name": null,
+        "value_raw": null,
+        "value_normalized": null,
+        "temporal_context": "current_incident",
+        "time_window": null,
+        "is_denial": false,
+        "is_boilerplate": false,
+        "source_chunk_id": null,
+        "source_doc_id": null,
+        "subject_entity_id": null,
+        "object_entity_id": null,
+        "raw_node": {}
+      },
+      "status": "needs_review",
+      "contradicting_pairs": [
+        {
+          "new_fact_text": "The light was red",
+          "new_fact_id": "STATED_FACT_1",
+          "existing_fact_id": "STATED_FACT_2",
+          "existing_fact_text": "The light was green",
+          "nli_label": "contradiction",
+          "nli_confidence": 0.7,
+          "retrieval_sources": [
+            "intra_document"
+          ],
+          "priority_score": 0.4,
+          "shared_entity_ids": [],
+          "contradiction_source": "intra_document"
+        }
+      ],
+      "retrieval_stats": {
+        "source": "intra_document",
+        "pairs_checked": 1
+      },
+      "helix_fact_id": null
+    }
+  ],
+  "unique_contradiction_pairs": [
+    {
+      "new_fact_text": "New fact text",
+      "new_fact_id": "new_001",
+      "existing_fact_id": "existing_001",
+      "existing_fact_text": "Existing fact text",
+      "nli_label": "contradiction",
+      "nli_confidence": 0.95,
+      "retrieval_sources": [
+        "graph",
+        "bm25"
+      ],
+      "priority_score": 1.5,
+      "shared_entity_ids": [
+        "ent_001",
+        "ent_002"
+      ],
+      "contradiction_source": "cross_document"
+    },
+    {
+      "new_fact_text": "The light was red",
+      "new_fact_id": "STATED_FACT_1",
+      "existing_fact_id": "STATED_FACT_2",
+      "existing_fact_text": "The light was green",
+      "nli_label": "contradiction",
+      "nli_confidence": 0.7,
+      "retrieval_sources": [
+        "intra_document"
+      ],
+      "priority_score": 0.4,
+      "shared_entity_ids": [],
+      "contradiction_source": "intra_document"
+    }
+  ],
+  "contradiction_threshold": 0.85,
+  "review_threshold": 0.6,
+  "processing_time_ms": 1234.5,
+  "total_nli_calls": 5,
+  "total_candidates_retrieved": 10,
+  "total_pairs_after_prefilter": 5,
+  "debug_trace": [
+    {
+      "candidate_id": "existing_001",
+      "pre_filter": "PASS",
+      "nli_label": "contradiction",
+      "nli_confidence": 0.95,
+      "priority_score": 1.5
+    }
+  ]
+}

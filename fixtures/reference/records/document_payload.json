@@ -1,0 +1,14 @@
+{
+  "doc_id": "test-doc-1",
+  "text": "This is test document text for processing.",
+  "doc_type": "complaint",
+  "title": "Test Document",
+  "file_path": "original/path.pdf",
+  "total_pages": 1,
+  "date_created": "2025-01-15T10:30:00Z",
+  "metadata": {
+    "case_id": "CASE-123",
+    "db_id": "DB-456"
+  },
+  "helix_id": null
+}

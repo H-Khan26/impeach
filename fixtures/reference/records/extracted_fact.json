@@ -1,0 +1,38 @@
+{
+  "id": "STATED_FACT_0",
+  "text": "Lopez was traveling at 35 mph",
+  "assertion_triple": {
+    "subject": "Maria Lopez",
+    "relationship": "traveled_at_speed",
+    "object": "35 mph"
+  },
+  "certainty": 0.9,
+  "temporal_validity": {
+    "t_valid_from": "2023-03-04",
+    "t_valid_until": null
+  },
+  "metadata": {
+    "pass": "pass1",
+    "source_sentence": 3
+  },
+  "value_type": "NUMERIC",
+  "property_type": "QUANTITATIVE",
+  "slot_name": "speed",
+  "value_raw": "approximately 35 mph",
+  "value_normalized": "35 mph",
+  "temporal_context": "prior_incident",
+  "time_window": {
+    "start": "2013-03-04",
+    "end": "2023-03-04"
+  },
+  "is_denial": true,
+  "is_boilerplate": false,
+  "source_chunk_id": "doc-1:chunk-00",
+  "source_doc_id": "doc-1",
+  "subject_entity_id": "ent_001",
+  "object_entity_id": null,
+  "raw_node": {
+    "id": "STATED_FACT_0",
+    "text": "Lopez was traveling at 35 mph"
+  }
+}

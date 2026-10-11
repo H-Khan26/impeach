@@ -1,0 +1,13 @@
+{
+  "id": "cluster-0",
+  "member_mention_ids": [
+    "m1",
+    "m2"
+  ],
+  "pronoun_spans": [
+    {
+      "start": 60,
+      "end": 63
+    }
+  ]
+}
