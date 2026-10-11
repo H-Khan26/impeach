@@ -79,6 +79,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "ce-ingest"
+version = "0.1.0"
+dependencies = [
+ "ce-core",
+ "ce-text",
+ "chrono",
+ "pretty_assertions",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
+name = "ce-store"
+version = "0.1.0"
+dependencies = [
+ "ce-core",
+ "ce-text",
+ "pretty_assertions",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
 name = "ce-text"
 version = "0.1.0"
 dependencies = [
