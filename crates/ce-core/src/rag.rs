@@ -3,7 +3,7 @@
 //! The chunking / embedding configuration dataclasses of that module are configuration and live
 //! in `ce-config`.
 
-use chrono::{DateTime, NaiveDate, NaiveDateTime, SecondsFormat, Utc};
+use chrono::{DateTime, NaiveDate, NaiveTime, SecondsFormat, Utc};
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 
@@ -12,29 +12,79 @@ use crate::ids::{ChunkId, DocId, NodeId, SpanId};
 use crate::Metadata;
 
 /// Parses an ISO-8601 timestamp the way the Python loader does (`datetime.fromisoformat`, with a
-/// trailing `Z` accepted). Timestamps without an offset are taken as UTC; date-only values map to
-/// midnight. Returns `None` for unparseable input.
+/// trailing `Z` accepted). Accepts extended (`2025-01-15`) and basic (`20250115`) dates, any
+/// single-character separator, times `HH`, `HH:MM`, `HH:MM:SS[.f]`, `HHMM`, `HHMMSS[.f]`, and offsets
+/// `Z`, `+HH`, `+HHMM`, `+HH:MM`, `+HH:MM:SS`. Timestamps without an offset are taken as UTC;
+/// date-only values map to midnight. Returns `None` for unparseable input.
 #[must_use]
 pub fn parse_iso_datetime(value: &str) -> Option<DateTime<Utc>> {
     let text = value.trim();
-    if let Ok(dt) = DateTime::parse_from_rfc3339(text) {
-        return Some(dt.with_timezone(&Utc));
+    let (date_part, time_part) = split_date_time(text)?;
+    let date = NaiveDate::parse_from_str(date_part, "%Y-%m-%d")
+        .or_else(|_| NaiveDate::parse_from_str(date_part, "%Y%m%d"))
+        .ok()?;
+    let Some(time_part) = time_part else {
+        return date.and_hms_opt(0, 0, 0).map(|naive| naive.and_utc());
+    };
+    let (clock, offset_seconds) = split_offset(time_part)?;
+    let time = parse_clock(clock)?;
+    let naive = date.and_time(time);
+    let utc = naive.checked_sub_signed(chrono::TimeDelta::seconds(offset_seconds))?;
+    Some(utc.and_utc())
+}
+
+/// Splits `text` into the date and the optional time (with offset) at the separator, which is
+/// any single character as in Python 3.11+; the date is 10 (`YYYY-MM-DD`) or 8 (`YYYYMMDD`)
+/// characters.
+fn split_date_time(text: &str) -> Option<(&str, Option<&str>)> {
+    let date_len = if text.as_bytes().get(4) == Some(&b'-') { 10 } else { 8 };
+    if text.len() == date_len {
+        return Some((text, None));
     }
-    for fmt in ["%Y-%m-%dT%H:%M:%S%.f%:z", "%Y-%m-%d %H:%M:%S%.f%:z", "%Y-%m-%dT%H:%M%:z"] {
-        if let Ok(dt) = DateTime::parse_from_str(text, fmt) {
-            return Some(dt.with_timezone(&Utc));
-        }
+    let date = text.get(..date_len)?;
+    let rest = text.get(date_len..)?;
+    let mut chars = rest.chars();
+    chars.next()?;
+    Some((date, Some(chars.as_str())))
+}
+
+/// Splits a time into the clock part and its UTC offset in seconds (0 when absent).
+fn split_offset(time: &str) -> Option<(&str, i64)> {
+    if let Some(clock) = time.strip_suffix(['Z', 'z']) {
+        return Some((clock, 0));
     }
-    for fmt in ["%Y-%m-%dT%H:%M:%S%.f", "%Y-%m-%d %H:%M:%S%.f", "%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"]
-    {
-        if let Ok(naive) = NaiveDateTime::parse_from_str(text, fmt) {
-            return Some(naive.and_utc());
-        }
+    let Some(sign_at) = time.find(['+', '-']) else {
+        return Some((time, 0));
+    };
+    let sign = if time.as_bytes()[sign_at] == b'-' { -1 } else { 1 };
+    let offset = &time[sign_at + 1..];
+    let offset = offset.split_once('.').map_or(offset, |(whole, _)| whole);
+    let digits: String = offset.chars().filter(|c| *c != ':').collect();
+    if !digits.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
     }
-    NaiveDate::parse_from_str(text, "%Y-%m-%d")
-        .ok()
-        .and_then(|d| d.and_hms_opt(0, 0, 0))
-        .map(|naive| naive.and_utc())
+    let field = |i: usize| digits.get(i..i + 2).and_then(|d| d.parse::<i64>().ok());
+    let (hours, minutes, seconds) = match digits.len() {
+        2 => (field(0)?, 0, 0),
+        4 => (field(0)?, field(2)?, 0),
+        6 => (field(0)?, field(2)?, field(4)?),
+        _ => return None,
+    };
+    if hours >= 24 || minutes >= 60 || seconds >= 60 {
+        return None;
+    }
+    Some((&time[..sign_at], sign * (hours * 3600 + minutes * 60 + seconds)))
+}
+
+/// Parses `HH`, `HH:MM`, `HH:MM:SS[.f]`, `HHMM` or `HHMMSS[.f]`.
+fn parse_clock(clock: &str) -> Option<NaiveTime> {
+    ["%H:%M:%S%.f", "%H:%M", "%H%M%S%.f", "%H%M"]
+        .iter()
+        .find_map(|fmt| NaiveTime::parse_from_str(clock, fmt).ok())
+        .or_else(|| {
+            let hour = (clock.len() == 2).then(|| clock.parse::<u32>().ok()).flatten()?;
+            NaiveTime::from_hms_opt(hour, 0, 0)
+        })
 }
 
 /// Formats a timestamp as RFC 3339 in UTC with a `Z` suffix and only as many fractional digits
@@ -311,6 +361,25 @@ mod tests {
         let micro = parse_iso_datetime("2025-01-15T10:30:00.123456").expect("parses");
         assert_eq!(format_datetime(&micro), "2025-01-15T10:30:00.123456Z");
         assert_eq!(parse_iso_datetime("yesterday"), None);
+        assert_eq!(parse_iso_datetime("2025-01-15T10:30:00+0000"), Some(base));
+        assert_eq!(parse_iso_datetime("2025-01-15T12:30:00+0200"), Some(base));
+        assert_eq!(parse_iso_datetime("2025-01-15T12:30:00+02"), Some(base));
+        assert_eq!(parse_iso_datetime("2025-01-15T08:30:00-02"), Some(base));
+        assert_eq!(parse_iso_datetime("2025-01-15T05:00:00-05:30"), Some(base));
+        assert_eq!(parse_iso_datetime("2025-01-15T12:30:00+02:00:00"), Some(base));
+        assert_eq!(parse_iso_datetime("2025-01-15T10:30:00.000+00:00"), Some(base));
+        assert_eq!(parse_iso_datetime("2025-01-15t10:30:00"), Some(base));
+        assert_eq!(parse_iso_datetime("2025-01-15T1030"), Some(base));
+        assert_eq!(parse_iso_datetime("2025-01-15T103000"), Some(base));
+        assert_eq!(parse_iso_datetime("20250115T103000"), Some(base));
+        assert_eq!(parse_iso_datetime("20250115"), Some(utc(2025, 1, 15, 0, 0, 0)));
+        assert_eq!(parse_iso_datetime("2025-01-15T10"), Some(utc(2025, 1, 15, 10, 0, 0)));
+        assert_eq!(parse_iso_datetime("2025-01-15T10:30:00+2"), None);
+        assert_eq!(parse_iso_datetime("2025-01-15T10:30:00+24:00"), None);
+        assert_eq!(parse_iso_datetime("2025-01-15T10:30:00+ab"), None);
+        assert_eq!(parse_iso_datetime("2025-01-15X10:30"), Some(base));
+        assert_eq!(parse_iso_datetime("2025-01-15TT10:30"), None);
+        assert_eq!(parse_iso_datetime("2025-13-15"), None);
         assert_eq!(parse_iso_datetime(""), None);
     }
 
