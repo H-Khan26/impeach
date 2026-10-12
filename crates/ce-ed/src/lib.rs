@@ -25,13 +25,16 @@ pub mod service;
 pub mod structured_keys;
 
 pub use context_builder::ContextBuilder;
+pub use entity_creator::{EntityCreator, EntityOutcome};
 pub use error::{recover_store, EdError, Result};
 pub use name_matching::{entity_types_compatible, names_match, normalize_for_matching};
 pub use name_similarity::{date_similarity, money_similarity, NameSimilarity};
+pub use resolver::{collect_cluster_aliases, CoreEdResolver, IntraDocumentMatcher, ResolveInput};
 pub use retrieval::{
     candidate_from_entity, EdRetrieval, EdRetriever, RetrieverSettings, StructuredKeyQuery,
 };
 pub use rule_resolvers::{
     resolve_case_rule, resolve_exhibit_rule, resolve_generic_rule, resolve_statute_rule,
 };
+pub use service::{EdService, EdServiceSettings};
 pub use structured_keys::{CaseCitationKey, ExhibitKey, FederalRuleKey, KeyPatterns, StatuteKey};
