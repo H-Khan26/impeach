@@ -72,16 +72,66 @@ pub fn model_key(pipeline_name: &str, kind: ModelKind) -> String {
     format!("{pipeline_name}_{}", kind.as_str())
 }
 
+/// One model slot: empty until the model is injected or constructed.
+type Slot<T> = Arc<Mutex<Option<Arc<T>>>>;
+
+/// Models of one kind by key. The map lock is held only to find a key's slot; construction
+/// runs under that slot's own lock, so a slow construction (a model download) blocks only
+/// callers of the same key.
+struct Models<T: ?Sized> {
+    slots: Mutex<HashMap<String, Slot<T>>>,
+}
+
+impl<T: ?Sized> Default for Models<T> {
+    fn default() -> Self {
+        Self { slots: Mutex::default() }
+    }
+}
+
+impl<T: ?Sized> Models<T> {
+    fn slot(&self, key: &str) -> Slot<T> {
+        let mut slots = lock(&self.slots);
+        match slots.get(key) {
+            Some(slot) => Arc::clone(slot),
+            None => {
+                let slot: Slot<T> = Arc::default();
+                slots.insert(key.to_owned(), Arc::clone(&slot));
+                slot
+            }
+        }
+    }
+
+    fn insert(&self, key: &str, model: Arc<T>) {
+        *lock(&self.slot(key)) = Some(model);
+    }
+
+    /// The model under `key`, constructed with `build` when the slot is empty.
+    fn get_or_build(
+        &self,
+        key: &str,
+        build: impl FnOnce() -> Result<Arc<T>, ModelError>,
+    ) -> Result<Arc<T>, ModelError> {
+        let slot = self.slot(key);
+        let mut model = lock(&slot);
+        if let Some(existing) = model.as_ref() {
+            return Ok(Arc::clone(existing));
+        }
+        let built = build()?;
+        *model = Some(Arc::clone(&built));
+        Ok(built)
+    }
+}
+
 /// Lazily constructed, shared model instances.
 pub struct ModelRegistry {
     pipeline_name: String,
     models: Option<ModelsConfig>,
     coref_sidecar: Option<SidecarCommand>,
-    embedders: Mutex<HashMap<String, Arc<dyn Embedder>>>,
-    nlis: Mutex<HashMap<String, Arc<dyn NliJudge>>>,
-    llms: Mutex<HashMap<String, Arc<dyn Llm>>>,
-    ners: Mutex<HashMap<String, Arc<dyn NerModel>>>,
-    corefs: Mutex<HashMap<String, Arc<dyn Coref>>>,
+    embedders: Models<dyn Embedder>,
+    nlis: Models<dyn NliJudge>,
+    llms: Models<dyn Llm>,
+    ners: Models<dyn NerModel>,
+    corefs: Models<dyn Coref>,
 }
 
 impl fmt::Debug for ModelRegistry {
@@ -114,11 +164,11 @@ impl ModelRegistry {
             pipeline_name,
             models,
             coref_sidecar: None,
-            embedders: Mutex::default(),
-            nlis: Mutex::default(),
-            llms: Mutex::default(),
-            ners: Mutex::default(),
-            corefs: Mutex::default(),
+            embedders: Models::default(),
+            nlis: Models::default(),
+            llms: Models::default(),
+            ners: Models::default(),
+            corefs: Models::default(),
         }
     }
 
@@ -158,87 +208,67 @@ impl ModelRegistry {
 
     /// Injects an embedder under `key`.
     pub fn insert_embedder(&self, key: impl Into<String>, model: Arc<dyn Embedder>) {
-        lock(&self.embedders).insert(key.into(), model);
+        self.embedders.insert(&key.into(), model);
     }
 
     /// Injects an NLI judge under `key`.
     pub fn insert_nli(&self, key: impl Into<String>, model: Arc<dyn NliJudge>) {
-        lock(&self.nlis).insert(key.into(), model);
+        self.nlis.insert(&key.into(), model);
     }
 
     /// Injects an LLM under `key`.
     pub fn insert_llm(&self, key: impl Into<String>, model: Arc<dyn Llm>) {
-        lock(&self.llms).insert(key.into(), model);
+        self.llms.insert(&key.into(), model);
     }
 
     /// Injects a NER model under `key`.
     pub fn insert_ner(&self, key: impl Into<String>, model: Arc<dyn NerModel>) {
-        lock(&self.ners).insert(key.into(), model);
+        self.ners.insert(&key.into(), model);
     }
 
     /// Injects a coreference resolver under `key`.
     pub fn insert_coref(&self, key: impl Into<String>, model: Arc<dyn Coref>) {
-        lock(&self.corefs).insert(key.into(), model);
+        self.corefs.insert(&key.into(), model);
     }
 
     /// The embedder registered under `key` (the `bge` model), constructed on first use.
     pub fn embedder(&self, key: &str) -> Result<Arc<dyn Embedder>, ModelError> {
-        let mut map = lock(&self.embedders);
-        if let Some(m) = map.get(key) {
-            return Ok(Arc::clone(m));
-        }
-        self.require_kind(key, ModelKind::Bge)?;
-        let model = self.build_embedder()?;
-        map.insert(key.to_owned(), Arc::clone(&model));
-        Ok(model)
+        self.embedders.get_or_build(key, || {
+            self.require_kind(key, ModelKind::Bge)?;
+            self.build_embedder()
+        })
     }
 
     /// The NLI judge registered under `key` (the `deberta_nli` model).
     pub fn nli(&self, key: &str) -> Result<Arc<dyn NliJudge>, ModelError> {
-        let mut map = lock(&self.nlis);
-        if let Some(m) = map.get(key) {
-            return Ok(Arc::clone(m));
-        }
-        self.require_kind(key, ModelKind::DebertaNli)?;
-        let model = self.build_nli()?;
-        map.insert(key.to_owned(), Arc::clone(&model));
-        Ok(model)
+        self.nlis.get_or_build(key, || {
+            self.require_kind(key, ModelKind::DebertaNli)?;
+            self.build_nli()
+        })
     }
 
     /// The LLM registered under `key` (the `ollama` model).
     pub fn llm(&self, key: &str) -> Result<Arc<dyn Llm>, ModelError> {
-        let mut map = lock(&self.llms);
-        if let Some(m) = map.get(key) {
-            return Ok(Arc::clone(m));
-        }
-        self.require_kind(key, ModelKind::Ollama)?;
-        let model = self.build_llm()?;
-        map.insert(key.to_owned(), Arc::clone(&model));
-        Ok(model)
+        self.llms.get_or_build(key, || {
+            self.require_kind(key, ModelKind::Ollama)?;
+            self.build_llm()
+        })
     }
 
     /// The NER model registered under `key` (the `gliner2` model).
     pub fn ner(&self, key: &str) -> Result<Arc<dyn NerModel>, ModelError> {
-        let mut map = lock(&self.ners);
-        if let Some(m) = map.get(key) {
-            return Ok(Arc::clone(m));
-        }
-        self.require_kind(key, ModelKind::Gliner2)?;
-        let model = self.build_ner()?;
-        map.insert(key.to_owned(), Arc::clone(&model));
-        Ok(model)
+        self.ners.get_or_build(key, || {
+            self.require_kind(key, ModelKind::Gliner2)?;
+            self.build_ner()
+        })
     }
 
     /// The coreference resolver registered under `key` (the `coref` model).
     pub fn coref(&self, key: &str) -> Result<Arc<dyn Coref>, ModelError> {
-        let mut map = lock(&self.corefs);
-        if let Some(m) = map.get(key) {
-            return Ok(Arc::clone(m));
-        }
-        self.require_kind(key, ModelKind::Coref)?;
-        let model = self.build_coref()?;
-        map.insert(key.to_owned(), Arc::clone(&model));
-        Ok(model)
+        self.corefs.get_or_build(key, || {
+            self.require_kind(key, ModelKind::Coref)?;
+            self.build_coref()
+        })
     }
 
     /// Checks that `key` names a configured model of `kind`.
@@ -499,5 +529,43 @@ mod tests {
             registry.llm("p_ollama"),
             Err(ModelError::Unavailable { ref backend, .. }) if backend == "ollama"
         ));
+    }
+
+    #[test]
+    fn slow_construction_does_not_block_other_keys() {
+        use std::sync::mpsc;
+        use std::time::Duration;
+
+        let registry = Arc::new(ModelRegistry::empty("p"));
+        registry.insert_embedder("p_injected", Arc::new(MockEmbedder::new(4)));
+        let (started_tx, started_rx) = mpsc::channel();
+        let (release_tx, release_rx) = mpsc::channel::<()>();
+
+        let builder = {
+            let registry = Arc::clone(&registry);
+            std::thread::spawn(move || {
+                registry.embedders.get_or_build("p_slow", || {
+                    started_tx.send(()).expect("signal start");
+                    // Waits until the concurrent lookup below has finished.
+                    release_rx.recv_timeout(Duration::from_secs(10)).map_err(|_| {
+                        ModelError::Unavailable {
+                            backend: "slow".to_owned(),
+                            reason: "never released".to_owned(),
+                        }
+                    })?;
+                    Ok(Arc::new(MockEmbedder::new(8)) as Arc<dyn Embedder>)
+                })
+            })
+        };
+
+        started_rx.recv_timeout(Duration::from_secs(10)).expect("construction started");
+        let injected = registry.embedder("p_injected").expect("injected lookup while building");
+        assert_eq!(injected.dimension(), 4);
+        release_tx.send(()).expect("release the builder");
+
+        let slow = builder.join().expect("builder thread").expect("slow model");
+        assert_eq!(slow.dimension(), 8);
+        let cached = registry.embedder("p_slow").expect("cached slow model");
+        assert!(Arc::ptr_eq(&slow, &cached));
     }
 }
