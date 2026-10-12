@@ -175,7 +175,7 @@ fn intra_document_contradiction_flags_both_facts() {
     {
         assert_eq!(result.new_fact.id, id);
         assert_eq!(result.status, ContradictionStatus::Contradiction);
-        assert_eq!(result.contradicting_pairs, [pair.clone()]);
+        assert_eq!(result.contradicting_pairs, std::slice::from_ref(pair));
         assert_eq!(
             Value::Object(result.retrieval_stats.clone()),
             json!({"source": "intra_document", "pairs_checked": 1})

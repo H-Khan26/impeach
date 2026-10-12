@@ -362,7 +362,6 @@ fn write_output(path: &Path, output: &E2eOutput) -> Result<()> {
 }
 
 /// The injected evaluator embedder, else the default evaluator model (feature `fastembed`).
-#[allow(clippy::unnecessary_wraps)]
 fn eval_embedder(injected: Option<Arc<dyn Embedder>>) -> Result<Option<Arc<dyn Embedder>>> {
     if let Some(embedder) = injected {
         return Ok(Some(embedder));

@@ -50,4 +50,4 @@ pub use retrieval::{
     retrieved_fact_from_node, SimilarFactRetriever, SOURCE_BM25, SOURCE_GRAPH, SOURCE_VECTOR,
 };
 pub use review::{build_review_items_from_report, ReviewProvenance};
-pub use service::ContradictionCheckService;
+pub use service::{ContradictionCheckService, IntraDocCheck, IntraDocStats};
