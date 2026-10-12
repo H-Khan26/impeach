@@ -401,7 +401,14 @@ fn open_store_with_helix_memory_mode() {
     .expect("runs");
     assert_eq!(
         run.stages,
-        ["rag_index", "mention_detection", "definition_extraction", "coreference"]
+        [
+            "rag_index",
+            "mention_detection",
+            "definition_extraction",
+            "coreference",
+            "ed_resolution",
+            "relation_extraction"
+        ]
     );
     let indexed = run.data.rag_index_result.as_ref().expect("indexed");
     assert_eq!(indexed.chunks.len(), 6);
@@ -413,4 +420,11 @@ fn open_store_with_helix_memory_mode() {
     let span_ids = run.data.mention_to_span_id.as_ref().expect("mention spans written");
     assert!(!span_ids.is_empty());
     assert!(span_ids.len() <= mentions.len());
+
+    // ED against helix: entities created and mention spans linked to them.
+    let resolved = run.data.resolved_mentions.as_ref().expect("resolved_mentions");
+    assert!(!resolved.is_empty());
+    assert!(!run.data.ed_results.as_ref().expect("ed_results").is_empty());
+    assert!(!store.get_all_entities(1000).expect("entities").is_empty());
+    assert_eq!(run.data.extracted_relations.as_deref(), Some(&[][..]));
 }

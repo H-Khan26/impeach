@@ -1,12 +1,13 @@
 //! The core ED resolver (Python `services/ed/resolver.py`, `interfaces.py`): intra-document
 //! matching, the ED service per mention, entity creation and coreference alias propagation.
 //!
-//! Per mention (in input order): build the [`EdContext`] (mentions outside the indexed chunks
-//! are skipped); try the [`IntraDocumentMatcher`] (`intra_doc_exact`, `intra_doc_fuzzy`,
-//! `intra_doc_alias`, confidence 0.85); else run [`EdService::resolve_span`] and, when
-//! unresolved and `create_if_missing` is set, [`EntityCreator::create_entity_from_ed_result`]
-//! with the coreference cluster aliases of a canonical mention. Every resolution is registered
-//! with the matcher together with the cluster aliases.
+//! Per mention (in input order): build the [`ce_core::EdContext`] (mentions outside the
+//! indexed chunks are skipped); try the [`IntraDocumentMatcher`] (`intra_doc_exact`,
+//! `intra_doc_fuzzy`, `intra_doc_alias`, confidence 0.85); else run
+//! [`EdService::resolve_span`] and, when unresolved and `create_if_missing` is set,
+//! [`EntityCreator::create_entity_from_ed_result`] with the coreference cluster aliases of a
+//! canonical mention. Every resolution is registered with the matcher together with the
+//! cluster aliases.
 //!
 //! Entity type compatibility uses [`entity_types_compatible`] everywhere (Python's alias step
 //! used a group-membership rule that called ungrouped types incompatible).

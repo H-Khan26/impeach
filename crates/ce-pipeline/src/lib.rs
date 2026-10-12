@@ -13,6 +13,9 @@
 //!   stage types).
 //! - [`RagIndexStage`]: chunking ([`rag::chunker`] documents the boundary rule), Document /
 //!   Chunk / Span nodes, chunk embeddings, optional document-identity cache.
+//! - [`MentionStage`], [`DefinitionStage`], [`CoreferenceStage`]: mentions, defined role terms
+//!   and coreference clusters; [`EdStage`]: mentions -> entities (`ce_ed`), role map and
+//!   mention span links; [`RelationStage`]: GLiNER2 relations kept in the context.
 //! - [`run_processing`]: the public entry point over a pre-ingested JSONL file;
 //!   [`run_processing_with`] injects the model registry, graph store and stage registry.
 //!
@@ -41,6 +44,12 @@
 //! - Embedder output whose count or dimension does not match the chunks / store fails the stage
 //!   instead of producing one store error per vector.
 //! - Without the `helix` feature, [`run_processing`] uses an in-memory store.
+//! - [`EdStage`] loads its prompt file and `roles.yaml` when it is built and fails the build
+//!   when either is missing (Python logged a missing prompt and failed at the first LLM
+//!   tie-break); an offline run (`index_persisted == false`) resolves nothing, like Python
+//!   without a Helix client.
+//! - [`RelationStage`] uses [`stages::relation::DEFAULT_RELATION_THRESHOLD`] when the config has
+//!   no `models.gliner2` block (an injected model); Python required the block.
 
 pub mod api;
 pub mod context;
