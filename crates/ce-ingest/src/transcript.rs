@@ -72,8 +72,13 @@ fn normalize_utterance(data: &Metadata) -> Utterance {
 /// is not one JSON document, each non-blank line is parsed as JSON and undecodable lines are
 /// skipped (JSON Lines).
 ///
+/// `NaN`, `Infinity` and `-Infinity` literals (which Python's `json.load` accepts) read as the
+/// strings `nan`, `inf` and `-inf`, what Python `str()` prints for them; a non-finite speaker
+/// is rejected.
+///
 /// # Errors
-/// Read errors, and [`IngestError::InvalidTranscript`] when an utterance is not an object.
+/// Read errors, and [`IngestError::InvalidTranscript`] when an utterance is not an object or a
+/// speaker is a non-finite number.
 pub fn parse_json(path: &Path) -> Result<Vec<Utterance>> {
     let content = py::read_text(path)?;
     let not_object = || IngestError::InvalidTranscript {
@@ -84,37 +89,48 @@ pub fn parse_json(path: &Path) -> Result<Vec<Utterance>> {
         Value::Object(map) => Ok(normalize_utterance(&map)),
         _ => Err(not_object()),
     };
-    match json_loads(&content) {
-        Some(Value::Array(items)) => items.into_iter().map(utterance).collect(),
-        Some(other) => Ok(vec![utterance(other)?]),
+    let mut utterances = match json_loads(&content) {
+        Some(Value::Array(items)) => items.into_iter().map(utterance).collect::<Result<_>>()?,
+        Some(other) => vec![utterance(other)?],
         None => content
             .split_terminator('\n')
             .map(py_strip)
             .filter(|line| !line.is_empty())
             .filter_map(json_loads)
             .map(utterance)
-            .collect(),
+            .collect::<Result<_>>()?,
+    };
+    if has_non_finite_literal(&content) {
+        for utterance in &mut utterances {
+            resolve_non_finite(path, utterance)?;
+        }
     }
+    Ok(utterances)
 }
 
-/// Python `json.loads`, which also accepts the `NaN`, `Infinity` and `-Infinity` literals that
-/// `json.dumps` writes. Those literals become the strings `nan`, `inf` and `-inf`, which is what
-/// Python `str()` prints for them. Returns `None` when the text is not one JSON document.
+/// Marks a string that stands for one of Python's non-finite float literals.
+const NON_FINITE_TAG: char = '\0';
+
+fn has_non_finite_literal(text: &str) -> bool {
+    text.contains("NaN") || text.contains("Infinity")
+}
+
+/// Python `json.loads`, which also accepts the `NaN`, `Infinity` and `-Infinity` literals;
+/// those become tagged strings that [`resolve_non_finite`] resolves. Returns `None` when the
+/// text is not one JSON document.
 fn json_loads(text: &str) -> Option<Value> {
     match serde_json::from_str(text) {
         Ok(value) => Some(value),
-        Err(_) if text.contains("NaN") || text.contains("Infinity") => {
-            serde_json::from_str(&quote_non_finite(text)).ok()
-        }
+        Err(_) if has_non_finite_literal(text) => serde_json::from_str(&tag_non_finite(text)).ok(),
         Err(_) => None,
     }
 }
 
-/// Replaces `NaN`, `Infinity` and `-Infinity` outside string literals with quoted `nan`, `inf`
-/// and `-inf`.
-fn quote_non_finite(text: &str) -> String {
+/// Replaces `NaN`, `Infinity` and `-Infinity` outside string literals with tagged strings of
+/// Python's `str()` spelling (`nan`, `inf`, `-inf`).
+fn tag_non_finite(text: &str) -> String {
     const LITERALS: [(&str, &str); 3] =
-        [("-Infinity", "\"-inf\""), ("Infinity", "\"inf\""), ("NaN", "\"nan\"")];
+        [("-Infinity", "-inf"), ("Infinity", "inf"), ("NaN", "nan")];
     let mut out = String::with_capacity(text.len() + 16);
     let mut in_string = false;
     let mut escaped = false;
@@ -130,10 +146,10 @@ fn quote_non_finite(text: &str) -> String {
             }
         } else if c == '"' {
             in_string = true;
-        } else if let Some((literal, quoted)) =
+        } else if let Some((literal, spelling)) =
             LITERALS.iter().find(|(literal, _)| rest.starts_with(literal))
         {
-            out.push_str(quoted);
+            out.push_str(&Value::String(format!("{NON_FINITE_TAG}{spelling}")).to_string());
             rest = &rest[literal.len()..];
             continue;
         }
@@ -141,6 +157,41 @@ fn quote_non_finite(text: &str) -> String {
         rest = &rest[c.len_utf8()..];
     }
     out
+}
+
+/// The Python spelling behind a tagged non-finite string.
+fn non_finite_spelling(value: &Value) -> Option<&str> {
+    value.as_str()?.strip_prefix(NON_FINITE_TAG)
+}
+
+/// Rejects a non-finite speaker (Python would write a bare `NaN` into `unique_speakers`, which
+/// is not JSON, or fail to sort it against string speakers) and turns every other tagged value
+/// into its Python `str()` spelling.
+fn resolve_non_finite(path: &Path, utterance: &mut Utterance) -> Result<()> {
+    if let Some(spelling) = non_finite_spelling(&utterance.speaker) {
+        return Err(IngestError::InvalidTranscript {
+            path: path.to_path_buf(),
+            reason: format!("speaker is the non-finite number {spelling}"),
+        });
+    }
+    untag(&mut utterance.role);
+    untag(&mut utterance.text);
+    untag(&mut utterance.timestamp);
+    utterance.metadata.values_mut().for_each(untag);
+    Ok(())
+}
+
+fn untag(value: &mut Value) {
+    match value {
+        Value::String(_) => {
+            if let Some(spelling) = non_finite_spelling(value) {
+                *value = Value::from(spelling);
+            }
+        }
+        Value::Array(items) => items.iter_mut().for_each(untag),
+        Value::Object(map) => map.values_mut().for_each(untag),
+        Value::Null | Value::Bool(_) | Value::Number(_) => {}
+    }
 }
 
 /// Parses a CSV transcript with a header row (`speaker,role,text[,timestamp]`) like Python's
@@ -764,12 +815,22 @@ mod tests {
              {\"speaker\": -Infinity, \"text\": \"bye\", \"page\": Infinity}\n]",
         )
         .expect("write");
-        let utterances = parse_json(&non_finite).expect("parse");
-        assert_eq!(utterances.len(), 2);
-        assert_eq!(utterances[0].text, json!("NaN or -Infinity"));
-        assert_eq!(utterances[0].timestamp, json!("nan"));
-        assert_eq!(utterances[1].speaker, json!("-inf"));
-        assert_eq!(Value::Object(utterances[1].metadata.clone()), json!({"page": "inf"}));
+        let error = parse_json(&non_finite).expect_err("non-finite speaker");
+        assert!(
+            matches!(&error, IngestError::InvalidTranscript { reason, .. } if reason.contains("-inf")),
+            "{error:?}"
+        );
+
+        let non_finite_values = dir.path().join("non_finite_values.json");
+        std::fs::write(
+            &non_finite_values,
+            "[{\"speaker\": \"A\", \"text\": NaN, \"timestamp\": -Infinity, \"page\": [Infinity]}]",
+        )
+        .expect("write");
+        let utterances = parse_json(&non_finite_values).expect("parse");
+        assert_eq!(utterances[0].text, json!("nan"));
+        assert_eq!(utterances[0].timestamp, json!("-inf"));
+        assert_eq!(Value::Object(utterances[0].metadata.clone()), json!({"page": ["inf"]}));
     }
 
     #[test]

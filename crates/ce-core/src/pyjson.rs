@@ -2,6 +2,9 @@
 //! `repr` (`1e+20`, `1.0`), and non-ASCII text either kept (`ensure_ascii=False`) or escaped as
 //! `\uXXXX` UTF-16 units (`ensure_ascii=True`, the Python default). Field order is the serde
 //! order, so records serialise in Python field order.
+//!
+//! One deliberate difference: non-finite floats are written as `null` (what `serde_json` does),
+//! not as Python's `NaN` / `Infinity`, which are not valid JSON.
 
 use std::fmt::Write as _;
 use std::io::{self, Write};
@@ -103,8 +106,7 @@ fn to_string_with<T: Serialize + ?Sized>(
     let mut out = Vec::new();
     let mut serializer = serde_json::Serializer::with_formatter(&mut out, formatter);
     value.serialize(&mut serializer)?;
-    // serde_json only writes valid UTF-8.
-    Ok(String::from_utf8_lossy(&out).into_owned())
+    String::from_utf8(out).map_err(serde::ser::Error::custom)
 }
 
 /// Python `json.dumps(value, ensure_ascii=False)`.
@@ -123,16 +125,17 @@ pub fn to_python_json_ascii<T: Serialize + ?Sized>(value: &T) -> serde_json::Res
     to_string_with(value, PythonFormatter { ensure_ascii: true })
 }
 
-/// Python `repr()` of a float (also what `json.dumps` writes): the shortest round-trip digits,
-/// positional for decimal exponents in `-4..16`, otherwise scientific with a signed two-digit
-/// exponent (`1e+20`, `1.5e-07`). Non-finite values use the `json.dumps` spellings.
+/// Python `repr()` (and `str()`) of a float, which is also what `json.dumps` writes for finite
+/// values: the shortest round-trip digits, positional for decimal exponents in `-4..16`,
+/// otherwise scientific with a signed two-digit exponent (`1e+20`, `1.5e-07`); `nan`, `inf`
+/// and `-inf` for non-finite values.
 #[must_use]
 pub fn float_repr(value: f64) -> String {
     if value.is_nan() {
-        return "NaN".to_owned();
+        return "nan".to_owned();
     }
     if value.is_infinite() {
-        return if value > 0.0 { "Infinity" } else { "-Infinity" }.to_owned();
+        return if value > 0.0 { "inf" } else { "-inf" }.to_owned();
     }
     if value == 0.0 {
         return if value.is_sign_negative() { "-0.0" } else { "0.0" }.to_owned();
@@ -211,6 +214,13 @@ mod tests {
     }
 
     #[test]
+    fn non_finite_floats_are_written_as_null() {
+        let values = [f64::NAN, f64::INFINITY, f64::NEG_INFINITY, 0.5];
+        assert_eq!(to_python_json(&values).expect("serialize"), "[null, null, null, 0.5]");
+        assert_eq!(to_python_json_ascii(&f32::NAN).expect("serialize"), "null");
+    }
+
+    #[test]
     fn ensure_ascii_escapes_like_python() {
         let value =
             json!({"a": [1, 2.5, null, true], "b": {"c": "Ünïcode \u{1F600} \"q\"\n\u{7f}/"}});
@@ -239,6 +249,9 @@ mod tests {
             (-0.0, "-0.0"),
             (1.0e300, "1e+300"),
             (2.0e-308, "2e-308"),
+            (f64::NAN, "nan"),
+            (f64::INFINITY, "inf"),
+            (f64::NEG_INFINITY, "-inf"),
             (2_163_462_279_744_188.0 + 0.25, "2163462279744188.2"),
             (5e-324, "5e-324"),
             (1.7976931348623157e308, "1.7976931348623157e+308"),

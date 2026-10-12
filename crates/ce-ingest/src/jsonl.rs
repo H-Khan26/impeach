@@ -63,7 +63,7 @@ pub fn read_first_record(jsonl_path: impl AsRef<Path>) -> Result<DocumentPayload
     let file = std::fs::File::open(path).map_err(io_error)?;
     let mut raw = Vec::new();
     io::BufReader::new(file).read_until(b'\n', &mut raw).map_err(io_error)?;
-    let raw = raw.strip_prefix(b"\xEF\xBB\xBF").unwrap_or(&raw);
+    let raw = py::strip_bom(&raw);
     // Python's text mode ends a line at `\n`, `\r\n` or a lone `\r`.
     let raw = raw.iter().position(|b| *b == b'\r').map_or(raw, |end| &raw[..end]);
     let line = std::str::from_utf8(raw)

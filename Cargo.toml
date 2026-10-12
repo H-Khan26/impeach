@@ -53,6 +53,7 @@ ollama-rs = { version = "0.3.6", default-features = false }
 
 # Ingestion and chunking
 csv = "1.4.0"
+unicode-general-category = "1.1.0"
 text-splitter = "0.33.0"
 pdf-extract = "0.12.1"
 

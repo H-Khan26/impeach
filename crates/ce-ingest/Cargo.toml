@@ -21,6 +21,7 @@ thiserror.workspace = true
 chrono.workspace = true
 csv.workspace = true
 regex.workspace = true
+unicode-general-category.workspace = true
 pdf-extract = { workspace = true, optional = true }
 
 [dev-dependencies]

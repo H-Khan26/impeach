@@ -15,10 +15,15 @@ use crate::error::{IngestError, Result};
 pub(crate) fn read_text(path: &Path) -> Result<String> {
     let bytes = std::fs::read(path)
         .map_err(|source| IngestError::Io { path: path.to_path_buf(), source })?;
-    let body = bytes.strip_prefix(b"\xEF\xBB\xBF").unwrap_or(&bytes);
+    let body = strip_bom(&bytes);
     let text = std::str::from_utf8(body)
         .map_err(|source| IngestError::Encoding { path: path.to_path_buf(), source })?;
     Ok(translate_newlines(text))
+}
+
+/// `bytes` without a leading UTF-8 byte-order mark.
+pub(crate) fn strip_bom(bytes: &[u8]) -> &[u8] {
+    bytes.strip_prefix(b"\xEF\xBB\xBF").unwrap_or(bytes)
 }
 
 /// Python universal-newline translation: `\r\n` and lone `\r` become `\n`.
@@ -189,7 +194,7 @@ fn write_repr(out: &mut String, value: &Value) {
 }
 
 /// Appends Python `repr()` of a string: single quotes unless the text contains `'` and no `"`;
-/// control and non-space whitespace characters are escaped.
+/// every non-printable character (see `is_py_printable`) is escaped.
 fn write_str_repr(out: &mut String, text: &str) {
     let quote = if text.contains('\'') && !text.contains('"') { '"' } else { '\'' };
     out.push(quote);
@@ -203,7 +208,7 @@ fn write_str_repr(out: &mut String, text: &str) {
                 out.push('\\');
                 out.push(c);
             }
-            c if c.is_control() || (c.is_whitespace() && c != ' ') => {
+            c if !is_py_printable(c) => {
                 let code = u32::from(c);
                 // Writing to a String cannot fail.
                 let _ = if code < 0x100 {
@@ -218,6 +223,26 @@ fn write_str_repr(out: &mut String, text: &str) {
         }
     }
     out.push(quote);
+}
+
+/// Python `str.isprintable()` for one character: false for the general categories Cc, Cf, Cs,
+/// Co, Cn, Zl, Zp and Zs, except the ASCII space. Category data comes from
+/// `unicode-general-category`, which may know characters newer than the running Python's
+/// Unicode database.
+fn is_py_printable(c: char) -> bool {
+    use unicode_general_category::{get_general_category, GeneralCategory};
+    c == ' '
+        || !matches!(
+            get_general_category(c),
+            GeneralCategory::Control
+                | GeneralCategory::Format
+                | GeneralCategory::Surrogate
+                | GeneralCategory::PrivateUse
+                | GeneralCategory::Unassigned
+                | GeneralCategory::LineSeparator
+                | GeneralCategory::ParagraphSeparator
+                | GeneralCategory::SpaceSeparator
+        )
 }
 
 #[cfg(test)]
@@ -286,5 +311,7 @@ mod tests {
             r#"["it's", 'say "hi"\n', 'a\xa0b']"#
         );
         assert_eq!(py_str(&json!(["both ' and \""])), r#"['both \' and "']"#);
+        // Format, private-use, unassigned and separator characters are escaped as in Python.
+        assert_eq!(py_str(&json!(["a\u{200b}b\u{feff}c\u{ad}d\u{2028}e\u{f0000}f\u{378}g\u{85} h\u{3000}\u{e9}\u{1f600}"])), r#"['a\u200bb\ufeffc\xadd\u2028e\U000f0000f\u0378g\x85 h\u3000é😀']"#);
     }
 }

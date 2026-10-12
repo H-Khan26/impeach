@@ -34,6 +34,10 @@
 //! - JSON documents need string `doc_id` / `text` and an integer `total_pages`; JSONL records
 //!   need a string `text`. Python passes other types through untyped.
 //! - Extra top-level JSONL keys move into `metadata` in record order (Python: set order).
+//! - `NaN` / `Infinity` literals in JSON transcripts read as the strings `nan` / `inf` (their
+//!   Python `str()`), and a non-finite speaker is an [`IngestError::InvalidTranscript`]: Python
+//!   writes it into `unique_speakers` as a bare `NaN` (not JSON) or fails to sort it against
+//!   string speakers.
 
 pub mod error;
 pub mod ingest;
