@@ -15,7 +15,9 @@
 //!
 //!    A gendered honorific (`mr`, `sir` masculine; `mrs`, `ms`, `miss`, `madam` feminine) is
 //!    kept as a constraint: `Mr. Lopez` and `Mrs. Lopez` are different names, a bare `Lopez`
-//!    beside both is ambiguous, and a bare `Lopez` beside only `Mr. Lopez` is its alias.
+//!    beside both is ambiguous, and a bare `Lopez` beside only `Mr. Lopez` is its alias. A name
+//!    that is the alias target of both a masculine and a feminine name (`Carlos Lopez` beside
+//!    `Mr. Lopez` and `Mrs. Lopez`) is ambiguous too: none of those aliases link to it.
 //! 2. **Pronoun linking**: every pronoun in the text that does not overlap a mention, and every
 //!    mention whose text is a pronoun, links to the nearest preceding compatible mention (or
 //!    already linked pronoun of the same kind) that starts in the same sentence or at most
@@ -33,8 +35,10 @@
 //!    capital initials; a blank line also ends a sentence.
 //!
 //! **Gender**: a cluster never mixes masculine and feminine evidence (gendered honorifics and
-//! pronouns). A name alias or a pronoun link that would mix them is skipped; a pronoun then
-//! tries its next nearest candidate.
+//! pronouns). Name aliases are decided before any linking (see above), so their result does
+//! not depend on mention order; an alias link that would still mix genders through earlier
+//! links is skipped. A pronoun link that would mix them is skipped and the pronoun tries its
+//! next nearest candidate.
 //!
 //! Output clusters hold at least two distinct spans sorted by start, ordered by their first span.
 
@@ -199,7 +203,7 @@ impl UnionFind {
         if combined == Gender::Masculine.bit() | Gender::Feminine.bit() {
             return false;
         }
-        // The smaller root wins so results do not depend on union order.
+        // The smaller root becomes the representative.
         let (keep, drop) = if ra < rb { (ra, rb) } else { (rb, ra) };
         self.parent[drop] = keep;
         self.genders[keep] = combined;
@@ -427,21 +431,31 @@ fn cluster_mentions(text: &str, mentions: &[CorefMention<'_>]) -> Vec<CorefClust
             forest.union(pair[0], pair[1]);
         }
     }
+    // Alias edges (alias group, target group): every alias whose targets nest.
+    let mut edges: Vec<(usize, usize)> = Vec::new();
     for (g, group) in groups.iter().enumerate() {
-        let longer: Vec<&NameGroup<'_>> = groups
+        let longer: Vec<usize> =
+            (0..groups.len()).filter(|h| *h != g && group.is_alias_of(&groups[*h])).collect();
+        let nested = longer
             .iter()
             .enumerate()
-            .filter(|(h, other)| *h != g && group.is_alias_of(other))
-            .map(|(_, other)| other)
-            .collect();
-        let nested =
-            longer.iter().enumerate().all(|(i, a)| longer[i + 1..].iter().all(|b| a.nests_with(b)));
-        if !nested {
-            continue;
+            .all(|(i, a)| longer[i + 1..].iter().all(|b| groups[*a].nests_with(&groups[*b])));
+        if nested {
+            edges.extend(longer.into_iter().map(|h| (g, h)));
         }
-        for other in longer {
+    }
+    // Targets receiving aliases of both genders are ambiguous and receive none.
+    let mut received: HashMap<usize, u8> = HashMap::new();
+    for &(g, h) in &edges {
+        if let Some(gender) = groups[g].gender {
+            *received.entry(h).or_default() |= gender.bit();
+        }
+    }
+    let both = Gender::Masculine.bit() | Gender::Feminine.bit();
+    for (g, h) in edges {
+        if received.get(&h) != Some(&both) {
             // Refused when the two sets already carry different genders.
-            forest.union(group.nodes[0], other.nodes[0]);
+            forest.union(groups[g].nodes[0], groups[h].nodes[0]);
         }
     }
 
@@ -615,6 +629,24 @@ mod tests {
         let text = "Mr. Lopez arrived. Lopez said he was late.";
         let got = resolve(text, &[("Mr. Lopez", "PER"), ("Lopez", "PER")]);
         assert_eq!(got, vec![vec!["Mr. Lopez", "Lopez", "he"]]);
+
+        // A full name targeted by both a masculine and a feminine alias links to neither, in
+        // either mention order.
+        for text in [
+            "Mrs. Lopez met Carlos Lopez. Mr. Lopez arrived.",
+            "Mr. Lopez met Carlos Lopez. Mrs. Lopez arrived.",
+        ] {
+            let got = resolve(
+                text,
+                &[("Mrs. Lopez", "PER"), ("Mr. Lopez", "PER"), ("Carlos Lopez", "PER")],
+            );
+            assert!(got.is_empty(), "{text}: {got:?}");
+        }
+        let got = resolve(
+            "Mr. Lopez met Carlos Lopez.",
+            &[("Mr. Lopez", "PER"), ("Carlos Lopez", "PER")],
+        );
+        assert_eq!(got, vec![vec!["Mr. Lopez", "Carlos Lopez"]]);
 
         // A feminine pronoun does not join the Mr. Lopez cluster.
         let text = "Mr. Lopez arrived. She was late.";

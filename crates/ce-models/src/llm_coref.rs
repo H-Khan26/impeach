@@ -33,13 +33,32 @@ fn prompt_error(message: impl std::fmt::Display) -> ModelError {
     ModelError::Load { model: "coref llm prompt".to_owned(), message: message.to_string() }
 }
 
-/// Checks that `prompt` uses only the `{mentions_json}` and `{text}` placeholders (none in the
-/// system template) and balanced braces.
-fn validate_prompt(prompt: &EdPrompt) -> Result<(), ModelError> {
-    fill_template(&prompt.system_template, &[]).map_err(prompt_error)?;
-    fill_template(&prompt.user_template, &[("mentions_json", ""), ("text", "")])
-        .map_err(prompt_error)?;
+/// Checks `prompt` (from `origin`, named in errors): the system template has no placeholders,
+/// the user template uses both `{mentions_json}` and `{text}` and no other placeholder, and
+/// braces are balanced.
+fn validate_prompt(prompt: &EdPrompt, origin: &str) -> Result<(), ModelError> {
+    const MENTIONS_MARK: &str = "@@coref-mentions@@";
+    const TEXT_MARK: &str = "@@coref-text@@";
+    let fail = |message: String| prompt_error(format!("{origin}: {message}"));
+    fill_template(&prompt.system_template, &[]).map_err(fail)?;
+    let user = fill_template(
+        &prompt.user_template,
+        &[("mentions_json", MENTIONS_MARK), ("text", TEXT_MARK)],
+    )
+    .map_err(fail)?;
+    for (mark, placeholder) in [(MENTIONS_MARK, "{mentions_json}"), (TEXT_MARK, "{text}")] {
+        if !user.contains(mark) {
+            return Err(fail(format!("user_template must contain {placeholder}")));
+        }
+    }
     Ok(())
+}
+
+/// Loads and validates the prompt file at `path` (errors name the path).
+fn load_prompt(path: &str) -> Result<EdPrompt, ModelError> {
+    let prompt = EdPrompt::load(path).map_err(|e| prompt_error(format!("{path}: {e}")))?;
+    validate_prompt(&prompt, path)?;
+    Ok(prompt)
 }
 
 /// Fills Python `str.format` placeholders `{name}` from `values`; `{{` and `}}` are literal
@@ -114,8 +133,8 @@ impl LlmCoref {
     /// # Errors
     /// [`ModelError::Load`] when the prompt cannot be read or is malformed.
     pub fn new(llm: Arc<dyn Llm>) -> Result<Self, ModelError> {
-        let prompt = EdPrompt::load(LLM_COREF_PROMPT_PATH).map_err(prompt_error)?;
-        Self::with_prompt(llm, prompt)
+        let prompt = load_prompt(LLM_COREF_PROMPT_PATH)?;
+        Ok(Self { llm, prompt, schema: response_schema() })
     }
 
     /// A resolver over `llm` with `prompt`.
@@ -123,7 +142,7 @@ impl LlmCoref {
     /// # Errors
     /// [`ModelError::Load`] when a template has an unknown placeholder or unbalanced braces.
     pub fn with_prompt(llm: Arc<dyn Llm>, prompt: EdPrompt) -> Result<Self, ModelError> {
-        validate_prompt(&prompt)?;
+        validate_prompt(&prompt, "coref prompt")?;
         Ok(Self { llm, prompt, schema: response_schema() })
     }
 
@@ -417,7 +436,24 @@ mod tests {
             LlmCoref::with_prompt(llm(), prompt("x", "{doc}")),
             Err(ModelError::Load { ref message, .. }) if message.contains("{doc}")
         ));
-        assert!(LlmCoref::with_prompt(llm(), prompt("{text}", "{text}")).is_err());
+        assert!(LlmCoref::with_prompt(llm(), prompt("{text}", "{mentions_json} {text}")).is_err());
+        assert!(LlmCoref::with_prompt(llm(), prompt("x", "{mentions_json}")).is_err());
+        assert!(LlmCoref::with_prompt(llm(), prompt("x", "{{text}} {mentions_json}")).is_err());
         assert!(LlmCoref::with_prompt(llm(), prompt("{{x}}", "{mentions_json} {text}")).is_ok());
+
+        // A prompt file without a user template does not load.
+        let partial: EdPrompt =
+            serde_json::from_str(r#"{"system_template": "x"}"#).expect("ED-shaped JSON");
+        assert!(matches!(
+            LlmCoref::with_prompt(llm(), partial),
+            Err(ModelError::Load { ref message, .. }) if message.contains("user_template must contain")
+        ));
+        // Errors from files name the path.
+        let missing = "contradiction_engine/prompts/coref/missing.json";
+        assert!(matches!(
+            load_prompt(missing),
+            Err(ModelError::Load { ref message, .. }) if message.contains(missing)
+        ));
+        assert!(load_prompt(LLM_COREF_PROMPT_PATH).is_ok());
     }
 }
