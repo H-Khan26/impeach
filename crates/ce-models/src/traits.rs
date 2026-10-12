@@ -7,6 +7,17 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::ModelError;
 
+/// Scales `vector` to unit L2 norm in place; a zero vector is left unchanged. The norm and
+/// the division are computed in `f64`.
+pub fn normalize_l2(vector: &mut [f32]) {
+    let norm = vector.iter().map(|x| f64::from(*x) * f64::from(*x)).sum::<f64>().sqrt();
+    if norm > 0.0 {
+        for x in vector.iter_mut() {
+            *x = (f64::from(*x) / norm) as f32;
+        }
+    }
+}
+
 /// Sentence embedding model.
 pub trait Embedder: Send + Sync {
     /// Embeds each text; the output has one vector of [`Embedder::dimension`] values per input.

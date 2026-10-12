@@ -714,6 +714,7 @@ name = "ce-models"
 version = "0.1.0"
 dependencies = [
  "ce-config",
+ "ce-core",
  "fastembed",
  "gliner2",
  "hf-hub",

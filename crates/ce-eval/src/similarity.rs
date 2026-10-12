@@ -2,7 +2,7 @@
 
 use std::collections::{BTreeSet, HashMap};
 
-use ce_models::Embedder;
+use ce_models::{normalize_l2, Embedder};
 
 use crate::error::{EvalError, Result};
 
@@ -24,15 +24,6 @@ impl std::fmt::Debug for SimilarityCache<'_> {
             .field("model", &self.embedder.model_name())
             .field("cached", &self.cache.len())
             .finish()
-    }
-}
-
-fn normalize(vector: Vec<f32>) -> Vec<f32> {
-    let norm = vector.iter().map(|x| f64::from(*x) * f64::from(*x)).sum::<f64>().sqrt();
-    if norm > 0.0 {
-        vector.into_iter().map(|x| (f64::from(x) / norm) as f32).collect()
-    } else {
-        vector
     }
 }
 
@@ -62,8 +53,9 @@ impl<'a> SimilarityCache<'a> {
         if vectors.len() != batch.len() {
             return Err(EvalError::EmbeddingCount { expected: batch.len(), got: vectors.len() });
         }
-        for (text, vector) in batch.into_iter().zip(vectors) {
-            self.cache.insert(text.to_owned(), normalize(vector));
+        for (text, mut vector) in batch.into_iter().zip(vectors) {
+            normalize_l2(&mut vector);
+            self.cache.insert(text.to_owned(), vector);
         }
         Ok(())
     }

@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
-use std::sync::{Mutex, MutexGuard, PoisonError};
+use std::sync::{Mutex, MutexGuard};
 
 use ce_core::{Metadata, NodeId};
 use serde_json::Value;
@@ -114,7 +114,7 @@ impl DocumentStateStore {
     }
 
     fn lock(&self) -> MutexGuard<'_, BTreeMap<String, String>> {
-        self.cache.lock().unwrap_or_else(PoisonError::into_inner)
+        ce_core::util::lock(&self.cache)
     }
 }
 

@@ -8,7 +8,7 @@ use ce_config::pipeline::BgeModelConfig;
 use fastembed::{EmbeddingModel, TextEmbedding, TextInitOptions};
 
 use crate::error::{error_chain, ModelError};
-use crate::traits::Embedder;
+use crate::traits::{normalize_l2, Embedder};
 
 /// Model ids accepted by [`FastEmbedder`] (case-insensitive) and their fastembed models.
 const SUPPORTED_MODELS: &[(&str, EmbeddingModel)] = &[
@@ -143,7 +143,7 @@ impl Embedder for FastEmbedder {
             .map_err(|e| ModelError::Inference(error_chain(&e)))?;
         drop(model);
         if self.normalize {
-            vectors.iter_mut().for_each(|v| normalize(v));
+            vectors.iter_mut().for_each(|v| normalize_l2(v));
         }
         Ok(vectors)
     }
@@ -154,14 +154,6 @@ impl Embedder for FastEmbedder {
 
     fn model_name(&self) -> &str {
         &self.name
-    }
-}
-
-/// Scales `v` to unit L2 norm (zero vectors are left unchanged).
-fn normalize(v: &mut [f32]) {
-    let norm = v.iter().map(|x| x * x).sum::<f32>().sqrt();
-    if norm > 0.0 {
-        v.iter_mut().for_each(|x| *x /= norm);
     }
 }
 
@@ -196,10 +188,10 @@ mod tests {
     #[test]
     fn normalize_scales_to_unit_length() {
         let mut v = vec![3.0, 4.0];
-        normalize(&mut v);
+        normalize_l2(&mut v);
         assert_eq!(v, vec![0.6, 0.8]);
         let mut zero = vec![0.0, 0.0];
-        normalize(&mut zero);
+        normalize_l2(&mut zero);
         assert_eq!(zero, vec![0.0, 0.0]);
     }
 

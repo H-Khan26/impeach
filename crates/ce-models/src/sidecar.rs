@@ -14,7 +14,9 @@ use std::io::{BufRead, BufReader, Read, Write};
 use std::path::PathBuf;
 use std::process::{ChildStdin, Command, Stdio};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError};
-use std::sync::{Mutex, MutexGuard, PoisonError};
+use std::sync::Mutex;
+
+use ce_core::util::lock;
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -212,10 +214,6 @@ fn read_lines<R: Read>(reader: R, mut sink: impl FnMut(Result<String, String>) -
             }
         }
     }
-}
-
-fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
-    mutex.lock().unwrap_or_else(PoisonError::into_inner)
 }
 
 /// A JSON-lines request / response client for a sidecar process. Requests are serialised: one

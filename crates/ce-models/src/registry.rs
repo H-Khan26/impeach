@@ -13,7 +13,9 @@
 
 use std::collections::HashMap;
 use std::fmt;
-use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
+use std::sync::{Arc, Mutex};
+
+use ce_core::util::lock;
 
 use ce_config::pipeline::ModelsConfig;
 use ce_config::PipelineConfig;
@@ -68,10 +70,6 @@ impl fmt::Display for ModelKind {
 /// Registry key of a model: `<pipeline_name>_<kind>`.
 pub fn model_key(pipeline_name: &str, kind: ModelKind) -> String {
     format!("{pipeline_name}_{}", kind.as_str())
-}
-
-fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
-    mutex.lock().unwrap_or_else(PoisonError::into_inner)
 }
 
 /// Lazily constructed, shared model instances.

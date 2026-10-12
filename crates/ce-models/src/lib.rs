@@ -54,6 +54,6 @@ pub use ort_nli::{OrtNli, OrtNliOptions};
 pub use registry::{model_key, ModelKind, ModelRegistry};
 pub use sidecar::{SidecarCommand, SidecarCoref, SidecarProcess};
 pub use traits::{
-    Coref, CorefCluster, Embedder, Llm, LlmRequest, NerModel, NerSpan, NliJudge, NliScores,
-    RelationHit,
+    normalize_l2, Coref, CorefCluster, Embedder, Llm, LlmRequest, NerModel, NerSpan, NliJudge,
+    NliScores, RelationHit,
 };

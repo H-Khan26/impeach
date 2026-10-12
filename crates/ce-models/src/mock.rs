@@ -2,17 +2,15 @@
 
 use std::collections::{HashMap, VecDeque};
 use std::fmt;
-use std::sync::{Mutex, MutexGuard, PoisonError};
+use std::sync::Mutex;
+
+use ce_core::util::lock;
 
 use crate::error::ModelError;
 use crate::traits::{
-    Coref, CorefCluster, Embedder, Llm, LlmRequest, NerModel, NerSpan, NliJudge, NliScores,
-    RelationHit,
+    normalize_l2, Coref, CorefCluster, Embedder, Llm, LlmRequest, NerModel, NerSpan, NliJudge,
+    NliScores, RelationHit,
 };
-
-fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
-    mutex.lock().unwrap_or_else(PoisonError::into_inner)
-}
 
 /// FNV-1a 64-bit hash.
 fn fnv1a(text: &str) -> u64 {
@@ -34,12 +32,7 @@ fn splitmix(state: &mut u64) -> u64 {
 }
 
 fn normalize(mut v: Vec<f32>) -> Vec<f32> {
-    let norm = v.iter().map(|x| x * x).sum::<f32>().sqrt();
-    if norm > 0.0 {
-        for x in &mut v {
-            *x /= norm;
-        }
-    }
+    normalize_l2(&mut v);
     v
 }
 

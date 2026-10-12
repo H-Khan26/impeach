@@ -26,7 +26,9 @@ use std::collections::{BTreeSet, HashMap};
 use std::fs::{File, OpenOptions};
 use std::num::NonZeroUsize;
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, LazyLock, Mutex, MutexGuard, OnceLock, PoisonError, RwLock, Weak};
+use std::sync::{Arc, LazyLock, Mutex, OnceLock, PoisonError, RwLock, Weak};
+
+use ce_core::util::lock;
 use std::time::{Duration, Instant};
 
 use ce_core::{ChunkId, EntityId, FactId, NodeId, SpanId};
@@ -210,10 +212,6 @@ fn strip_verbatim_prefix(path: PathBuf) -> PathBuf {
 
 static REGISTRY: LazyLock<Mutex<HashMap<RegistryKey, Weak<HelixStore>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
-
-fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
-    mutex.lock().unwrap_or_else(PoisonError::into_inner)
-}
 
 /// Graph store backed by HelixDB.
 pub struct HelixStore {

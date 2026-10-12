@@ -23,6 +23,7 @@
 //!   whitespace, skipping empty ones.
 
 use ce_config::pipeline::{ChunkingConfig, ChunkingStrategy};
+use ce_core::util::saturating_i64;
 use ce_core::{Chunk, ChunkingResult, DocumentPayload, Metadata, SentenceSpan, Span};
 use indexmap::IndexMap;
 use serde_json::Value;
@@ -260,17 +261,13 @@ fn set_neighbors(chunks: &mut [Chunk]) {
     for (index, chunk) in chunks.iter_mut().enumerate() {
         let mut neighbors = IndexMap::new();
         if index > 0 {
-            neighbors.insert("prev_chunk_seq".to_owned(), as_i64(index - 1));
+            neighbors.insert("prev_chunk_seq".to_owned(), saturating_i64(index - 1));
         }
         if index + 1 < count {
-            neighbors.insert("next_chunk_seq".to_owned(), as_i64(index + 1));
+            neighbors.insert("next_chunk_seq".to_owned(), saturating_i64(index + 1));
         }
         chunk.neighbors = neighbors;
     }
-}
-
-fn as_i64(value: usize) -> i64 {
-    i64::try_from(value).unwrap_or(i64::MAX)
 }
 
 #[cfg(test)]

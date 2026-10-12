@@ -5,6 +5,7 @@
 use std::collections::HashMap;
 
 use ce_core::pyjson::to_python_json_ascii;
+use ce_core::util::saturating_i64;
 use ce_core::{
     Chunk, ChunkId, ChunkWriteResult, DocumentPayload, DocumentWriteResult, EmbeddingWriteResult,
     Metadata, NodeId, SentenceSpan, SpanWriteResult,
@@ -35,10 +36,6 @@ pub fn serialize_metadata(metadata: &Metadata) -> String {
         }
     }
     to_python_json_ascii(&safe).unwrap_or_else(|_| "{}".to_owned())
-}
-
-fn to_i64(value: usize) -> i64 {
-    i64::try_from(value).unwrap_or(i64::MAX)
 }
 
 /// The `Document` node of a payload: empty `doc_type` -> `UNKNOWN`, empty title -> `doc_id`,
@@ -81,10 +78,10 @@ pub fn chunk_node(chunk: &Chunk) -> ChunkNode {
     ChunkNode {
         text: chunk.text.clone(),
         page_number: i64::from(chunk.page_number.unwrap_or(0)),
-        start_char: to_i64(chunk.start_char),
-        end_char: to_i64(chunk.end_char),
+        start_char: saturating_i64(chunk.start_char),
+        end_char: saturating_i64(chunk.end_char),
         section: chunk.section.clone().unwrap_or_default(),
-        sequence_number: to_i64(chunk.sequence_number),
+        sequence_number: saturating_i64(chunk.sequence_number),
         metadata: serialize_metadata(&metadata),
     }
 }
@@ -101,8 +98,8 @@ pub fn sentence_span_node(
     SpanNode {
         doc_id: doc_node_id.clone(),
         chunk_id: chunk_id.clone(),
-        start_char: to_i64(span.start_char),
-        end_char: to_i64(span.end_char),
+        start_char: saturating_i64(span.start_char),
+        end_char: saturating_i64(span.end_char),
         span_type: SENTENCE_SPAN_TYPE.to_owned(),
         span_label: SENTENCE_SPAN_TYPE.to_owned(),
         surface_text: span.text.clone(),

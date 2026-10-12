@@ -21,6 +21,7 @@ pub mod ids;
 pub mod processing;
 pub mod pyjson;
 pub mod rag;
+pub mod util;
 pub mod vocab;
 
 /// Free-form JSON object (Python `Dict[str, Any]`), insertion ordered.
