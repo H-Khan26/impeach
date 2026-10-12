@@ -26,7 +26,7 @@ use std::collections::{BTreeSet, HashMap};
 use std::fs::{File, OpenOptions};
 use std::num::NonZeroUsize;
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, LazyLock, Mutex, MutexGuard, PoisonError, RwLock, Weak};
+use std::sync::{Arc, LazyLock, Mutex, MutexGuard, OnceLock, PoisonError, RwLock, Weak};
 use std::time::{Duration, Instant};
 
 use ce_core::{ChunkId, EntityId, FactId, NodeId, SpanId};
@@ -169,8 +169,8 @@ impl HelixOptions {
         }
     }
 
-    /// Absolute, normalised data directory (embedded), `memory`, or the server URL without a
-    /// trailing slash.
+    /// Canonical data directory (embedded; created if missing), `memory`, or the server URL
+    /// without a trailing slash.
     fn location(&self) -> Result<String> {
         match self.mode {
             HelixMode::Embedded => {
@@ -179,8 +179,10 @@ impl HelixOptions {
                 } else {
                     self.data_dir.clone()
                 };
-                // Normalised so every spelling of one directory shares a registry entry.
-                Ok(std::path::absolute(dir)?.to_string_lossy().into_owned())
+                // Canonical so every spelling of one directory shares a registry entry.
+                std::fs::create_dir_all(&dir)?;
+                let canonical = strip_verbatim_prefix(std::fs::canonicalize(&dir)?);
+                Ok(canonical.to_string_lossy().into_owned())
             }
             HelixMode::Memory => Ok("memory".to_owned()),
             HelixMode::Server => match self.url.as_deref().filter(|url| !url.is_empty()) {
@@ -193,20 +195,24 @@ impl HelixOptions {
 
 type RegistryKey = (HelixMode, String, String);
 
+/// Windows verbatim path prefix: backslash, backslash, question mark, backslash.
+const VERBATIM_PREFIX: &str = concat!('\\', '\\', '?', '\\');
+
+/// Drops the verbatim prefix (`\\?\`) that `canonicalize` adds on Windows when the rest is a
+/// plain drive path (`C:\...`), so the location reads like an ordinary path.
+fn strip_verbatim_prefix(path: PathBuf) -> PathBuf {
+    let text = path.to_string_lossy();
+    match text.strip_prefix(VERBATIM_PREFIX) {
+        Some(rest) if rest.as_bytes().get(1) == Some(&b':') => PathBuf::from(rest),
+        _ => path,
+    }
+}
+
 static REGISTRY: LazyLock<Mutex<HashMap<RegistryKey, Weak<HelixStore>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
     mutex.lock().unwrap_or_else(PoisonError::into_inner)
-}
-
-/// Mutable connection state, guarded by one mutex so requests run one at a time.
-#[derive(Debug, Default)]
-struct State {
-    /// Set once the handle is closed or fenced; every later request fails with it.
-    lost: Option<String>,
-    /// Indexes already reported as missing.
-    warned_indexes: BTreeSet<String>,
 }
 
 /// Graph store backed by HelixDB.
@@ -215,7 +221,12 @@ pub struct HelixStore {
     embedding_dim: usize,
     client: Client,
     runtime: Option<tokio::runtime::Runtime>,
-    state: Mutex<State>,
+    /// Set once the handle is closed or fenced; every later request fails with it.
+    lost: OnceLock<String>,
+    /// Held for the duration of one request so requests run one at a time.
+    request_lock: Mutex<()>,
+    /// Indexes already reported as missing.
+    warned_indexes: Mutex<BTreeSet<String>>,
     store_id: RwLock<String>,
     file_lock: Mutex<Option<File>>,
 }
@@ -243,7 +254,7 @@ impl HelixStore {
         let key = (options.mode, options.location()?, options.namespace.clone());
         let mut registry = lock(&REGISTRY);
         if let Some(store) = registry.get(&key).and_then(Weak::upgrade) {
-            if lock(&store.state).lost.is_none() {
+            if store.lost.get().is_none() {
                 if store.embedding_dim != options.embedding_dim {
                     return Err(StoreError::Connection(format!(
                         "Helix database {} is already open with embedding_dim={}, requested {}",
@@ -293,7 +304,9 @@ impl HelixStore {
             embedding_dim: dim.get(),
             client,
             runtime: Some(runtime),
-            state: Mutex::new(State::default()),
+            lost: OnceLock::new(),
+            request_lock: Mutex::new(()),
+            warned_indexes: Mutex::new(BTreeSet::new()),
             store_id: RwLock::new(String::new()),
             file_lock: Mutex::new(file_lock),
         };
@@ -349,12 +362,9 @@ impl HelixStore {
     /// # Errors
     /// [`StoreError::Connection`] when the embedded database fails to flush.
     pub fn close(&self) -> Result<()> {
-        let mut state = lock(&self.state);
-        if state.lost.is_some() {
+        if self.lost.set(format!("Helix database {} was closed", self.describe())).is_err() {
             return Ok(());
         }
-        state.lost = Some(format!("Helix database {} was closed", self.describe()));
-        drop(state);
         let result = if self.key.0 == HelixMode::Server {
             Ok(())
         } else {
@@ -392,21 +402,25 @@ impl HelixStore {
         })
     }
 
-    /// Sends one request (one transaction), retrying transaction conflicts.
+    /// Sends one request (one transaction), retrying transaction conflicts. The request lock
+    /// is held only while a request runs, not during the backoff between attempts.
     fn execute(&self, query: &str, request: &QueryRequest) -> Result<Value> {
-        let mut state = lock(&self.state);
-        if let Some(lost) = &state.lost {
-            return Err(StoreError::DatabaseLost(lost.clone()));
-        }
         let mut jitter = RandomJitter::default();
-        for attempt in 0..TRANSACTION_CONFLICT_ATTEMPTS {
-            let client = self.client.clone();
-            let request = request.clone();
-            let error =
-                match self.run(async move { client.query::<Value>(request).send().await })? {
-                    Ok(value) => return Ok(value),
-                    Err(error) => error,
-                };
+        let mut attempt = 0;
+        loop {
+            if let Some(lost) = self.lost.get() {
+                return Err(StoreError::DatabaseLost(lost.clone()));
+            }
+            let outcome = {
+                let _request = lock(&self.request_lock);
+                let client = self.client.clone();
+                let request = request.clone();
+                self.run(async move { client.query::<Value>(request).send().await })?
+            };
+            let error = match outcome {
+                Ok(value) => return Ok(value),
+                Err(error) => error,
+            };
             if is_database_lost(&error) {
                 let message = format!(
                     "Helix database {} is no longer usable ({error}); it was closed or another \
@@ -414,33 +428,29 @@ impl HelixStore {
                     self.describe()
                 );
                 tracing::error!("{message}");
-                state.lost = Some(message.clone());
+                let _ = self.lost.set(message.clone());
                 return Err(StoreError::DatabaseLost(message));
             }
             if !is_retryable(&error) {
-                if error.error_code() == Some("index_not_found") {
-                    let first = state.warned_indexes.insert(query.to_owned());
-                    if first {
-                        tracing::warn!(
-                            "Helix index for {query} is missing or not active yet; searches on it \
-                             fail until it is built: {error}"
-                        );
-                    }
+                if error.error_code() == Some("index_not_found")
+                    && lock(&self.warned_indexes).insert(query.to_owned())
+                {
+                    tracing::warn!(
+                        "Helix index for {query} is missing or not active yet; searches on it \
+                         fail until it is built: {error}"
+                    );
                 }
                 return Err(map_error(query, &error));
             }
-            if attempt + 1 == TRANSACTION_CONFLICT_ATTEMPTS {
+            if attempt + 1 >= TRANSACTION_CONFLICT_ATTEMPTS {
                 return Err(StoreError::Conflict {
                     attempts: TRANSACTION_CONFLICT_ATTEMPTS,
                     message: error.to_string(),
                 });
             }
             std::thread::sleep(conflict_backoff(attempt, &mut jitter));
+            attempt += 1;
         }
-        Err(StoreError::Conflict {
-            attempts: TRANSACTION_CONFLICT_ATTEMPTS,
-            message: String::new(),
-        })
     }
 
     fn read(&self, query: &str, batch: ReadBatch) -> Result<Map<String, Value>> {
@@ -1476,12 +1486,23 @@ mod tests {
         let mut no_url = server;
         no_url.url = None;
         assert!(matches!(no_url.location(), Err(StoreError::Connection(_))));
-        let embedded = HelixOptions::embedded("data/helix", "ns", 3);
+        let base = tempfile::tempdir().expect("tempdir");
+        let embedded = HelixOptions::embedded(base.path().join("data/helix"), "ns", 3);
         let location = embedded.location().expect("embedded");
         assert!(Path::new(&location).is_absolute());
-        for spelling in ["./data/helix", "data/./helix"] {
-            let same = HelixOptions::embedded(spelling, "ns", 3);
+        assert!(Path::new(&location).is_dir());
+        for spelling in ["data/./helix", "data/other/../helix", "data//helix"] {
+            let same = HelixOptions::embedded(base.path().join(spelling), "ns", 3);
             assert_eq!(same.location().expect("embedded"), location, "{spelling}");
         }
+    }
+
+    #[test]
+    fn verbatim_prefix_is_dropped_for_drive_paths_only() {
+        let drive = format!("{VERBATIM_PREFIX}C:/data");
+        assert_eq!(strip_verbatim_prefix(PathBuf::from(&drive)), PathBuf::from("C:/data"));
+        let unc = format!("{VERBATIM_PREFIX}UNC/server/share");
+        assert_eq!(strip_verbatim_prefix(PathBuf::from(&unc)), PathBuf::from(&unc));
+        assert_eq!(strip_verbatim_prefix(PathBuf::from("/srv/data")), PathBuf::from("/srv/data"));
     }
 }

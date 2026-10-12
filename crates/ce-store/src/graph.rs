@@ -220,7 +220,7 @@ impl VectorLabel {
 }
 
 /// `Document` node.
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase", default)]
 pub struct DocumentNode {
     /// Document type, e.g. `complaint` (`UNKNOWN` when the payload has none).
@@ -237,8 +237,21 @@ pub struct DocumentNode {
     pub metadata: String,
 }
 
+impl Default for DocumentNode {
+    fn default() -> Self {
+        Self {
+            doc_type: String::new(),
+            title: String::new(),
+            date_created: String::new(),
+            file_path: String::new(),
+            total_pages: 0,
+            metadata: "{}".to_owned(),
+        }
+    }
+}
+
 /// `DocumentChunk` node.
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase", default)]
 pub struct ChunkNode {
     /// Chunk text.
@@ -257,8 +270,22 @@ pub struct ChunkNode {
     pub metadata: String,
 }
 
+impl Default for ChunkNode {
+    fn default() -> Self {
+        Self {
+            text: String::new(),
+            page_number: 0,
+            start_char: 0,
+            end_char: 0,
+            section: String::new(),
+            sequence_number: 0,
+            metadata: "{}".to_owned(),
+        }
+    }
+}
+
 /// `Span` node.
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase", default)]
 pub struct SpanNode {
     /// Graph id of the document the span belongs to.
@@ -277,6 +304,21 @@ pub struct SpanNode {
     pub surface_text: String,
     /// JSON object string.
     pub metadata: String,
+}
+
+impl Default for SpanNode {
+    fn default() -> Self {
+        Self {
+            doc_id: NodeId::default(),
+            chunk_id: ChunkId::default(),
+            start_char: 0,
+            end_char: 0,
+            span_type: String::new(),
+            span_label: String::new(),
+            surface_text: String::new(),
+            metadata: "{}".to_owned(),
+        }
+    }
 }
 
 /// `Entity` node (concrete actors and objects).
@@ -673,6 +715,23 @@ mod tests {
         let mut bad = fact;
         bad.temporal_validity = String::new();
         assert_eq!(field_of(&bad.validate().expect_err("validity")), "TemporalValidity");
+    }
+
+    #[test]
+    fn default_metadata_is_a_json_object() {
+        let metadata = [
+            DocumentNode::default().metadata,
+            ChunkNode::default().metadata,
+            SpanNode::default().metadata,
+            EntityNode::default().metadata,
+            FactNode::default().metadata,
+        ];
+        for text in metadata {
+            let value: serde_json::Value = serde_json::from_str(&text).expect("valid JSON");
+            assert!(value.is_object(), "{text}");
+        }
+        let chunk: ChunkNode = serde_json::from_str(r#"{"Text": "t"}"#).expect("partial chunk");
+        assert_eq!(chunk.metadata, "{}");
     }
 
     #[test]

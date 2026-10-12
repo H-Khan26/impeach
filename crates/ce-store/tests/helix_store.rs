@@ -69,6 +69,19 @@ fn embedded_database_persists_and_holds_the_writer_lock() {
 }
 
 #[test]
+fn every_spelling_of_an_embedded_directory_shares_one_handle() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    let first =
+        HelixStore::open(&HelixOptions::embedded(dir.path(), "spelled", DIM)).expect("opens");
+    let detour = dir.path().join("sub").join("..");
+    std::fs::create_dir_all(dir.path().join("sub")).expect("sub dir");
+    let second = HelixStore::open(&HelixOptions::embedded(&detour, "spelled", DIM))
+        .expect("a `..` spelling reuses the open handle instead of hitting the lock");
+    assert!(Arc::ptr_eq(&first, &second));
+    first.close().expect("close");
+}
+
+#[test]
 fn a_held_lock_fails_open() {
     let dir = tempfile::tempdir().expect("temp dir");
     let lock_path = dir.path().join("busy.lock");
