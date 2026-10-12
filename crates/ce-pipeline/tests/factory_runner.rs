@@ -145,7 +145,9 @@ fn runner_records_stage_timings_in_order() {
         .expect("runs");
     let names: Vec<_> = report.stage_timings.iter().map(|t| t.stage.as_str()).collect();
     assert_eq!(names, ["a", "b"]);
-    assert!(report.total >= report.stage_timings.iter().map(|t| t.elapsed).sum());
+    assert!(
+        report.total >= report.stage_timings.iter().map(|t| t.elapsed).sum::<std::time::Duration>()
+    );
     assert_eq!(ctx.data.case_id.as_deref(), Some("seen-by-b"));
     assert_eq!(seen_a.lock().expect("lock")[0].doc_id.as_str(), "d1");
 }
