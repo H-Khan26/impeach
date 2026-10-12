@@ -1,0 +1,4 @@
+[env]
+# esaxx-rs (via the gliner2 tokenizer stack) builds with the static CRT by default, which fails
+# to link next to ONNX Runtime on Windows (LNK2038); build its C++ with the dynamic CRT instead.
+CXXFLAGS_x86_64_pc_windows_msvc = "-MD"

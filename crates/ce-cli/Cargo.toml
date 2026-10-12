@@ -1,0 +1,36 @@
+[package]
+name = "ce-cli"
+description = "The contradiction-engine command-line binary"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "contradiction-engine"
+path = "src/main.rs"
+
+[features]
+default = ["helix", "fastembed", "ort-nli", "ollama"]
+helix = ["ce-pipeline/helix"]
+fastembed = ["ce-pipeline/fastembed", "ce-eval/fastembed", "ce-models/fastembed"]
+ort-nli = ["ce-pipeline/ort-nli"]
+ollama = ["ce-pipeline/ollama"]
+gliner2 = ["ce-pipeline/gliner2"]
+
+[dependencies]
+ce-config.workspace = true
+ce-ingest.workspace = true
+ce-models.workspace = true
+ce-pipeline.workspace = true
+ce-eval.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,406 @@
+{
+  "GREEN_VALLEY_CONTRA_KEY.md": [
+    {
+      "id": "C-01",
+      "contradiction_type": "Temporal \u2013 Date",
+      "fact_a": {
+        "text": "Collision date: March 5, 2023",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b66"
+      },
+      "fact_b": {
+        "text": "Collision date: March 4, 2023",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b61"
+      },
+      "notes": "Same collision, different dates.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-02",
+      "contradiction_type": "Temporal \u2013 Time",
+      "fact_a": {
+        "text": "Approximately 5:30 p.m.",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b66"
+      },
+      "fact_b": {
+        "text": "Approximately 9:20 p.m.",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b61"
+      },
+      "notes": "Same event, different time of day.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-03",
+      "contradiction_type": "Factual \u2013 Weather/Conditions",
+      "fact_a": {
+        "text": "Weather clear, roadway dry, visibility good",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b613"
+      },
+      "fact_b": {
+        "text": "Rainy, steady precipitation, wet roadway, reduced visibility",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b63"
+      },
+      "notes": "Directly conflicting environment conditions.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-04",
+      "contradiction_type": "Factual \u2013 Direction of Travel",
+      "fact_a": {
+        "text": "Reed traveling northbound on 14th Ave",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b67"
+      },
+      "fact_b": {
+        "text": "Reed traveling southbound on 14th Ave",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b66"
+      },
+      "notes": "Same driver, same intersection, opposite directions.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-05",
+      "contradiction_type": "Factual \u2013 Traffic Signal / Right-of-Way",
+      "fact_a": {
+        "text": "Lopez enters on green; Reed runs a solid red for northbound 14th",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b610"
+      },
+      "fact_b": {
+        "text": "Reed enters on solid green; Lopez enters against red / late yellow",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b67\u20138"
+      },
+      "notes": "Mutually exclusive signal states and right-of-way.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-06",
+      "contradiction_type": "Quantitative \u2013 Speed",
+      "fact_a": {
+        "text": "Lopez at or below 35 mph (speed limit)",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b69"
+      },
+      "fact_b": {
+        "text": "Lopez at estimated 45\u201350 mph in 35 mph zone",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b65"
+      },
+      "notes": "Conflicting estimates of Plaintiff\u2019s speed.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-07",
+      "contradiction_type": "Quantitative \u2013 Occupants",
+      "fact_a": {
+        "text": "Lopez was the sole occupant of her vehicle",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b612"
+      },
+      "fact_b": {
+        "text": "Reed saw an additional adult passenger; Lopez later confirms \u201ctwo people\u201d in the vehicle",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b610, \u00b627"
+      },
+      "notes": "Occupant count conflict.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-08",
+      "contradiction_type": "Factual \u2013 Seat Belt Use",
+      "fact_a": {
+        "text": "Lopez \u201cproperly restrained\u201d with shoulder and lap belt",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b612"
+      },
+      "fact_b": {
+        "text": "Reed did not observe any seat belt across torso or lap and believes she was not restrained",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b612"
+      },
+      "notes": "Opposite claims about restraint use.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-09",
+      "contradiction_type": "Factual \u2013 EMS / Ambulance",
+      "fact_a": {
+        "text": "EMS dispatched; Lopez immobilized and transported by ambulance to SF General",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b616"
+      },
+      "fact_b": {
+        "text": "Lopez repeatedly said she was \u201cokay,\u201d did not want an ambulance, and no ambulance transport was observed",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b613"
+      },
+      "notes": "Conflicting facts on emergency treatment and transport.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-10",
+      "contradiction_type": "Quantitative \u2013 Time Off Work",
+      "fact_a": {
+        "text": "Lopez unable to work for four (4) weeks, \u201ccompletely disabled from work\u201d",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b619"
+      },
+      "fact_b": {
+        "text": "Lopez reports missing \u201cabout three days\u201d of work, then returning to full-time duties",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b624"
+      },
+      "notes": "Duration of disability / lost wages differs.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-11",
+      "contradiction_type": "Temporal & Quantitative \u2013 Treatment Onset & Course",
+      "fact_a": {
+        "text": "Physical therapy from March 8, 2023 to June 15, 2023, ~12 sessions",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b618"
+      },
+      "fact_b": {
+        "text": "First medical visit March 20, 2023 (urgent care), PT \u201caround six\u201d sessions over ~1 month",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b622\u201323"
+      },
+      "notes": "Contradictory first-treatment date, number of sessions, and treatment duration.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-12",
+      "contradiction_type": "Quantitative \u2013 Medical Expenses (Cross-Doc)",
+      "fact_a": {
+        "text": "Medical expenses \u201cbelieved to exceed $28,000\u201d; total to date $18,000",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b620"
+      },
+      "fact_b": {
+        "text": "Bills processed total $14,250",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b625"
+      },
+      "notes": "Doc 1\u2019s internal conflict plus discrepancy with insurer total in Doc 2.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-13",
+      "contradiction_type": "Quantitative & Categorical \u2013 Property Damage / Total Loss",
+      "fact_a": {
+        "text": "Civic declared a total loss; pre-collision value + repair > $12,000",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b621"
+      },
+      "fact_b": {
+        "text": "Damage repairable; repair $7,400, ACV $8,500, and not declared a total loss",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b626"
+      },
+      "notes": "Conflicts on total-loss status and key dollar amounts.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-14",
+      "contradiction_type": "Temporal / Factual \u2013 Prior Accident History (Cross-Doc)",
+      "fact_a": {
+        "text": "\u201cNo prior motor vehicle collisions within past 10 years\u201d; acknowledges June 10, 2018 rear-end collision",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b623"
+      },
+      "fact_b": {
+        "text": "Lopez initially denies any accidents in 10 years, then acknowledges 2018 SF collision and an additional 2019 Daly City incident",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b628\u201330"
+      },
+      "notes": "Combined corpus shows inconsistent statements and more prior incidents than admitted in Doc 1.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-15",
+      "contradiction_type": "Factual / Legal-Status \u2013 Course & Scope of Employment",
+      "fact_a": {
+        "text": "Reed was acting \u201cin the course and scope of his employment at all times relevant\u201d",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b63"
+      },
+      "fact_b": {
+        "text": "Reed had finished his route, was released from duty, and driving home for personal convenience (no active business purpose)",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b618"
+      },
+      "notes": "Conflicting facts about whether Reed was within course and scope at the time of collision.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "D1-INTRA-01",
+      "contradiction_type": "Factual / Temporal \u2013 Prior Accident History",
+      "fact_a": {
+        "text": "Lopez \u201chas not been involved in any prior motor vehicle collisions within the past ten (10) years.\u201d",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b623 vs \u00b624"
+      },
+      "fact_b": {
+        "text": "Lopez was involved in a June 10, 2018 rear-end collision in SF with neck soreness.",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b623 vs \u00b624"
+      },
+      "notes": "Same document, conflicting assertions about prior collisions in last 10 years.",
+      "is_inter_doc": false
+    },
+    {
+      "id": "D1-INTRA-02",
+      "contradiction_type": "Quantitative \u2013 Medical Expenses",
+      "fact_a": {
+        "text": "Medical expenses to date believed to exceed $28,000.00.",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b620 vs \u00b631"
+      },
+      "fact_b": {
+        "text": "Total amount of medical expenses to date is approximately $18,000.00.",
+        "source": "Doc 1",
+        "paragraph_ref": "\u00b620 vs \u00b631"
+      },
+      "notes": "Different amounts for \u201cmedical expenses to date\u201d within same pleading.",
+      "is_inter_doc": false
+    },
+    {
+      "id": "D2-INTRA-01",
+      "contradiction_type": "Factual / Temporal \u2013 Driver\u2019s Prior Preventable Collisions",
+      "fact_a": {
+        "text": "Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b619 vs \u00b620"
+      },
+      "fact_b": {
+        "text": "A later audit confirms Reed was involved in a preventable rear-end collision on Feb 2, 2020 in Oakland, CA.",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b619 vs \u00b620"
+      },
+      "notes": "The report itself shows that the initial \u201cno prior preventable collisions\u201d is incorrect.",
+      "is_inter_doc": false
+    },
+    {
+      "id": "D2-INTRA-02",
+      "contradiction_type": "Factual / Temporal \u2013 Lopez Prior Accident Statements",
+      "fact_a": {
+        "text": "Lopez initially states she had not been involved in any motor vehicle accidents in the past ten (10) years.",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b628 vs \u00b629\u201330"
+      },
+      "fact_b": {
+        "text": "She later acknowledges 2018 rear-end collision and claim database also shows a 2019 Daly City incident.",
+        "source": "Doc 2",
+        "paragraph_ref": "\u00b628 vs \u00b629\u201330"
+      },
+      "notes": "Internal inconsistency between Lopez\u2019s initial assertion and documented prior accidents.",
+      "is_inter_doc": false
+    }
+  ],
+  "MASON_KEY.md": [
+    {
+      "id": "C-01",
+      "contradiction_type": "Location (value_type: `LOCATION`, property_type: `LOCATION`)",
+      "fact_a": {
+        "text": "Eastvale, California",
+        "source": "Doc 1",
+        "paragraph_ref": null
+      },
+      "fact_b": {
+        "text": "Stockton, California",
+        "source": "Doc 2",
+        "paragraph_ref": null
+      },
+      "notes": "Same event framing (\u201cattending a fair\u201d), different city.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-02",
+      "contradiction_type": "Attribute / Categorical (value_type: `CATEGORICAL`, property_type: `ATTRIBUTE`)",
+      "fact_a": {
+        "text": "Played beer pong",
+        "source": "Doc 1",
+        "paragraph_ref": null
+      },
+      "fact_b": {
+        "text": "Played cup pong",
+        "source": "Doc 2",
+        "paragraph_ref": null
+      },
+      "notes": "Activity differs.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-03",
+      "contradiction_type": "Relation / Entity Ref (value_type: `ENTITY_REF`, property_type: `RELATION`)",
+      "fact_a": {
+        "text": "Struck by Billy",
+        "source": "Doc 1",
+        "paragraph_ref": null
+      },
+      "fact_b": {
+        "text": "Struck by Watson",
+        "source": "Doc 2",
+        "paragraph_ref": null
+      },
+      "notes": "Different alleged assailant.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-04",
+      "contradiction_type": "Attribute / Categorical (value_type: `CATEGORICAL`, property_type: `ATTRIBUTE`)",
+      "fact_a": {
+        "text": "Severe concussion",
+        "source": "Doc 1",
+        "paragraph_ref": null
+      },
+      "fact_b": {
+        "text": "Minor concussion",
+        "source": "Doc 2",
+        "paragraph_ref": null
+      },
+      "notes": "Severity differs.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-05",
+      "contradiction_type": "Temporal / Duration (value_type: `TEMPORAL_INTERVAL`, property_type: `TEMPORAL`)",
+      "fact_a": {
+        "text": "Expenses spanned several months",
+        "source": "Doc 1",
+        "paragraph_ref": null
+      },
+      "fact_b": {
+        "text": "Expenses spanned 2 months",
+        "source": "Doc 2",
+        "paragraph_ref": null
+      },
+      "notes": "Duration differs.",
+      "is_inter_doc": true
+    },
+    {
+      "id": "C-06",
+      "contradiction_type": "Quantitative / Money (value_type: `NUMERIC`, property_type: `QUANTITATIVE`)",
+      "fact_a": {
+        "text": "Total hospital expenses $3200",
+        "source": "Doc 1",
+        "paragraph_ref": null
+      },
+      "fact_b": {
+        "text": "Total hospital expenses $300",
+        "source": "Doc 2",
+        "paragraph_ref": null
+      },
+      "notes": "Amount differs.",
+      "is_inter_doc": true
+    }
+  ]
+}

@@ -12,13 +12,16 @@
 //! `json.dumps` byte format used for every diffable output.
 
 pub mod contradictions;
+pub mod e2e;
 pub mod ed;
 pub mod entities;
 pub mod error;
 pub mod facts;
 pub mod ids;
+pub mod processing;
 pub mod pyjson;
 pub mod rag;
+pub mod util;
 pub mod vocab;
 
 /// Free-form JSON object (Python `Dict[str, Any]`), insertion ordered.

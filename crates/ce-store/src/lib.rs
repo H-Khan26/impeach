@@ -8,8 +8,9 @@
 //!   ([`DocumentNode`], [`ChunkNode`], [`SpanNode`], [`EntityNode`], [`FactNode`]) with the
 //!   Python parameter validation, and the result types [`Stored`] and [`SearchHit`].
 //! - [`GraphStore`]: one method per query of the Python Helix client, plus `store_id`,
-//!   `reset` and batch writes for chunks, spans and embeddings. Synchronous and object safe;
-//!   share one store as `Arc<dyn GraphStore>`.
+//!   `reset`, batch writes for chunks, spans and embeddings, and `delete_document_chunks`
+//!   (clears a document's chunks before it is re-indexed). Synchronous and object safe; share
+//!   one store as `Arc<dyn GraphStore>`.
 //! - [`MemoryStore`]: complete in-process backend (brute-force cosine, Okapi BM25 from
 //!   [`bm25`]); used by tests and model-free runs.
 //! - `HelixStore` (cargo feature `helix`, on by default): embedded HelixDB v3 on disk or in

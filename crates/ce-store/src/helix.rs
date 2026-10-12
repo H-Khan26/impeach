@@ -26,7 +26,9 @@ use std::collections::{BTreeSet, HashMap};
 use std::fs::{File, OpenOptions};
 use std::num::NonZeroUsize;
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, LazyLock, Mutex, MutexGuard, OnceLock, PoisonError, RwLock, Weak};
+use std::sync::{Arc, LazyLock, Mutex, OnceLock, PoisonError, RwLock, Weak};
+
+use ce_core::util::lock;
 use std::time::{Duration, Instant};
 
 use ce_core::{ChunkId, EntityId, FactId, NodeId, SpanId};
@@ -210,10 +212,6 @@ fn strip_verbatim_prefix(path: PathBuf) -> PathBuf {
 
 static REGISTRY: LazyLock<Mutex<HashMap<RegistryKey, Weak<HelixStore>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
-
-fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
-    mutex.lock().unwrap_or_else(PoisonError::into_inner)
-}
 
 /// Graph store backed by HelixDB.
 pub struct HelixStore {
@@ -1335,6 +1333,32 @@ impl GraphStore for HelixStore {
             }
         }
         Ok(stored)
+    }
+
+    fn delete_document_chunks(&self, doc_id: &NodeId) -> Result<usize> {
+        let id = parse_node_id("doc_id", doc_id.as_str())?;
+        // Dropping a node also drops its incident edges and its vector.
+        let result = self.write(
+            "DeleteDocumentChunks",
+            write_batch()
+                .var_as(
+                    "chunks",
+                    g().n(NodeRef::id(id))
+                        .has_label(DOCUMENT)
+                        .in_(Some(CHUNK_OF_DOCUMENT))
+                        .has_label(DOCUMENT_CHUNK),
+                )
+                .var_as(
+                    "spans",
+                    g().n(NodeRef::var("chunks")).in_(Some(SPAN_OF_CHUNK)).has_label(SPAN),
+                )
+                .var_as("chunk_count", g().n(NodeRef::var("chunks")).count())
+                .var_as("dropped_spans", g().n(NodeRef::var("spans")).drop())
+                .var_as("dropped_chunks", g().n(NodeRef::var("chunks")).drop())
+                .returning(["chunk_count"]),
+        )?;
+        let count = result.get("chunk_count").and_then(Value::as_u64).unwrap_or(0);
+        Ok(usize::try_from(count).unwrap_or(usize::MAX))
     }
 
     fn create_spans_batch(&self, spans: &[SpanNode]) -> Result<Vec<StoredSpan>> {

@@ -473,6 +473,45 @@ fn batches(store: &dyn GraphStore) {
     assert_eq!(store.create_embeddings_batch(VectorLabel::Fact, &[]).expect("empty"), 0);
 }
 
+fn delete_document_chunks(store: &dyn GraphStore) {
+    let doc = store.create_document(&document("Doc")).expect("document");
+    let other = store.create_document(&document("Other")).expect("document");
+    let inputs: Vec<ChunkNode> = (0..3).map(|i| chunk(i, &format!("chunk {i}"))).collect();
+    let chunks = store.create_chunks_batch(&doc.id, &inputs).expect("chunks");
+    let kept = store.create_document_chunk(&other.id, &chunk(0, "kept")).expect("other chunk");
+    let spans: Vec<SpanNode> =
+        chunks.iter().map(|stored| span(&doc.id, &stored.id, 0, "sentence")).collect();
+    let spans = store.create_spans_batch(&spans).expect("spans");
+    let kept_span =
+        store.create_span_for_chunk(&span(&other.id, &kept.id, 0, "kept")).expect("other span");
+    let vector = [1.0_f32, 0.0, 0.0, 0.0];
+    store.create_chunk_embedding(&chunks[0].id, &vector).expect("embedding");
+    let acme = store.create_entity(&entity("Acme", "ORG", &[])).expect("entity");
+    store.link_span_to_entity(&spans[0].id, &acme.id, 0.9, "").expect("link");
+
+    assert_eq!(store.delete_document_chunks(&doc.id).expect("delete"), 3);
+    assert!(store.get_document_chunks(&doc.id).expect("chunks").is_empty());
+    for stored in &chunks {
+        let error = store.create_chunk_embedding(&stored.id, &vector).expect_err("chunk gone");
+        assert!(is_not_found(&error), "{error:?}");
+    }
+    for stored in &spans {
+        let error = store.link_span_to_entity(&stored.id, &acme.id, 0.5, "").expect_err("gone");
+        assert!(is_not_found(&error), "{error:?}");
+    }
+    store.update_document(&doc.id, &document("Doc again")).expect("document is kept");
+    assert_eq!(store.get_document_chunks(&other.id).expect("other chunks").len(), 1);
+    store.link_span_to_entity(&kept_span.id, &acme.id, 0.5, "").expect("other span is kept");
+
+    let recreated = store.create_chunks_batch(&doc.id, &inputs[..2]).expect("recreate");
+    assert_eq!(store.get_document_chunks(&doc.id).expect("chunks").len(), recreated.len());
+    assert_eq!(store.delete_document_chunks(&doc.id).expect("delete again"), 2);
+    assert_eq!(store.delete_document_chunks(&doc.id).expect("nothing left"), 0);
+    assert_eq!(store.delete_document_chunks(&NodeId::new("987654")).expect("missing doc"), 0);
+    let malformed = store.delete_document_chunks(&NodeId::new("doc-1")).expect_err("malformed");
+    assert!(is_validation(&malformed, "doc_id"), "{malformed:?}");
+}
+
 fn shared_across_threads(store: &Arc<dyn GraphStore>) {
     let handles: Vec<_> = (0..4)
         .map(|worker| {
@@ -548,6 +587,11 @@ macro_rules! contract_tests {
             #[test]
             fn batches() {
                 super::batches(&*$factory());
+            }
+
+            #[test]
+            fn delete_document_chunks() {
+                super::delete_document_chunks(&*$factory());
             }
 
             #[test]
