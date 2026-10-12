@@ -13,7 +13,7 @@ use ce_models::{MockEmbedder, ModelKind, ModelRegistry};
 use ce_pipeline::{
     load_processing_config, run_processing, run_processing_with, PipelineContext, PipelineError,
     ProcessingEnv, ProcessingOptions, ProcessingResult, RagIndexStage, Stage, StageBuildContext,
-    StageRegistry,
+    StageRegistry, UnregisteredStages,
 };
 use ce_store::{GraphStore, MemoryStore};
 use common::{fixture, DIM};
@@ -118,7 +118,7 @@ fn dummy_env() -> (ProcessingEnv, Seen) {
         registry: Some(Arc::new(ModelRegistry::empty("processing_v17"))),
         store: Some(Arc::new(MemoryStore::new(DIM))),
         stages: Some(stages),
-        unregistered: None,
+        unregistered: Some(UnregisteredStages::Skip),
     };
     (env, seen)
 }
@@ -132,7 +132,7 @@ fn mock_env() -> (ProcessingEnv, Arc<MemoryStore>) {
         registry: Some(Arc::new(registry)),
         store: Some(dyn_store),
         stages: Some(rag_index_only()),
-        unregistered: None,
+        unregistered: Some(UnregisteredStages::Skip),
     };
     (env, store)
 }
@@ -351,7 +351,7 @@ fn run_processing_indexes_fixtures_with_mocks() {
         assert_eq!(store.node_count(), 1 + indexed.chunks.len() + indexed.spans.len());
         assert!(run.data.doc_metadata.is_some());
         assert!(run.data.case_id.is_some());
-        // Later stages are not ported yet: the result is empty.
+        // Only the RAG index stage runs: the result is empty.
         let result = run.result;
         assert_eq!(result.contradiction_report, None);
         assert!(result.extracted_facts.is_empty() && result.clean_facts.is_empty());
@@ -410,11 +410,16 @@ fn open_store_with_helix_memory_mode() {
             "coreference",
             "ed_resolution",
             "relation_extraction",
-            "fact_extraction"
+            "fact_extraction",
+            "contradiction_check"
         ]
     );
-    // No LLM is registered: the fact stage skips without writing anything.
+    // No LLM is registered: the fact stage skips without writing anything, and the
+    // contradiction stage reports an empty check.
     assert!(run.data.extracted_facts.is_none());
+    let report = run.result.contradiction_report.as_ref().expect("contradiction report");
+    assert_eq!(report.total_facts_extracted, 0);
+    assert_eq!(run.result.committed_fact_ids, Vec::<ce_core::FactId>::new());
     let indexed = run.data.rag_index_result.as_ref().expect("indexed");
     assert_eq!(indexed.chunks.len(), 6);
     assert_eq!(indexed.embeddings.count, 6);

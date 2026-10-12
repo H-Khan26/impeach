@@ -9,8 +9,8 @@
 //! - [`Pipeline`]: ordered stages; [`Pipeline::run`] takes a [`PipelineInput`] (a
 //!   `DocumentPayload`, a JSONL path or a JSON file path) and logs per-stage timings.
 //! - [`StageRegistry`]: stage `type` name -> [`StageConstructor`]; [`build_pipeline`] builds
-//!   the enabled stages in config order (see [`factory`] for disabled and not-yet-ported
-//!   stage types).
+//!   the enabled stages in config order (see [`factory`] for disabled and unregistered stage
+//!   types). [`StageRegistry::builtin`] registers all eight stages.
 //! - [`RagIndexStage`]: chunking ([`rag::chunker`] documents the boundary rule), Document /
 //!   Chunk / Span nodes, chunk embeddings, optional document-identity cache.
 //! - [`MentionStage`], [`DefinitionStage`], [`CoreferenceStage`]: mentions, defined role terms
@@ -18,8 +18,12 @@
 //!   mention span links; [`RelationStage`]: GLiNER2 relations kept in the context.
 //! - [`FactStage`]: LLM facts per chunk (`ce_facts`), linked to ED entities; committed to the
 //!   store (`commit_facts: true`) or left in `fact_nodes_pending` for the contradiction stage.
+//! - [`ContradictionStage`]: intra- and cross-document contradiction check
+//!   (`ce_contradictions`), commit of the clean facts and the SQLite review queue.
 //! - [`run_processing`]: the public entry point over a pre-ingested JSONL file;
 //!   [`run_processing_with`] injects the model registry, graph store and stage registry.
+//! - [`e2e`]: the end-to-end runner (sequential documents into one store, the stage-based
+//!   output JSON `ce-eval` reads, evaluation against a key).
 //!
 //! ```no_run
 //! use ce_pipeline::{run_processing, ProcessingOptions};
@@ -61,6 +65,17 @@
 //!   Fact node value / property types are always normalised through the taxonomy. A role term
 //!   that links to no name is looked up in the EDStage `role_map`. Prompt aliases keep
 //!   first-seen order (Python used a set).
+//! - [`ContradictionStage`] loads the LLM judge prompt at build time (`judge_model: qwen`) and
+//!   fails the build without `qwen_prompt_file`. Facts the fact stage already committed
+//!   (`commit_facts: true`) are excluded from their own document's cross-document retrieval
+//!   and not written twice. The judge is resolved once per stage. A judge-less run reports
+//!   every fact clean with the fact stage's committed ids (Python: none). Judge calls are
+//!   batched per fact (cross-document) and per document (intra-document).
+//! - Every stage type has a constructor, so [`run_processing`] and [`build_pipeline`] fail on
+//!   an unregistered stage type ([`UnregisteredStages::Error`]); a custom registry with only
+//!   some stages passes [`UnregisteredStages::Skip`].
+//! - The e2e runner ([`e2e`]) records a failed document's error message (Python stored the
+//!   exception `repr`) and renders header scalars as text.
 
 pub mod api;
 pub mod context;

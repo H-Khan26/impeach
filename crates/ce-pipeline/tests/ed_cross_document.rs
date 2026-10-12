@@ -60,7 +60,8 @@ fn second_document_reuses_entities_of_the_first() {
             "coreference",
             "ed_resolution",
             "relation_extraction",
-            "fact_extraction"
+            "fact_extraction",
+            "contradiction_check"
         ]
     );
     let after_first = entity_ids(&store);

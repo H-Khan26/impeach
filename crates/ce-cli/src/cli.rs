@@ -32,6 +32,10 @@ pub enum Command {
     Run(RunArgs),
     /// Evaluate e2e pipeline output against a ground-truth contradiction key.
     Eval(EvalArgs),
+    /// Run pre-ingested JSONL documents sequentially into one store, write the e2e output
+    /// JSON and evaluate it against a key.
+    #[command(name = "run-e2e", after_help = SCENARIO_HELP)]
+    RunE2e(RunE2eArgs),
     /// Manage the graph store.
     #[command(subcommand)]
     Store(StoreCommand),
@@ -120,6 +124,47 @@ pub struct EvalArgs {
     pub no_value_guard: bool,
 }
 
+/// Preset scenarios listed after the `run-e2e` help.
+pub const SCENARIO_HELP: &str = "Scenarios (paths under --fixtures-dir):
+  green_valley: input/green_valley_incident_report.jsonl -> input/lopez_v_green_valley_complaint.jsonl (key: keys/GREEN_VALLEY_CONTRA_KEY.md)
+  mason: input/Mason_billy.jsonl -> input/Mason_watson.jsonl (key: keys/MASON_KEY.md)";
+
+/// `run-e2e` arguments.
+#[derive(Debug, Args)]
+pub struct RunE2eArgs {
+    /// Preset inputs and key.
+    #[arg(long, value_parser = clap::builder::PossibleValuesParser::new(ce_pipeline::e2e::SCENARIO_NAMES))]
+    pub scenario: Option<String>,
+    /// JSONL files, processed in the given order (overrides the scenario inputs).
+    #[arg(long, num_args = 1.., value_name = "JSONL")]
+    pub inputs: Vec<PathBuf>,
+    /// Pipeline config YAML (default: the packaged processing config).
+    #[arg(short, long)]
+    pub config: Option<PathBuf>,
+    /// Output JSON (default: data/output/e2e_<scenario|custom>.json).
+    #[arg(short, long)]
+    pub output: Option<PathBuf>,
+    /// SQLite review-store path (default: <output>.sqlite3 next to the output).
+    #[arg(long)]
+    pub db_path: Option<PathBuf>,
+    /// Keep an existing SQLite file at the review-store path and append to it (default:
+    /// delete it first).
+    #[arg(long)]
+    pub append_db: bool,
+    /// Contradiction key markdown; enables evaluation (a scenario supplies a default).
+    #[arg(long)]
+    pub key: Option<PathBuf>,
+    /// Skip evaluation even if a key is available.
+    #[arg(long)]
+    pub no_eval: bool,
+    /// Evaluator similarity threshold (default: the evaluator default, 0.75).
+    #[arg(short, long)]
+    pub threshold: Option<f64>,
+    /// Root of the scenario fixtures (`input/`, `keys/`).
+    #[arg(long, default_value = "fixtures")]
+    pub fixtures_dir: PathBuf,
+}
+
 /// `store` subcommands.
 #[derive(Debug, Subcommand)]
 pub enum StoreCommand {
@@ -161,6 +206,50 @@ mod tests {
         assert!(cli.verbose);
         let Command::Run(args) = cli.command else { panic!("expected run") };
         assert_eq!(args.processing.config, Some(PathBuf::from("x.yaml")));
+    }
+
+    #[test]
+    fn run_e2e_defaults() {
+        let cli = Cli::parse_from(["contradiction-engine", "run-e2e", "--scenario", "mason"]);
+        let Command::RunE2e(args) = cli.command else { panic!("expected run-e2e") };
+        assert_eq!(args.scenario.as_deref(), Some("mason"));
+        assert!(args.inputs.is_empty());
+        assert!(args.config.is_none() && args.output.is_none() && args.db_path.is_none());
+        assert!(!args.append_db && !args.no_eval);
+        assert!(args.key.is_none() && args.threshold.is_none());
+        assert_eq!(args.fixtures_dir, PathBuf::from("fixtures"));
+    }
+
+    #[test]
+    fn run_e2e_takes_several_inputs_and_short_flags() {
+        let cli = Cli::parse_from([
+            "contradiction-engine",
+            "run-e2e",
+            "--inputs",
+            "a.jsonl",
+            "b.jsonl",
+            "-c",
+            "x.yaml",
+            "-o",
+            "out.json",
+            "-t",
+            "0.8",
+            "--no-eval",
+            "--append-db",
+        ]);
+        let Command::RunE2e(args) = cli.command else { panic!("expected run-e2e") };
+        assert_eq!(args.inputs, [PathBuf::from("a.jsonl"), PathBuf::from("b.jsonl")]);
+        assert_eq!(args.config, Some(PathBuf::from("x.yaml")));
+        assert_eq!(args.output, Some(PathBuf::from("out.json")));
+        assert_eq!(args.threshold, Some(0.8));
+        assert!(args.no_eval && args.append_db);
+    }
+
+    #[test]
+    fn run_e2e_rejects_unknown_scenarios() {
+        let error = Cli::try_parse_from(["contradiction-engine", "run-e2e", "--scenario", "x"])
+            .expect_err("unknown scenario");
+        assert_eq!(error.kind(), clap::error::ErrorKind::InvalidValue);
     }
 
     #[test]

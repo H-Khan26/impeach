@@ -55,7 +55,7 @@ fn help_lists_every_subcommand() {
     let output = run(&["--help"]);
     assert!(output.status.success());
     let text = stdout(&output);
-    for command in ["ingest", "process", "run", "eval", "store"] {
+    for command in ["ingest", "process", "run", "eval", "run-e2e", "store"] {
         assert!(text.contains(command), "help lists {command}: {text}");
     }
 }
@@ -121,8 +121,9 @@ fn process_without_enabled_stages_writes_the_summary() {
     let text = stdout(&output);
     assert!(text.contains("Contradiction Detection Report"), "{text}");
     assert!(text.contains("Results written to:"), "{text}");
-    // No ContradictionCheckStage ran, so nothing was written to SQLite.
-    assert!(!text.contains("SQLite output:"), "{text}");
+    // The ContradictionCheckStage ran with the review store (no facts, so no rows).
+    assert!(text.contains("SQLite output:"), "{text}");
+    assert!(db_path.exists());
 
     let value: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string(&summary).expect("read summary"))
@@ -142,7 +143,7 @@ fn process_without_enabled_stages_writes_the_summary() {
         ]
     );
     assert_eq!(value["total_facts_extracted"], 0);
-    assert_eq!(value["sqlite_db_path"], serde_json::Value::Null);
+    assert_eq!(value["sqlite_db_path"], path_arg(&db_path));
 }
 
 #[test]
@@ -222,4 +223,186 @@ fn default_fastcoref_backend_falls_back_to_rules_with_a_warning() {
                    models.coref.backend: rule to silence this";
     assert_eq!(log.matches(warning).count(), 1, "{log}");
     assert!(log.contains("WARN"), "{log}");
+}
+
+/// The packaged config without models: offline RAG index, no GLiNER2 detector, rule
+/// coreference, in-memory Helix and no relation stage.
+fn offline_config(dir: &Path) -> PathBuf {
+    write_config(
+        dir,
+        &[
+            ("    offline: false", "    offline: true"),
+            (
+                "      - type: \"gliner2\"\n        model_name_suffix: \"gliner2\"\n        min_score: 0.4\n        label_set: \"legal_entities\"\n",
+                "",
+            ),
+            ("backend: \"fastcoref\"", "backend: \"rule\""),
+            ("mode: \"embedded\"", "mode: \"memory\""),
+            RELATION_STAGE_OFF,
+        ],
+    )
+}
+
+#[test]
+fn run_e2e_requires_a_scenario_or_inputs() {
+    let output = run(&["run-e2e"]);
+    assert_eq!(output.status.code(), Some(1));
+    assert!(stderr(&output).contains("provide --scenario or --inputs"), "{}", stderr(&output));
+}
+
+#[test]
+fn run_e2e_lists_missing_files() {
+    let output =
+        run(&["run-e2e", "--inputs", "missing_a.jsonl", "missing_b.jsonl", "-c", "nope.yaml"]);
+    assert_eq!(output.status.code(), Some(1));
+    let text = stderr(&output);
+    assert!(
+        text.contains("file(s) not found: missing_a.jsonl, missing_b.jsonl, nope.yaml"),
+        "{text}"
+    );
+}
+
+#[test]
+fn run_e2e_rejects_a_missing_key() {
+    let output = run(&[
+        "run-e2e",
+        "--inputs",
+        path_arg(&fixture("input/Mason_intra.jsonl")),
+        "--key",
+        "missing_key.md",
+    ]);
+    assert_eq!(output.status.code(), Some(1));
+    assert!(stderr(&output).contains("key not found: missing_key.md"), "{}", stderr(&output));
+}
+
+#[test]
+fn run_e2e_offline_writes_the_output_json() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let config = offline_config(dir.path());
+    let out = dir.path().join("out").join("e2e_custom.json");
+    let first = fixture("input/Mason_billy.jsonl");
+    let second = fixture("input/Mason_watson.jsonl");
+    let output = run(&[
+        "run-e2e",
+        "--inputs",
+        path_arg(&first),
+        path_arg(&second),
+        "-c",
+        path_arg(&config),
+        "-o",
+        path_arg(&out),
+        "--no-eval",
+    ]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let text = stdout(&output);
+    assert!(text.contains("Document 1: Mason_billy.jsonl"), "{text}");
+    assert!(text.contains("Document 2: Mason_watson.jsonl"), "{text}");
+    assert!(text.contains("Aggregates"), "{text}");
+    assert!(text.contains("Output written to"), "{text}");
+
+    let value: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&out).expect("read output"))
+            .expect("output JSON");
+    let keys: Vec<&str> = value.as_object().expect("object").keys().map(String::as_str).collect();
+    assert_eq!(
+        keys,
+        [
+            "run_id",
+            "timestamp",
+            "scenario",
+            "pipeline_name",
+            "helix_namespace",
+            "helix_url",
+            "helix_mode",
+            "helix_data_dir",
+            "config_path",
+            "sqlite_db_path",
+            "inputs",
+            "status",
+            "pipeline_summary",
+            "aggregates",
+            "documents",
+        ]
+    );
+    assert_eq!(value["status"], "ok");
+    assert!(value["run_id"].as_str().is_some_and(|id| id.starts_with("e2e_custom_")));
+    assert_eq!(value["scenario"], serde_json::Value::Null);
+    assert_eq!(value["helix_mode"], "memory");
+    assert_eq!(value["pipeline_summary"]["total_documents"], 2);
+    let sqlite = dir.path().join("out").join("e2e_custom.sqlite3");
+    assert_eq!(value["sqlite_db_path"], path_arg(&sqlite));
+    assert!(sqlite.exists());
+    let documents = value["documents"].as_array().expect("documents");
+    assert_eq!(documents.len(), 2);
+    assert_eq!(documents[0]["case_id"], "mason_v_billy");
+    let check = &documents[1]["stage_6_contradiction_check"];
+    assert_eq!(check["total_checked"], 0);
+    assert_eq!(check["cross_doc_contradictions"], serde_json::json!([]));
+    // The text is Python `json.dumps(indent=2)`.
+    let raw = std::fs::read_to_string(&out).expect("read output");
+    assert!(raw.starts_with("{\n  \"run_id\": "), "{raw}");
+}
+
+#[test]
+fn run_e2e_scenario_resolves_fixture_inputs() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let config = offline_config(dir.path());
+    let out = dir.path().join("gv.json");
+    let fixtures = workspace_root().join("fixtures");
+    let output = run(&[
+        "run-e2e",
+        "--scenario",
+        "green_valley",
+        "--fixtures-dir",
+        path_arg(&fixtures),
+        "-c",
+        path_arg(&config),
+        "-o",
+        path_arg(&out),
+        "--no-eval",
+    ]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let value: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&out).expect("read output"))
+            .expect("output JSON");
+    assert_eq!(value["scenario"], "green_valley");
+    assert!(value["run_id"].as_str().is_some_and(|id| id.starts_with("e2e_green_valley_")));
+    let inputs: Vec<&str> =
+        value["inputs"].as_array().expect("inputs").iter().filter_map(|v| v.as_str()).collect();
+    assert_eq!(inputs.len(), 2);
+    assert!(inputs[0].ends_with("green_valley_incident_report.jsonl"), "{inputs:?}");
+    assert!(inputs[1].ends_with("lopez_v_green_valley_complaint.jsonl"), "{inputs:?}");
+    assert!(!dir.path().join("gv_eval.json").exists());
+}
+
+#[test]
+fn run_e2e_failing_document_fails_the_run() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let config = offline_config(dir.path());
+    let bad = dir.path().join("bad.jsonl");
+    std::fs::write(&bad, "{\"doc_id\": \"bad-1\", \"case_id\": 7}\n").expect("write");
+    let out = dir.path().join("failed.json");
+    let good = fixture("input/Mason_billy.jsonl");
+    let output = run(&[
+        "run-e2e",
+        "--inputs",
+        path_arg(&bad),
+        path_arg(&good),
+        "-c",
+        path_arg(&config),
+        "-o",
+        path_arg(&out),
+    ]);
+    assert_eq!(output.status.code(), Some(1));
+    assert!(stderr(&output).contains("e2e run failed"), "{}", stderr(&output));
+    let value: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&out).expect("read output"))
+            .expect("output JSON");
+    assert_eq!(value["status"], "failed");
+    let documents = value["documents"].as_array().expect("documents");
+    assert_eq!(documents.len(), 1, "later documents are not run");
+    assert_eq!(documents[0]["doc_id"], "bad-1");
+    assert_eq!(documents[0]["case_id"], "7");
+    assert!(documents[0]["error"].as_str().is_some_and(|e| e.contains("text")), "{value}");
+    assert!(documents[0].get("stage_6_contradiction_check").is_none());
 }

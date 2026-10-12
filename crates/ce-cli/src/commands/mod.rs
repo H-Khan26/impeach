@@ -1,5 +1,6 @@
 //! Subcommand implementations.
 
+pub mod e2e;
 pub mod eval;
 pub mod ingest;
 pub mod process;
@@ -18,6 +19,7 @@ pub fn dispatch(command: Command) -> anyhow::Result<()> {
         Command::Process(args) => process::execute(&args),
         Command::Run(args) => run::execute(&args),
         Command::Eval(args) => eval::execute(&args),
+        Command::RunE2e(args) => e2e::execute(&args),
         Command::Store(StoreCommand::Reset(args)) => store::reset(&args),
     }
 }
