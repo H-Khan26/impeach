@@ -7,7 +7,7 @@
 //! are sequential integers shared by all labels and never reused, also across
 //! [`GraphStore::reset`].
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::sync::{PoisonError, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use ce_core::{ChunkId, EntityId, FactId, NodeId, SpanId};
@@ -537,6 +537,31 @@ impl GraphStore for MemoryStore {
         let mut graph = self.write();
         let parent = graph.require(DOCUMENT, "doc_id", doc_id.as_str())?;
         Ok(chunks.iter().map(|chunk| insert_chunk(&mut graph, chunk, parent)).collect())
+    }
+
+    fn delete_document_chunks(&self, doc_id: &NodeId) -> Result<usize> {
+        let id = parse_node_id("doc_id", doc_id.as_str())?;
+        let mut graph = self.write();
+        if graph.get(DOCUMENT, id).is_none() {
+            return Ok(0);
+        }
+        let chunks: Vec<u64> = graph
+            .sources(CHUNK_OF_DOCUMENT, id)
+            .into_iter()
+            .filter(|chunk_id| graph.get(DOCUMENT_CHUNK, *chunk_id).is_some())
+            .collect();
+        let spans: Vec<u64> = chunks
+            .iter()
+            .flat_map(|chunk_id| graph.sources(SPAN_OF_CHUNK, *chunk_id))
+            .filter(|span_id| graph.get(SPAN, *span_id).is_some())
+            .collect();
+        let removed: BTreeSet<String> =
+            chunks.iter().chain(&spans).map(ToString::to_string).collect();
+        for node_id in chunks.iter().chain(&spans) {
+            graph.nodes.remove(node_id);
+        }
+        graph.edges.retain(|edge| !removed.contains(&edge.from) && !removed.contains(&edge.to));
+        Ok(chunks.len())
     }
 
     fn create_spans_batch(&self, spans: &[SpanNode]) -> Result<Vec<StoredSpan>> {

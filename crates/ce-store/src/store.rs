@@ -1,4 +1,5 @@
-//! The [`GraphStore`] trait: one method per query of the Python Helix client, plus batch writes.
+//! The [`GraphStore`] trait: one method per query of the Python Helix client, plus batch writes
+//! and the chunk cleanup of re-indexed documents.
 
 use ce_core::{ChunkId, EntityId, FactId, NodeId, SpanId};
 
@@ -200,6 +201,15 @@ pub trait GraphStore: Send + Sync + std::fmt::Debug {
         doc_id: &NodeId,
         chunks: &[ChunkNode],
     ) -> Result<Vec<StoredChunk>>;
+
+    /// Deletes every chunk linked to the document by `ChunkOfDocument`, the spans linked to
+    /// those chunks by `SpanOfChunk`, their vectors and every edge touching them, in one
+    /// transaction; the `Document` node itself is kept. Returns the number of chunks deleted
+    /// (0 when the document does not exist).
+    ///
+    /// # Errors
+    /// `Validation` for a malformed id; database failures.
+    fn delete_document_chunks(&self, doc_id: &NodeId) -> Result<usize>;
 
     /// Batch `CreateSpanForChunk`: results in input order; transactions as in
     /// [`GraphStore::create_chunks_batch`].
