@@ -7,9 +7,20 @@
 //!
 //! Configured backends: `bge` -> `FastEmbedder` (feature `fastembed`), `deberta_nli` ->
 //! `OrtNli` (feature `ort-nli`), `ollama` -> `OllamaLlm` (feature `ollama`), `gliner2` ->
-//! `Gliner2Ner` (feature `gliner2`), `coref` -> [`SidecarCoref`] when a sidecar command is set
-//! with [`ModelRegistry::with_coref_sidecar`]. A backend whose feature is off (or the coref
-//! model without a sidecar) yields [`ModelError::Unavailable`].
+//! `Gliner2Ner` (feature `gliner2`), `coref` by `models.coref.backend`:
+//!
+//! | `backend` | Resolver |
+//! | --- | --- |
+//! | `fastcoref` | [`SidecarCoref`] started with `models.coref.command`; without a command, [`RuleCoref`] with one warning ([`FASTCOREF_FALLBACK_WARNING`]) so the shipped config runs out of the box |
+//! | `rule` | [`RuleCoref`] |
+//! | `llm` | [`LlmCoref`] over the registry's `<pipeline.name>_ollama` LLM |
+//! | `mock` | [`MockCoref`] returning no clusters |
+//!
+//! A sidecar set with [`ModelRegistry::with_coref_sidecar`] replaces the configured coref
+//! backend, whatever it is. A backend whose feature is off yields [`ModelError::Unavailable`];
+//! a configured sidecar that cannot start is a [`ModelError::Load`] error.
+//!
+//! Models are built once per key, so the fallback warning is logged once per registry.
 
 use std::collections::HashMap;
 use std::fmt;
@@ -17,12 +28,21 @@ use std::sync::{Arc, Mutex};
 
 use ce_core::util::lock;
 
-use ce_config::pipeline::ModelsConfig;
+use ce_config::pipeline::{CorefBackend, ModelsConfig};
 use ce_config::PipelineConfig;
 
 use crate::error::ModelError;
+use crate::llm_coref::LlmCoref;
+use crate::mock::MockCoref;
+use crate::rule_coref::RuleCoref;
 use crate::sidecar::{SidecarCommand, SidecarCoref};
 use crate::traits::{Coref, Embedder, Llm, NerModel, NliJudge};
+
+/// Warning logged when `models.coref.backend: fastcoref` has no `command` and the registry
+/// falls back to [`RuleCoref`].
+pub const FASTCOREF_FALLBACK_WARNING: &str = "fastcoref sidecar command not configured; using \
+     the rule coreference backend. set models.coref.command to a fastcoref sidecar, or set \
+     models.coref.backend: rule to silence this";
 
 /// Model types of the `models:` config block, in Python registration order.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -172,8 +192,8 @@ impl ModelRegistry {
         }
     }
 
-    /// Runs the configured `coref` model as a sidecar process started with `command`
-    /// (see [`SidecarCoref`] for the protocol).
+    /// Runs the `coref` model as a sidecar process started with `command` (see
+    /// [`SidecarCoref`] for the protocol), replacing the configured coref backend.
     pub fn with_coref_sidecar(mut self, command: SidecarCommand) -> Self {
         self.coref_sidecar = Some(command);
         self
@@ -348,14 +368,26 @@ impl ModelRegistry {
     }
 
     fn build_coref(&self) -> Result<Arc<dyn Coref>, ModelError> {
-        match &self.coref_sidecar {
-            Some(command) => Ok(Arc::new(SidecarCoref::new(command.clone())?)),
-            None => Err(ModelError::Unavailable {
-                backend: "coref".to_owned(),
-                reason: "fastcoref has no Rust backend; set a coreference sidecar with \
-                         ModelRegistry::with_coref_sidecar"
-                    .to_owned(),
-            }),
+        if let Some(command) = &self.coref_sidecar {
+            return Ok(Arc::new(SidecarCoref::new(command.clone())?));
+        }
+        let config = &self.configured()?.coref;
+        match config.backend {
+            CorefBackend::Fastcoref => {
+                let Some((program, args)) = config.command.as_deref().and_then(<[_]>::split_first)
+                else {
+                    tracing::warn!("{FASTCOREF_FALLBACK_WARNING}");
+                    return Ok(Arc::new(RuleCoref::new()));
+                };
+                let command = SidecarCommand::new(program).args(args);
+                Ok(Arc::new(SidecarCoref::new(command)?))
+            }
+            CorefBackend::Rule => Ok(Arc::new(RuleCoref::new())),
+            CorefBackend::Llm => {
+                let llm = self.llm(&self.key(ModelKind::Ollama))?;
+                Ok(Arc::new(LlmCoref::new(llm)?))
+            }
+            CorefBackend::Mock => Ok(Arc::new(MockCoref::default())),
         }
     }
 }
@@ -467,13 +499,127 @@ mod tests {
         ));
     }
 
+    /// A models block with the given `coref` block (`device: cpu` added).
+    fn coref_models(coref: &serde_json::Value) -> ModelsConfig {
+        let mut models = json!({
+            "ollama": {"model": "m", "base_url": "http://localhost:11434",
+                       "temperature": 0.2, "num_ctx": 16384},
+            "coref": coref,
+            "bge": {"model": "b", "device": "cpu", "normalize_embeddings": true, "batch_size": 64},
+            "deberta_nli": {"model": "n", "device": "cpu"}
+        });
+        models["coref"]["device"] = json!("cpu");
+        serde_json::from_value(models).expect("valid models block")
+    }
+
     #[test]
-    fn coref_without_sidecar_is_unavailable() {
+    fn fastcoref_without_command_falls_back_to_rules_with_one_warning() {
+        use std::io::Write;
+        use std::sync::Mutex;
+
+        use crate::traits::CorefMention;
+
+        /// Appends formatted log lines to a shared buffer.
+        struct Capture(Arc<Mutex<Vec<u8>>>);
+        impl Write for Capture {
+            fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+                lock(&self.0).extend_from_slice(buf);
+                Ok(buf.len())
+            }
+            fn flush(&mut self) -> std::io::Result<()> {
+                Ok(())
+            }
+        }
+
+        let log = Arc::new(Mutex::new(Vec::new()));
+        let writer = Arc::clone(&log);
+        let subscriber = tracing_subscriber::fmt()
+            .with_writer(move || Capture(Arc::clone(&writer)))
+            .with_ansi(false)
+            .with_max_level(tracing::Level::WARN)
+            .finish();
         let registry = ModelRegistry::new("p", models(false));
+        let mentions = [
+            CorefMention { start: 0, end: 11, text: "Maria Lopez", entity_type: "PER" },
+            CorefMention { start: 17, end: 22, text: "Lopez", entity_type: "PER" },
+        ];
+        tracing::subscriber::with_default(subscriber, || {
+            let first = registry.coref("p_coref").expect("rule fallback");
+            let second = registry.coref("p_coref").expect("cached fallback");
+            assert!(Arc::ptr_eq(&first, &second));
+            let clusters = first
+                .resolve_with_mentions("Maria Lopez said Lopez left.", &mentions)
+                .expect("rule clusters");
+            assert_eq!(clusters, vec![crate::CorefCluster { spans: vec![(0, 11), (17, 22)] }]);
+        });
+        let text = String::from_utf8(lock(&log).clone()).expect("UTF-8 log");
+        assert_eq!(text.matches(FASTCOREF_FALLBACK_WARNING).count(), 1, "{text}");
+        assert!(text.contains("WARN"), "{text}");
+        assert!(
+            FASTCOREF_FALLBACK_WARNING.contains(
+                "set models.coref.command to a fastcoref sidecar, or set \
+                 models.coref.backend: rule to silence this"
+            ),
+            "{FASTCOREF_FALLBACK_WARNING}"
+        );
+    }
+
+    #[test]
+    fn fastcoref_command_that_does_not_start_is_a_load_error() {
+        let registry = ModelRegistry::new(
+            "p",
+            coref_models(&json!({"backend": "fastcoref",
+                                "command": ["ce-models-no-such-sidecar-program", "--flag"]})),
+        );
         let Err(err) = registry.coref("p_coref") else {
-            panic!("coref without sidecar resolved");
+            panic!("missing sidecar program resolved");
         };
-        assert!(matches!(err, ModelError::Unavailable { ref backend, .. } if backend == "coref"));
+        assert!(
+            matches!(err, ModelError::Load { ref message, .. }
+                if message.contains("ce-models-no-such-sidecar-program")),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn rule_and_mock_backends_resolve() {
+        use crate::traits::CorefMention;
+
+        let rule = ModelRegistry::new("p", coref_models(&json!({"backend": "rule"})));
+        let coref = rule.coref("p_coref").expect("rule backend");
+        let mentions = [
+            CorefMention { start: 0, end: 11, text: "Maria Lopez", entity_type: "PER" },
+            CorefMention { start: 17, end: 22, text: "Lopez", entity_type: "PER" },
+        ];
+        let clusters = coref
+            .resolve_with_mentions("Maria Lopez said Lopez left.", &mentions)
+            .expect("rule clusters");
+        assert_eq!(clusters, vec![crate::CorefCluster { spans: vec![(0, 11), (17, 22)] }]);
+
+        let mock = ModelRegistry::new("p", coref_models(&json!({"backend": "mock"})));
+        let coref = mock.coref("p_coref").expect("mock backend");
+        assert!(coref
+            .resolve_with_mentions("Maria Lopez said Lopez left.", &mentions)
+            .expect("mock clusters")
+            .is_empty());
+    }
+
+    #[test]
+    fn llm_backend_uses_the_registry_llm() {
+        let registry = ModelRegistry::new("p", coref_models(&json!({"backend": "llm"})));
+        let llm = Arc::new(MockLlm::with_responses([r#"{"clusters": [[[0, 5], [10, 13]]]}"#]));
+        registry.insert_llm("p_ollama", llm.clone());
+        let coref = registry.coref("p_coref").expect("llm backend");
+        let clusters = coref.resolve("Maria and she.").expect("llm clusters");
+        assert_eq!(clusters, vec![crate::CorefCluster { spans: vec![(0, 5), (10, 13)] }]);
+        assert_eq!(llm.prompts().len(), 1);
+    }
+
+    #[test]
+    fn injected_sidecar_replaces_any_backend() {
+        let registry = ModelRegistry::new("p", coref_models(&json!({"backend": "rule"})))
+            .with_coref_sidecar(SidecarCommand::new("ce-models-no-such-sidecar-program"));
+        assert!(matches!(registry.coref("p_coref"), Err(ModelError::Load { .. })));
     }
 
     #[cfg(not(feature = "fastembed"))]

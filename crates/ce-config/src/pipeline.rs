@@ -85,6 +85,7 @@ impl PipelineConfig {
         for (index, stage) in self.stages.iter().enumerate() {
             stage.validate(&format!("stages[{index}]"))?;
         }
+        self.models.coref.validate("models.coref")?;
         self.helix.validate("helix")?;
         self.rag.chunking.validate("rag.chunking")
     }
@@ -135,11 +136,30 @@ pub struct OllamaModelConfig {
 
 /// Coreference backend.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum CorefBackend {
-    /// fastcoref (`biu-nlp/f-coref`).
+    /// fastcoref (`biu-nlp/f-coref`) run as a sidecar process started with
+    /// [`CorefModelConfig::command`].
     #[default]
-    #[serde(rename = "fastcoref")]
     Fastcoref,
+    /// Deterministic name / alias matching and pronoun linking.
+    Rule,
+    /// Clusters returned by the `ollama` LLM as JSON.
+    Llm,
+    /// A resolver that returns no clusters (tests).
+    Mock,
+}
+
+impl CorefBackend {
+    /// The config value, e.g. `fastcoref`.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Fastcoref => "fastcoref",
+            Self::Rule => "rule",
+            Self::Llm => "llm",
+            Self::Mock => "mock",
+        }
+    }
 }
 
 /// Coreference model.
@@ -154,6 +174,19 @@ pub struct CorefModelConfig {
     /// Optional model name or path (the service default is `biu-nlp/f-coref`).
     #[serde(default)]
     pub model: Option<String>,
+    /// Sidecar command line of the `fastcoref` backend: program followed by its arguments.
+    /// Not part of the Python schema; absent in the shared YAML files.
+    #[serde(default)]
+    pub command: Option<Vec<String>>,
+}
+
+impl CorefModelConfig {
+    fn validate(&self, path: &str) -> Result<()> {
+        if self.command.as_ref().is_some_and(|c| c.first().is_none_or(|p| p.trim().is_empty())) {
+            return Err(field_error(path, "command", "command must name a program".into()));
+        }
+        Ok(())
+    }
 }
 
 /// BGE embedding model.

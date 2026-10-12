@@ -56,8 +56,14 @@ fn builtin_registry_builds_ported_stages_and_skips_the_rest() {
         Arc::clone(&harness.services.store),
     )
     .expect("builds");
-    assert_eq!(pipeline.stage_names(), ["rag_index"]);
-    assert_eq!(StageRegistry::builtin().type_names(), [RagIndexStage::TYPE_NAME]);
+    assert_eq!(
+        pipeline.stage_names(),
+        ["rag_index", "mention_detection", "definition_extraction", "coreference"]
+    );
+    assert_eq!(
+        StageRegistry::builtin().type_names(),
+        ["RAGIndexStage", "MentionStage", "DefinitionStage", "CoreferenceStage"]
+    );
 }
 
 #[test]
@@ -65,11 +71,14 @@ fn unregistered_stage_types_error_with_the_known_types() {
     let harness = Harness::new(default_config());
     let error = StageRegistry::builtin()
         .build(harness.services.clone(), UnregisteredStages::Error)
-        .expect_err("MentionStage is not ported");
+        .expect_err("EDStage is not ported");
     match error {
         PipelineError::UnknownStage { stage_type, known } => {
-            assert_eq!(stage_type, "MentionStage");
-            assert_eq!(known, ["RAGIndexStage"]);
+            assert_eq!(stage_type, "EDStage");
+            assert_eq!(
+                known,
+                ["RAGIndexStage", "MentionStage", "DefinitionStage", "CoreferenceStage"]
+            );
         }
         other => panic!("unexpected error {other}"),
     }
@@ -108,7 +117,10 @@ fn custom_constructors_follow_config_order() {
     assert!(registry.is_registered("EDStage"));
     let pipeline =
         registry.build(harness.services.clone(), UnregisteredStages::Skip).expect("builds");
-    assert_eq!(pipeline.stage_names(), ["rag_index", "mention_detection", "ed_resolution"]);
+    assert_eq!(
+        pipeline.stage_names(),
+        ["rag_index", "mention_detection", "definition_extraction", "coreference", "ed_resolution"]
+    );
 }
 
 #[test]
@@ -243,14 +255,12 @@ fn json_file_input_errors() {
 }
 
 #[test]
-fn full_pipeline_runs_rag_index_on_json_input() {
+fn rag_index_pipeline_runs_on_json_input() {
     let harness = Harness::new(default_config());
-    let pipeline = build_pipeline(
-        Arc::clone(&harness.services.config),
-        Arc::clone(&harness.services.registry),
-        Arc::clone(&harness.services.store),
-    )
-    .expect("builds");
+    let pipeline = StageRegistry::empty()
+        .with(RagIndexStage::TYPE_NAME, RagIndexStage::construct)
+        .build(harness.services.clone(), UnregisteredStages::Skip)
+        .expect("builds");
     let mut ctx = pipeline.new_context();
     let report = pipeline
         .run(&mut ctx, PipelineInput::from_path(fixture("ingest/sample_memo.json")))

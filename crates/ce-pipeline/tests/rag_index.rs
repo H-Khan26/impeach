@@ -34,6 +34,7 @@ fn indexes_every_fixture() {
         let name = path.display().to_string();
         let harness = Harness::new(default_config());
         let (result, data) = harness.index(PipelineInput::Jsonl(path.clone()));
+        assert!(data.index_persisted, "{name}");
         let text = data.doc_text.clone().expect("doc_text");
         let document = ce_ingest::read_first_record(&path).expect("fixture");
         assert_eq!(text, document.text, "{name}");
@@ -237,6 +238,7 @@ fn offline_mode_writes_nothing_and_fabricates_ids() {
     assert_eq!(harness.store.node_count(), 0);
     assert_eq!(harness.embedder.calls(), 0);
     assert!(data.embedder.is_none());
+    assert!(!data.index_persisted);
     assert_eq!(result.document.helix_id.as_str(), "doc:002");
     assert_eq!(result.chunks[0].helix_id.as_str(), "002:chunk-00000");
     assert_eq!(result.spans[0].span_id.as_str(), "002:sent-00000");

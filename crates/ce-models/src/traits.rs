@@ -133,8 +133,47 @@ pub struct CorefCluster {
     pub spans: Vec<(usize, usize)>,
 }
 
+/// Pronouns flagged as such in coreference output (the Python `CorefService` list).
+pub const PRONOUNS: [&str; 16] = [
+    "he", "she", "they", "them", "him", "her", "his", "hers", "their", "theirs", "it", "its", "we",
+    "us", "our", "ours",
+];
+
+/// Whether `text`, stripped of Python whitespace and lowercased, is one of [`PRONOUNS`]
+/// (Python `CorefService`: `text.strip().lower() in pronouns`).
+pub fn is_pronoun(text: &str) -> bool {
+    let lowered = ce_text::normalize::py_strip(text).to_lowercase();
+    PRONOUNS.contains(&lowered.as_str())
+}
+
+/// A detected mention handed to a coreference resolver: character offsets into the resolved
+/// text, the surface text and the entity type label.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CorefMention<'a> {
+    /// Start character offset (inclusive).
+    pub start: usize,
+    /// End character offset (exclusive).
+    pub end: usize,
+    /// Mention text.
+    pub text: &'a str,
+    /// Entity type label, e.g. `PER`.
+    pub entity_type: &'a str,
+}
+
 /// Coreference resolver.
 pub trait Coref: Send + Sync {
     /// Clusters of coreferent mentions in `text`.
     fn resolve(&self, text: &str) -> Result<Vec<CorefCluster>, ModelError>;
+
+    /// Clusters of coreferent mentions in `text`, given the mentions detected in it (the
+    /// CoreferenceStage passes the mentions of its eligible types, sorted by start). Resolvers
+    /// that find their own mentions ignore `mentions`; the default calls [`Coref::resolve`].
+    fn resolve_with_mentions(
+        &self,
+        text: &str,
+        mentions: &[CorefMention<'_>],
+    ) -> Result<Vec<CorefCluster>, ModelError> {
+        let _ = mentions;
+        self.resolve(text)
+    }
 }

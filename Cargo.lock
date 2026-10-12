@@ -674,6 +674,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "ce-coref"
+version = "0.1.0"
+dependencies = [
+ "ce-config",
+ "ce-core",
+ "ce-models",
+ "ce-ner",
+ "indexmap",
+ "pretty_assertions",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
 name = "ce-eval"
 version = "0.1.0"
 dependencies = [
@@ -715,6 +729,7 @@ version = "0.1.0"
 dependencies = [
  "ce-config",
  "ce-core",
+ "ce-text",
  "fastembed",
  "gliner2",
  "hf-hub",
@@ -729,6 +744,24 @@ dependencies = [
  "tokenizers 0.23.2",
  "tokio",
  "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "ce-ner"
+version = "0.1.0"
+dependencies = [
+ "ce-config",
+ "ce-core",
+ "ce-models",
+ "ce-text",
+ "indexmap",
+ "once_cell",
+ "pretty_assertions",
+ "regex",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tracing",
 ]
 
 [[package]]
@@ -737,8 +770,10 @@ version = "0.1.0"
 dependencies = [
  "ce-config",
  "ce-core",
+ "ce-coref",
  "ce-ingest",
  "ce-models",
+ "ce-ner",
  "ce-store",
  "ce-text",
  "chrono",

@@ -8,7 +8,7 @@ publish.workspace = true
 rust-version.workspace = true
 
 [features]
-default = ["fastembed", "ort-nli", "ollama"]
+default = ["fastembed", "ort-nli", "ollama", "gliner2"]
 # Sentence embeddings through fastembed (ONNX Runtime).
 fastembed = ["dep:fastembed"]
 # DeBERTa NLI cross-encoder through ONNX Runtime, model files from the Hugging Face hub.
@@ -21,6 +21,7 @@ gliner2 = ["dep:gliner2"]
 [dependencies]
 ce-core.workspace = true
 ce-config.workspace = true
+ce-text.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
@@ -39,6 +40,7 @@ gliner2 = { workspace = true, optional = true, features = ["candle"] }
 [dev-dependencies]
 pretty_assertions.workspace = true
 tempfile.workspace = true
+tracing-subscriber.workspace = true
 
 [[test]]
 name = "sidecar"

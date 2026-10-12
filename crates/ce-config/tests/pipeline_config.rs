@@ -570,3 +570,43 @@ fn mappings_block_is_required_but_its_paths_are_not_read() {
     );
     assert!(parse_error(&without_block).contains("relationship_types"));
 }
+
+#[test]
+fn coref_backends_and_sidecar_command() {
+    let from = "backend: \"fastcoref\"\n    device: \"cpu\"";
+    for (value, backend) in [
+        ("rule", CorefBackend::Rule),
+        ("llm", CorefBackend::Llm),
+        ("mock", CorefBackend::Mock),
+        ("fastcoref", CorefBackend::Fastcoref),
+    ] {
+        let text =
+            replace_once(&v17_text(), from, &format!("backend: \"{value}\"\n    device: \"cpu\""));
+        let config = parse(&text).expect("backend parses");
+        assert_eq!(config.models.coref.backend, backend);
+        assert_eq!(backend.as_str(), value);
+        assert_eq!(config.models.coref.command, None);
+    }
+
+    let text = replace_once(
+        &v17_text(),
+        from,
+        "backend: \"fastcoref\"\n    device: \"cpu\"\n    command: [\"python\", \"coref_sidecar.py\"]",
+    );
+    let config = parse(&text).expect("command parses");
+    assert_eq!(
+        config.models.coref.command,
+        Some(vec!["python".to_owned(), "coref_sidecar.py".to_owned()])
+    );
+
+    let text = replace_once(
+        &v17_text(),
+        from,
+        "backend: \"fastcoref\"\n    device: \"cpu\"\n    command: []",
+    );
+    let (path, _) = validation_error(&text);
+    assert_eq!(path, "models.coref.command");
+
+    let text = replace_once(&v17_text(), from, "backend: \"spacy\"\n    device: \"cpu\"");
+    assert!(parse_error(&text).contains("spacy"));
+}

@@ -8,7 +8,7 @@ publish.workspace = true
 rust-version.workspace = true
 
 [features]
-default = ["helix", "fastembed", "ort-nli", "ollama"]
+default = ["helix", "fastembed", "ort-nli", "ollama", "gliner2"]
 helix = ["ce-store/helix"]
 fastembed = ["ce-models/fastembed"]
 ort-nli = ["ce-models/ort-nli"]
@@ -22,6 +22,8 @@ ce-text.workspace = true
 ce-ingest.workspace = true
 ce-store.workspace = true
 ce-models.workspace = true
+ce-ner.workspace = true
+ce-coref.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

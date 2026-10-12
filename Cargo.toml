@@ -17,6 +17,8 @@ ce-text = { path = "crates/ce-text" }
 ce-ingest = { path = "crates/ce-ingest" }
 ce-store = { path = "crates/ce-store", default-features = false }
 ce-models = { path = "crates/ce-models", default-features = false }
+ce-ner = { path = "crates/ce-ner" }
+ce-coref = { path = "crates/ce-coref" }
 ce-pipeline = { path = "crates/ce-pipeline", default-features = false }
 ce-eval = { path = "crates/ce-eval", default-features = false }
 
@@ -89,5 +91,9 @@ uninlined_format_args = "warn"
 unnested_or_patterns = "warn"
 unwrap_used = "warn"
 
+[profile.dev]
+debug = "line-tables-only"
+
 [profile.dev.package."*"]
 opt-level = 1
+debug = false

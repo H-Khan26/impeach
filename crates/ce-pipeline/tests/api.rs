@@ -11,7 +11,8 @@ use ce_ingest::IngestError;
 use ce_models::{MockEmbedder, ModelKind, ModelRegistry};
 use ce_pipeline::{
     load_processing_config, run_processing, run_processing_with, PipelineContext, PipelineError,
-    ProcessingEnv, ProcessingOptions, ProcessingResult, Stage, StageBuildContext, StageRegistry,
+    ProcessingEnv, ProcessingOptions, ProcessingResult, RagIndexStage, Stage, StageBuildContext,
+    StageRegistry,
 };
 use ce_store::{GraphStore, MemoryStore};
 use common::{fixture, DIM};
@@ -129,10 +130,15 @@ fn mock_env() -> (ProcessingEnv, Arc<MemoryStore>) {
     let env = ProcessingEnv {
         registry: Some(Arc::new(registry)),
         store: Some(dyn_store),
-        stages: None,
+        stages: Some(rag_index_only()),
         unregistered: None,
     };
     (env, store)
+}
+
+/// A stage registry with only `RAGIndexStage`; later stage types are skipped.
+fn rag_index_only() -> StageRegistry {
+    StageRegistry::empty().with(RagIndexStage::TYPE_NAME, RagIndexStage::construct)
 }
 
 fn create_test_jsonl(dir: &Path) -> PathBuf {
@@ -375,9 +381,12 @@ fn open_store_with_helix_memory_mode() {
     let store = ce_pipeline::open_store(&config.helix).expect("store");
     assert_eq!(store.embedding_dim(), config.helix.embedding_dim);
 
-    // The RAG-only flow against helix memory mode with the mock embedder.
+    // The built-in stages against helix memory mode: mock embedder, a NER model that finds
+    // nothing (regex and citation mentions remain) and rule coreference.
     let registry = ModelRegistry::empty("processing_v17");
     registry.insert_embedder(registry.key(ModelKind::Bge), Arc::new(MockEmbedder::new(DIM)));
+    registry.insert_ner(registry.key(ModelKind::Gliner2), Arc::new(ce_models::MockNer::default()));
+    registry.insert_coref(registry.key(ModelKind::Coref), Arc::new(ce_models::RuleCoref::new()));
     let env = ProcessingEnv {
         registry: Some(Arc::new(registry)),
         store: Some(Arc::clone(&store)),
@@ -390,9 +399,18 @@ fn open_store_with_helix_memory_mode() {
         env,
     )
     .expect("runs");
-    let indexed = run.data.rag_index_result.expect("indexed");
+    assert_eq!(
+        run.stages,
+        ["rag_index", "mention_detection", "definition_extraction", "coreference"]
+    );
+    let indexed = run.data.rag_index_result.as_ref().expect("indexed");
     assert_eq!(indexed.chunks.len(), 6);
     assert_eq!(indexed.embeddings.count, 6);
     let chunks = store.get_document_chunks(&indexed.document.helix_id).expect("chunks");
     assert_eq!(chunks.len(), 6);
+
+    let mentions = run.data.doc_mentions.as_ref().expect("mentions");
+    let span_ids = run.data.mention_to_span_id.as_ref().expect("mention spans written");
+    assert!(!span_ids.is_empty());
+    assert!(span_ids.len() <= mentions.len());
 }
