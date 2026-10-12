@@ -15,9 +15,11 @@ use serde_json::{json, Value};
 
 const HELPER_ENV: &str = "CE_MODELS_SIDECAR_HELPER";
 const SPAWN_LOG_ENV: &str = "CE_MODELS_SIDECAR_SPAWN_LOG";
+/// Argument that starts sidecar mode (commands from config cannot set environment variables).
+const HELPER_ARG: &str = "--ce-sidecar-helper";
 
 fn main() {
-    if std::env::var_os(HELPER_ENV).is_some() {
+    if std::env::var_os(HELPER_ENV).is_some() || std::env::args().any(|a| a == HELPER_ARG) {
         serve();
         return;
     }
@@ -31,6 +33,7 @@ fn main() {
         ("crash_is_reported_and_restarted", crash_is_reported_and_restarted),
         ("timeout_is_reported_and_restarted", timeout_is_reported_and_restarted),
         ("registry_builds_sidecar_coref_once", registry_builds_sidecar_coref_once),
+        ("registry_starts_configured_command", registry_starts_configured_command),
     ];
     let mut failed = Vec::new();
     for (name, test) in tests {
@@ -192,4 +195,13 @@ fn registry_builds_sidecar_coref_once() {
     assert!(Arc::ptr_eq(&first, &second));
     assert_eq!(first.resolve("Zoë").expect("resolve")[0].spans, vec![(0, 3)]);
     assert_eq!(spawn_count(&log), 1);
+}
+
+fn registry_starts_configured_command() {
+    let mut config = ce_config::load_default_config().expect("default config");
+    let exe = std::env::current_exe().expect("test executable path");
+    config.models.coref.command = Some(vec![exe.display().to_string(), HELPER_ARG.to_owned()]);
+    let registry = ModelRegistry::from_config(&config);
+    let coref = registry.coref(&registry.key(ce_models::ModelKind::Coref)).expect("fastcoref");
+    assert_eq!(coref.resolve("Zoë").expect("resolve")[0].spans, vec![(0, 3)]);
 }
