@@ -1,0 +1,422 @@
+{
+  "run_id": "e2e_synthetic_20260101_000000",
+  "timestamp": "2026-01-01T00:00:00",
+  "scenario": null,
+  "pipeline_name": "processing_v17",
+  "helix_namespace": "contradiction_engine",
+  "helix_url": null,
+  "helix_mode": "embedded",
+  "helix_data_dir": ".helix_data",
+  "config_path": "config.yaml",
+  "sqlite_db_path": "out.sqlite3",
+  "inputs": [
+    "fixtures/input/green_valley_incident_report.jsonl",
+    "fixtures/input/lopez_v_green_valley_complaint.jsonl",
+    "fixtures/input/missing.jsonl"
+  ],
+  "status": "failed",
+  "pipeline_summary": {
+    "total_documents": 3,
+    "total_processing_time_seconds": 32.75,
+    "avg_processing_time_per_doc": 10.916666666666666
+  },
+  "aggregates": {
+    "total_entities_resolved": 6,
+    "total_entities_created": 2,
+    "entity_reuse_rate_percent": 66.66666666666666,
+    "total_facts_extracted": 11,
+    "fact_linking_rate_percent": 9.090909090909092,
+    "total_facts_committed": 6,
+    "total_contradictions": 11,
+    "total_needs_review": 0,
+    "total_intra_doc_pairs": 4,
+    "total_cross_doc_pairs": 7
+  },
+  "documents": [
+    {
+      "doc_id": "001",
+      "case_id": "c1",
+      "db_id": "d1",
+      "title": "Incident report",
+      "doc_path": "fixtures/input/green_valley_incident_report.jsonl",
+      "processing_time_seconds": 12.5,
+      "stage_4_entity_disambiguation": {
+        "total_resolved": 3,
+        "total_unresolved": 1,
+        "resolution_by_strategy": {
+          "exact": 2,
+          "llm_create": 1
+        },
+        "new_entities_created_count": 1,
+        "entities_reused_count": 2
+      },
+      "stage_5_fact_extraction": {
+        "total_facts": 8,
+        "boilerplate_count": 0,
+        "facts_by_value_type": {
+          "DATE": 1,
+          "TIME": 1,
+          "UNKNOWN": 6
+        },
+        "facts_by_property_type": {
+          "UNKNOWN": 8
+        },
+        "entity_linking": {
+          "linked_subjects": 1,
+          "linked_objects": 0,
+          "linked_both": 0,
+          "linked_either": 1,
+          "linking_rate_percent": 12.5
+        },
+        "all_facts": [
+          {
+            "fact_id": "F0",
+            "text": "Collision date: March 4, 2023",
+            "value_type": "DATE",
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null,
+            "is_boilerplate": false
+          },
+          {
+            "fact_id": "F1",
+            "text": "Approximately 9:20 p.m.",
+            "value_type": "TIME",
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null,
+            "is_boilerplate": false
+          },
+          {
+            "fact_id": "F2",
+            "text": "Reed traveling southbound on 14th Ave",
+            "value_type": null,
+            "property_type": null,
+            "subject_entity_id": "E1",
+            "object_entity_id": null,
+            "is_boilerplate": false
+          },
+          {
+            "fact_id": "F3",
+            "text": "Rainy weather with wet roadway and reduced visibility",
+            "value_type": null,
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null,
+            "is_boilerplate": false
+          },
+          {
+            "fact_id": "F4",
+            "text": "Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.",
+            "value_type": null,
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null,
+            "is_boilerplate": false
+          },
+          {
+            "fact_id": "F5",
+            "text": "A later audit confirms Reed was involved in a preventable rear-end collision on Feb 2, 2020 in Oakland, CA.",
+            "value_type": null,
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null,
+            "is_boilerplate": false
+          },
+          {
+            "fact_id": "F6",
+            "text": "Lopez said she was \u201cokay\u201d at the scene",
+            "value_type": null,
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null,
+            "is_boilerplate": false
+          },
+          {
+            "fact_id": "F7",
+            "text": "The report was filed on March 10, 2023",
+            "value_type": null,
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null,
+            "is_boilerplate": false
+          }
+        ]
+      },
+      "stage_6_contradiction_check": {
+        "total_checked": 8,
+        "contradiction_count": 2,
+        "needs_review_count": 0,
+        "clean_count": 4,
+        "committed_fact_count": 4,
+        "all_clean_facts": [
+          {
+            "fact_id": "F0",
+            "text": "Collision date: March 4, 2023",
+            "value_type": "DATE",
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null
+          },
+          {
+            "fact_id": "F1",
+            "text": "Approximately 9:20 p.m.",
+            "value_type": "TIME",
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null
+          },
+          {
+            "fact_id": "F2",
+            "text": "Reed traveling southbound on 14th Ave",
+            "value_type": null,
+            "property_type": null,
+            "subject_entity_id": "E1",
+            "object_entity_id": null
+          },
+          {
+            "fact_id": "F3",
+            "text": "Rainy weather with wet roadway and reduced visibility",
+            "value_type": null,
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null
+          }
+        ],
+        "intra_doc_contradictions": [
+          {
+            "new_fact_text": "A later audit confirms Reed was involved in a preventable rear-end collision on Feb 2, 2020 in Oakland, CA.",
+            "new_fact_id": "F5",
+            "existing_fact_text": "Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.",
+            "existing_fact_id": "F4",
+            "nli_label": "contradiction",
+            "nli_confidence": 0.97,
+            "retrieval_sources": [
+              "semantic"
+            ]
+          },
+          {
+            "new_fact_text": "The report was filed late",
+            "new_fact_id": "F8",
+            "existing_fact_text": "The report was filed on March 10, 2023",
+            "existing_fact_id": "F7",
+            "nli_label": "contradiction",
+            "nli_confidence": 0.55,
+            "retrieval_sources": [
+              "keyword"
+            ]
+          }
+        ],
+        "cross_doc_contradictions": [],
+        "retrieval_stats": {
+          "total_candidates_retrieved": 7,
+          "retrieval_sources_breakdown": {
+            "semantic": 1,
+            "keyword": 1
+          }
+        },
+        "filtering_stats": {
+          "pairs_after_prefilter": 5,
+          "total_nli_calls": 5
+        },
+        "nli_stats": {
+          "nli_label_breakdown": {
+            "contradiction": 2
+          },
+          "contradiction_threshold": 0.7,
+          "review_threshold": null
+        }
+      }
+    },
+    {
+      "doc_id": "002",
+      "case_id": "c1",
+      "db_id": "d1",
+      "title": null,
+      "doc_path": "fixtures/input/lopez_v_green_valley_complaint.jsonl",
+      "processing_time_seconds": 20.25,
+      "stage_4_entity_disambiguation": {
+        "total_resolved": 3,
+        "total_unresolved": 1,
+        "resolution_by_strategy": {
+          "exact": 2,
+          "llm_create": 1
+        },
+        "new_entities_created_count": 1,
+        "entities_reused_count": 2
+      },
+      "stage_5_fact_extraction": {
+        "total_facts": 3,
+        "boilerplate_count": 0,
+        "facts_by_value_type": {
+          "DATE": 1,
+          "UNKNOWN": 2
+        },
+        "facts_by_property_type": {
+          "UNKNOWN": 3
+        },
+        "entity_linking": {
+          "linked_subjects": 0,
+          "linked_objects": 0,
+          "linked_both": 0,
+          "linked_either": 0,
+          "linking_rate_percent": 0.0
+        }
+      },
+      "stage_6_contradiction_check": {
+        "total_checked": 3,
+        "contradiction_count": 9,
+        "needs_review_count": 0,
+        "clean_count": 2,
+        "committed_fact_count": 2,
+        "all_clean_facts": [
+          {
+            "fact_id": "F0",
+            "text": "Collision date: March 5, 2023",
+            "value_type": "DATE",
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null
+          },
+          {
+            "fact_id": "F1",
+            "text": "Lopez was the sole occupant of her vehicle",
+            "value_type": null,
+            "property_type": null,
+            "subject_entity_id": null,
+            "object_entity_id": null
+          }
+        ],
+        "intra_doc_contradictions": [
+          {
+            "new_fact_text": "Medical expenses to date believed to exceed $25,000.00.",
+            "new_fact_id": "F10",
+            "existing_fact_text": "Total amount of medical expenses to date is approximately $17,000.00.",
+            "existing_fact_id": "F11",
+            "nli_label": "contradiction",
+            "nli_confidence": 0.88,
+            "retrieval_sources": [
+              "semantic"
+            ]
+          },
+          {
+            "new_fact_text": "Lopez has not been involved in any prior collisions within the past ten years.",
+            "new_fact_id": "F12",
+            "existing_fact_text": "Lopez was involved in a June 10, 2018 rear-end collision in SF.",
+            "existing_fact_id": "F13",
+            "nli_label": "contradiction",
+            "nli_confidence": 0.91,
+            "retrieval_sources": [
+              "semantic"
+            ]
+          }
+        ],
+        "cross_doc_contradictions": [
+          {
+            "new_fact_text": "Collision date: March 5, 2023",
+            "new_fact_id": "F0",
+            "existing_fact_text": "Collision date: March 4, 2023",
+            "existing_fact_id": "H0",
+            "nli_label": "contradiction",
+            "nli_confidence": 0.99,
+            "retrieval_sources": [
+              "semantic"
+            ]
+          },
+          {
+            "new_fact_text": "The collision happened on March 5, 2023",
+            "new_fact_id": "F14",
+            "existing_fact_text": "Collision on March 4, 2023",
+            "existing_fact_id": "H0",
+            "nli_label": "contradiction",
+            "nli_confidence": 0.95,
+            "retrieval_sources": [
+              "semantic",
+              "keyword"
+            ]
+          },
+          {
+            "new_fact_text": "Approximately 9:20 p.m.",
+            "new_fact_id": "F15",
+            "existing_fact_text": "Approximately 5:30 p.m.",
+            "existing_fact_id": "H1",
+            "nli_label": "contradiction",
+            "nli_confidence": 0.93,
+            "retrieval_sources": [
+              "semantic"
+            ]
+          },
+          {
+            "new_fact_text": "Reed was traveling northbound on 14th Avenue",
+            "new_fact_id": "F16",
+            "existing_fact_text": "Reed was traveling southbound on 14th Avenue",
+            "existing_fact_id": "H2",
+            "nli_label": "contradiction",
+            "nli_confidence": 0.9,
+            "retrieval_sources": [
+              "semantic"
+            ]
+          },
+          {
+            "new_fact_text": "Lopez was driving at 30 mph",
+            "new_fact_id": "F2",
+            "existing_fact_text": "Lopez at 60 mph in a 40 mph zone",
+            "existing_fact_id": "H3",
+            "nli_label": "contradiction",
+            "nli_confidence": 0.8,
+            "retrieval_sources": [
+              "semantic"
+            ]
+          },
+          {
+            "new_fact_text": "Lopez was the sole occupant",
+            "new_fact_id": "F1",
+            "existing_fact_text": "Reed was alone in the truck",
+            "existing_fact_id": "H4",
+            "nli_label": "contradiction",
+            "nli_confidence": 0.6,
+            "retrieval_sources": [
+              "semantic"
+            ]
+          },
+          {
+            "new_fact_text": null,
+            "new_fact_id": null,
+            "existing_fact_text": "Weather clear",
+            "existing_fact_id": "H5",
+            "nli_label": null,
+            "nli_confidence": null,
+            "retrieval_sources": null
+          }
+        ],
+        "retrieval_stats": {
+          "total_candidates_retrieved": 7,
+          "retrieval_sources_breakdown": {
+            "semantic": 8,
+            "keyword": 1
+          }
+        },
+        "filtering_stats": {
+          "pairs_after_prefilter": 5,
+          "total_nli_calls": 5
+        },
+        "nli_stats": {
+          "nli_label_breakdown": {
+            "contradiction": 8,
+            "null": 1
+          },
+          "contradiction_threshold": 0.7,
+          "review_threshold": null
+        }
+      }
+    },
+    {
+      "doc_id": "003",
+      "case_id": "c1",
+      "db_id": "d1",
+      "title": null,
+      "doc_path": "fixtures/input/missing.jsonl",
+      "error": "RuntimeError('boom')"
+    }
+  ]
+}

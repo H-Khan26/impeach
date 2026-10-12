@@ -20,7 +20,8 @@ serde_json.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 regex.workspace = true
-pathfinding.workspace = true
+chrono.workspace = true
+indexmap.workspace = true
 
 [dev-dependencies]
 pretty_assertions.workspace = true

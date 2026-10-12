@@ -1,0 +1,1049 @@
+{
+  "evaluation_id": "eval_20260101_000000",
+  "timestamp": "2026-01-01T00:00:00",
+  "input_file": "fixtures/input/eval/e2e_synthetic.json",
+  "ground_truth_file": "fixtures/keys/GREEN_VALLEY_CONTRA_KEY.md",
+  "similarity_threshold": 0.6,
+  "embedding_model": "token-cosine",
+  "value_guard": true,
+  "assignment": "optimal (scipy linear_sum_assignment)",
+  "metrics": {
+    "overall": {
+      "true_positives": 5,
+      "ground_truth": 19,
+      "detected": 11,
+      "false_negatives": 14,
+      "false_positives": 6,
+      "recall": 0.2631578947368421,
+      "precision": 0.45454545454545453,
+      "f1": 0.3333333333333333
+    },
+    "inter_doc": {
+      "true_positives": 3,
+      "ground_truth": 15,
+      "detected": 7,
+      "false_negatives": 12,
+      "false_positives": 4,
+      "recall": 0.2,
+      "precision": 0.42857142857142855,
+      "f1": 0.27272727272727276
+    },
+    "intra_doc": {
+      "true_positives": 2,
+      "ground_truth": 4,
+      "detected": 4,
+      "false_negatives": 2,
+      "false_positives": 2,
+      "recall": 0.5,
+      "precision": 0.5,
+      "f1": 0.5
+    },
+    "fact_coverage": {
+      "covered": 9,
+      "total": 38,
+      "ratio": 0.23684210526315788,
+      "pipeline_facts_considered": 10,
+      "fact_source": "all_extracted_facts"
+    }
+  },
+  "matched_contradictions": [
+    {
+      "ground_truth_id": "C-01",
+      "ground_truth_type": "Temporal \u2013 Date",
+      "fact_a": {
+        "text": "Collision date: March 5, 2023",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Collision date: March 4, 2023",
+        "source": "Doc 2"
+      },
+      "detected_pair": {
+        "new_fact_text": "Collision date: March 5, 2023",
+        "existing_fact_text": "Collision date: March 4, 2023",
+        "new_fact_id": "F0",
+        "existing_fact_id": "H0",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.99,
+        "source_type": "cross_doc",
+        "doc_id": "002"
+      },
+      "scores": {
+        "combined": 1.0,
+        "fact_a": 1.0,
+        "fact_b": 1.0,
+        "orientation": "a=new,b=existing"
+      }
+    },
+    {
+      "ground_truth_id": "C-02",
+      "ground_truth_type": "Temporal \u2013 Time",
+      "fact_a": {
+        "text": "Approximately 5:30 p.m.",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Approximately 9:20 p.m.",
+        "source": "Doc 2"
+      },
+      "detected_pair": {
+        "new_fact_text": "Approximately 9:20 p.m.",
+        "existing_fact_text": "Approximately 5:30 p.m.",
+        "new_fact_id": "F15",
+        "existing_fact_id": "H1",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.93,
+        "source_type": "cross_doc",
+        "doc_id": "002"
+      },
+      "scores": {
+        "combined": 0.9999999403953552,
+        "fact_a": 0.9999999403953552,
+        "fact_b": 0.9999999403953552,
+        "orientation": "a=existing,b=new"
+      }
+    },
+    {
+      "ground_truth_id": "C-04",
+      "ground_truth_type": "Factual \u2013 Direction of Travel",
+      "fact_a": {
+        "text": "Reed traveling northbound on 14th Ave",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Reed traveling southbound on 14th Ave",
+        "source": "Doc 2"
+      },
+      "detected_pair": {
+        "new_fact_text": "Reed was traveling northbound on 14th Avenue",
+        "existing_fact_text": "Reed was traveling southbound on 14th Avenue",
+        "new_fact_id": "F16",
+        "existing_fact_id": "H2",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.9,
+        "source_type": "cross_doc",
+        "doc_id": "002"
+      },
+      "scores": {
+        "combined": 0.771516740322113,
+        "fact_a": 0.771516740322113,
+        "fact_b": 0.771516740322113,
+        "orientation": "a=new,b=existing"
+      }
+    },
+    {
+      "ground_truth_id": "D1-INTRA-01",
+      "ground_truth_type": "Factual / Temporal \u2013 Prior Accident History",
+      "fact_a": {
+        "text": "Lopez \u201chas not been involved in any prior motor vehicle collisions within the past ten (10) years.\u201d",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Lopez was involved in a June 10, 2018 rear-end collision in SF with neck soreness.",
+        "source": "Doc 1"
+      },
+      "detected_pair": {
+        "new_fact_text": "Lopez has not been involved in any prior collisions within the past ten years.",
+        "existing_fact_text": "Lopez was involved in a June 10, 2018 rear-end collision in SF.",
+        "new_fact_id": "F12",
+        "existing_fact_id": "F13",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.91,
+        "source_type": "intra_doc",
+        "doc_id": "002"
+      },
+      "scores": {
+        "combined": 0.7778444290161133,
+        "fact_a": 0.7778444290161133,
+        "fact_b": 0.8864052295684814,
+        "orientation": "a=new,b=existing"
+      }
+    },
+    {
+      "ground_truth_id": "D2-INTRA-01",
+      "ground_truth_type": "Factual / Temporal \u2013 Driver\u2019s Prior Preventable Collisions",
+      "fact_a": {
+        "text": "Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.",
+        "source": "Doc 2"
+      },
+      "fact_b": {
+        "text": "A later audit confirms Reed was involved in a preventable rear-end collision on Feb 2, 2020 in Oakland, CA.",
+        "source": "Doc 2"
+      },
+      "detected_pair": {
+        "new_fact_text": "A later audit confirms Reed was involved in a preventable rear-end collision on Feb 2, 2020 in Oakland, CA.",
+        "existing_fact_text": "Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.",
+        "new_fact_id": "F5",
+        "existing_fact_id": "F4",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.97,
+        "source_type": "intra_doc",
+        "doc_id": "001"
+      },
+      "scores": {
+        "combined": 0.9999999403953552,
+        "fact_a": 1.0,
+        "fact_b": 0.9999999403953552,
+        "orientation": "a=existing,b=new"
+      }
+    }
+  ],
+  "missed_contradictions": [
+    {
+      "ground_truth_id": "C-03",
+      "ground_truth_type": "Factual \u2013 Weather/Conditions",
+      "fact_a": {
+        "text": "Weather clear, roadway dry, visibility good",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Rainy, steady precipitation, wet roadway, reduced visibility",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Collision date: March 5, 2023",
+        "existing_fact_text": "Collision date: March 4, 2023",
+        "new_fact_id": "F0",
+        "existing_fact_id": "H0",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.99,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.0,
+        "value_guard_rejected": false,
+        "taken_by": "C-01"
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.4330127239227295,
+        "best_fact": "Rainy weather with wet roadway and reduced visibility",
+        "best_fact_origin": "extracted"
+      },
+      "fact_b_extracted": {
+        "covered": true,
+        "similarity": 0.6681531071662903,
+        "best_fact": "Rainy weather with wet roadway and reduced visibility",
+        "best_fact_origin": "extracted"
+      }
+    },
+    {
+      "ground_truth_id": "C-05",
+      "ground_truth_type": "Factual \u2013 Traffic Signal / Right-of-Way",
+      "fact_a": {
+        "text": "Lopez enters on green; Reed runs a solid red for northbound 14th",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Reed enters on solid green; Lopez enters against red / late yellow",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Reed was traveling northbound on 14th Avenue",
+        "existing_fact_text": "Reed was traveling southbound on 14th Avenue",
+        "new_fact_id": "F16",
+        "existing_fact_id": "H2",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.9,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.22792115807533264,
+        "value_guard_rejected": false,
+        "taken_by": "C-04"
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.3535533845424652,
+        "best_fact": "Reed traveling southbound on 14th Ave",
+        "best_fact_origin": "extracted"
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.24618299305438995,
+        "best_fact": "Reed traveling southbound on 14th Ave",
+        "best_fact_origin": "extracted"
+      }
+    },
+    {
+      "ground_truth_id": "C-06",
+      "ground_truth_type": "Quantitative \u2013 Speed",
+      "fact_a": {
+        "text": "Lopez at or below 35 mph (speed limit)",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Lopez at estimated 45\u201350 mph in 35 mph zone",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Lopez was driving at 30 mph",
+        "existing_fact_text": "Lopez at 60 mph in a 40 mph zone",
+        "new_fact_id": "F2",
+        "existing_fact_id": "H3",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.8,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.4330127239227295,
+        "value_guard_rejected": true,
+        "taken_by": null
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.2499999850988388,
+        "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+        "best_fact_origin": "extracted"
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.2499999850988388,
+        "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+        "best_fact_origin": "extracted"
+      }
+    },
+    {
+      "ground_truth_id": "C-07",
+      "ground_truth_type": "Quantitative \u2013 Occupants",
+      "fact_a": {
+        "text": "Lopez was the sole occupant of her vehicle",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Reed saw an additional adult passenger; Lopez later confirms \u201ctwo people\u201d in the vehicle",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Lopez was the sole occupant",
+        "existing_fact_text": "Reed was alone in the truck",
+        "new_fact_id": "F1",
+        "existing_fact_id": "H4",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.6,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.32732683420181274,
+        "value_guard_rejected": false,
+        "taken_by": null
+      },
+      "fact_a_extracted": {
+        "covered": true,
+        "similarity": 0.9999999403953552,
+        "best_fact": "Lopez was the sole occupant of her vehicle",
+        "best_fact_origin": "clean"
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.28347334265708923,
+        "best_fact": "Lopez was the sole occupant of her vehicle",
+        "best_fact_origin": "clean"
+      }
+    },
+    {
+      "ground_truth_id": "C-08",
+      "ground_truth_type": "Factual \u2013 Seat Belt Use",
+      "fact_a": {
+        "text": "Lopez \u201cproperly restrained\u201d with shoulder and lap belt",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Reed did not observe any seat belt across torso or lap and believes she was not restrained",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Lopez was the sole occupant",
+        "existing_fact_text": "Reed was alone in the truck",
+        "new_fact_id": "F1",
+        "existing_fact_id": "H4",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.6,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.15811388194561005,
+        "value_guard_rejected": false,
+        "taken_by": null
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.2499999850988388,
+        "best_fact": "Rainy weather with wet roadway and reduced visibility",
+        "best_fact_origin": "extracted"
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.1767766922712326,
+        "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+        "best_fact_origin": "extracted"
+      }
+    },
+    {
+      "ground_truth_id": "C-09",
+      "ground_truth_type": "Factual \u2013 EMS / Ambulance",
+      "fact_a": {
+        "text": "EMS dispatched; Lopez immobilized and transported by ambulance to SF General",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Lopez repeatedly said she was \u201cokay,\u201d did not want an ambulance, and no ambulance transport was observed",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Lopez was driving at 30 mph",
+        "existing_fact_text": "Lopez at 60 mph in a 40 mph zone",
+        "new_fact_id": "F2",
+        "existing_fact_id": "H3",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.8,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.10660035908222198,
+        "value_guard_rejected": false,
+        "taken_by": null
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.10660035908222198,
+        "best_fact": "Rainy weather with wet roadway and reduced visibility",
+        "best_fact_origin": "extracted"
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.3651483654975891,
+        "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+        "best_fact_origin": "extracted"
+      }
+    },
+    {
+      "ground_truth_id": "C-10",
+      "ground_truth_type": "Quantitative \u2013 Time Off Work",
+      "fact_a": {
+        "text": "Lopez unable to work for four (4) weeks, \u201ccompletely disabled from work\u201d",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Lopez reports missing \u201cabout three days\u201d of work, then returning to full-time duties",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Lopez was driving at 30 mph",
+        "existing_fact_text": "Lopez at 60 mph in a 40 mph zone",
+        "new_fact_id": "F2",
+        "existing_fact_id": "H3",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.8,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.10206206887960434,
+        "value_guard_rejected": true,
+        "taken_by": null
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.10206206887960434,
+        "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+        "best_fact_origin": "extracted"
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.1961161345243454,
+        "best_fact": "Lopez was the sole occupant of her vehicle",
+        "best_fact_origin": "clean"
+      }
+    },
+    {
+      "ground_truth_id": "C-11",
+      "ground_truth_type": "Temporal & Quantitative \u2013 Treatment Onset & Course",
+      "fact_a": {
+        "text": "Physical therapy from March 8, 2023 to June 15, 2023, ~12 sessions",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "First medical visit March 20, 2023 (urgent care), PT \u201caround six\u201d sessions over ~1 month",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Collision date: March 5, 2023",
+        "existing_fact_text": "Collision date: March 4, 2023",
+        "new_fact_id": "F0",
+        "existing_fact_id": "H0",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.99,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.2309401035308838,
+        "value_guard_rejected": true,
+        "taken_by": "C-01"
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.0,
+        "best_fact": null,
+        "best_fact_origin": null
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.0,
+        "best_fact": null,
+        "best_fact_origin": null
+      }
+    },
+    {
+      "ground_truth_id": "C-12",
+      "ground_truth_type": "Quantitative \u2013 Medical Expenses (Cross-Doc)",
+      "fact_a": {
+        "text": "Medical expenses \u201cbelieved to exceed $28,000\u201d; total to date $18,000",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Bills processed total $14,250",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Collision date: March 5, 2023",
+        "existing_fact_text": "Collision date: March 4, 2023",
+        "new_fact_id": "F0",
+        "existing_fact_id": "H0",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.99,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.0,
+        "value_guard_rejected": true,
+        "taken_by": "C-01"
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.0,
+        "best_fact": null,
+        "best_fact_origin": null
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.0,
+        "best_fact": null,
+        "best_fact_origin": null
+      }
+    },
+    {
+      "ground_truth_id": "C-13",
+      "ground_truth_type": "Quantitative & Categorical \u2013 Property Damage / Total Loss",
+      "fact_a": {
+        "text": "Civic declared a total loss; pre-collision value + repair > $12,000",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Damage repairable; repair $7,400, ACV $8,500, and not declared a total loss",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Collision date: March 5, 2023",
+        "existing_fact_text": "Collision date: March 4, 2023",
+        "new_fact_id": "F0",
+        "existing_fact_id": "H0",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.99,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.0,
+        "value_guard_rejected": true,
+        "taken_by": "C-01"
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.0,
+        "best_fact": null,
+        "best_fact_origin": null
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.10206206887960434,
+        "best_fact": "Rainy weather with wet roadway and reduced visibility",
+        "best_fact_origin": "extracted"
+      }
+    },
+    {
+      "ground_truth_id": "C-14",
+      "ground_truth_type": "Temporal / Factual \u2013 Prior Accident History (Cross-Doc)",
+      "fact_a": {
+        "text": "\u201cNo prior motor vehicle collisions within past 10 years\u201d; acknowledges June 10, 2018 rear-end collision",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Lopez initially denies any accidents in 10 years, then acknowledges 2018 SF collision and an additional 2019 Daly City incident",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Collision date: March 5, 2023",
+        "existing_fact_text": "Collision date: March 4, 2023",
+        "new_fact_id": "F0",
+        "existing_fact_id": "H0",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.99,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.09999999403953552,
+        "value_guard_rejected": true,
+        "taken_by": "C-01"
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.2760262191295624,
+        "best_fact": "Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.",
+        "best_fact_origin": "extracted"
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.07905694097280502,
+        "best_fact": "Rainy weather with wet roadway and reduced visibility",
+        "best_fact_origin": "extracted"
+      }
+    },
+    {
+      "ground_truth_id": "C-15",
+      "ground_truth_type": "Factual / Legal-Status \u2013 Course & Scope of Employment",
+      "fact_a": {
+        "text": "Reed was acting \u201cin the course and scope of his employment at all times relevant\u201d",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Reed had finished his route, was released from duty, and driving home for personal convenience (no active business purpose)",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Lopez was the sole occupant",
+        "existing_fact_text": "Reed was alone in the truck",
+        "new_fact_id": "F1",
+        "existing_fact_id": "H4",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.6,
+        "source_type": "cross_doc",
+        "doc_id": "002",
+        "combined": 0.1873171627521515,
+        "value_guard_rejected": false,
+        "taken_by": null
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.27386125922203064,
+        "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+        "best_fact_origin": "extracted"
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.23693954944610596,
+        "best_fact": "Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.",
+        "best_fact_origin": "extracted"
+      }
+    },
+    {
+      "ground_truth_id": "D1-INTRA-02",
+      "ground_truth_type": "Quantitative \u2013 Medical Expenses",
+      "fact_a": {
+        "text": "Medical expenses to date believed to exceed $28,000.00.",
+        "source": "Doc 1"
+      },
+      "fact_b": {
+        "text": "Total amount of medical expenses to date is approximately $18,000.00.",
+        "source": "Doc 1"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Medical expenses to date believed to exceed $25,000.00.",
+        "existing_fact_text": "Total amount of medical expenses to date is approximately $17,000.00.",
+        "new_fact_id": "F10",
+        "existing_fact_id": "F11",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.88,
+        "source_type": "intra_doc",
+        "doc_id": "002",
+        "combined": 0.8571428060531616,
+        "value_guard_rejected": true,
+        "taken_by": null
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.0,
+        "best_fact": null,
+        "best_fact_origin": null
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.11180339753627777,
+        "best_fact": "Lopez was the sole occupant of her vehicle",
+        "best_fact_origin": "clean"
+      }
+    },
+    {
+      "ground_truth_id": "D2-INTRA-02",
+      "ground_truth_type": "Factual / Temporal \u2013 Lopez Prior Accident Statements",
+      "fact_a": {
+        "text": "Lopez initially states she had not been involved in any motor vehicle accidents in the past ten (10) years.",
+        "source": "Doc 2"
+      },
+      "fact_b": {
+        "text": "She later acknowledges 2018 rear-end collision and claim database also shows a 2019 Daly City incident.",
+        "source": "Doc 2"
+      },
+      "closest_detected_pair": {
+        "new_fact_text": "Lopez has not been involved in any prior collisions within the past ten years.",
+        "existing_fact_text": "Lopez was involved in a June 10, 2018 rear-end collision in SF.",
+        "new_fact_id": "F12",
+        "existing_fact_id": "F13",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.91,
+        "source_type": "intra_doc",
+        "doc_id": "002",
+        "combined": 0.30151134729385376,
+        "value_guard_rejected": false,
+        "taken_by": "D1-INTRA-01"
+      },
+      "fact_a_extracted": {
+        "covered": false,
+        "similarity": 0.25,
+        "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+        "best_fact_origin": "extracted"
+      },
+      "fact_b_extracted": {
+        "covered": false,
+        "similarity": 0.0883883461356163,
+        "best_fact": "Rainy weather with wet roadway and reduced visibility",
+        "best_fact_origin": "extracted"
+      }
+    }
+  ],
+  "false_positives": [
+    {
+      "detected_pair": {
+        "new_fact_text": "Medical expenses to date believed to exceed $25,000.00.",
+        "existing_fact_text": "Total amount of medical expenses to date is approximately $17,000.00.",
+        "new_fact_id": "F10",
+        "existing_fact_id": "F11",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.88,
+        "source_type": "intra_doc",
+        "doc_id": "002"
+      },
+      "closest_ground_truth": "D1-INTRA-02",
+      "closest_score": 0.8571428060531616
+    },
+    {
+      "detected_pair": {
+        "new_fact_text": "The collision happened on March 5, 2023",
+        "existing_fact_text": "Collision on March 4, 2023",
+        "new_fact_id": "F14",
+        "existing_fact_id": "H0",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.95,
+        "source_type": "cross_doc",
+        "doc_id": "002"
+      },
+      "closest_ground_truth": "C-01",
+      "closest_score": 0.6761233806610107
+    },
+    {
+      "detected_pair": {
+        "new_fact_text": "Lopez was driving at 30 mph",
+        "existing_fact_text": "Lopez at 60 mph in a 40 mph zone",
+        "new_fact_id": "F2",
+        "existing_fact_id": "H3",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.8,
+        "source_type": "cross_doc",
+        "doc_id": "002"
+      },
+      "closest_ground_truth": "C-06",
+      "closest_score": 0.4330127239227295
+    },
+    {
+      "detected_pair": {
+        "new_fact_text": "Lopez was the sole occupant",
+        "existing_fact_text": "Reed was alone in the truck",
+        "new_fact_id": "F1",
+        "existing_fact_id": "H4",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.6,
+        "source_type": "cross_doc",
+        "doc_id": "002"
+      },
+      "closest_ground_truth": "C-07",
+      "closest_score": 0.32732683420181274
+    },
+    {
+      "detected_pair": {
+        "new_fact_text": "The report was filed late",
+        "existing_fact_text": "The report was filed on March 10, 2023",
+        "new_fact_id": "F8",
+        "existing_fact_id": "F7",
+        "nli_label": "contradiction",
+        "nli_confidence": 0.55,
+        "source_type": "intra_doc",
+        "doc_id": "001"
+      },
+      "closest_ground_truth": "D1-INTRA-01",
+      "closest_score": 0.11952285468578339
+    },
+    {
+      "detected_pair": {
+        "new_fact_text": "",
+        "existing_fact_text": "Weather clear",
+        "new_fact_id": "",
+        "existing_fact_id": "H5",
+        "nli_label": "",
+        "nli_confidence": 0.0,
+        "source_type": "cross_doc",
+        "doc_id": "002"
+      },
+      "closest_ground_truth": "C-01",
+      "closest_score": 0.0
+    }
+  ],
+  "unpaired_correct_facts": [
+    {
+      "key_fact": "C-03.fact_b",
+      "fact_text": "Rainy weather with wet roadway and reduced visibility",
+      "similarity": 0.6681531071662903
+    },
+    {
+      "key_fact": "C-04.fact_a",
+      "fact_text": "Reed traveling southbound on 14th Ave",
+      "similarity": 0.8333333730697632
+    },
+    {
+      "key_fact": "C-04.fact_b",
+      "fact_text": "Reed traveling southbound on 14th Ave",
+      "similarity": 1.0
+    },
+    {
+      "key_fact": "C-07.fact_a",
+      "fact_text": "Lopez was the sole occupant of her vehicle",
+      "similarity": 0.9999999403953552
+    }
+  ],
+  "fact_coverage_detail": {
+    "C-01.fact_a": {
+      "covered": true,
+      "similarity": 1.0,
+      "best_fact": "Collision date: March 5, 2023",
+      "best_fact_origin": "clean"
+    },
+    "C-01.fact_b": {
+      "covered": true,
+      "similarity": 1.0,
+      "best_fact": "Collision date: March 4, 2023",
+      "best_fact_origin": "extracted"
+    },
+    "C-02.fact_a": {
+      "covered": false,
+      "similarity": 0.0,
+      "best_fact": null,
+      "best_fact_origin": null
+    },
+    "C-02.fact_b": {
+      "covered": true,
+      "similarity": 0.9999999403953552,
+      "best_fact": "Approximately 9:20 p.m.",
+      "best_fact_origin": "extracted"
+    },
+    "C-03.fact_a": {
+      "covered": false,
+      "similarity": 0.4330127239227295,
+      "best_fact": "Rainy weather with wet roadway and reduced visibility",
+      "best_fact_origin": "extracted"
+    },
+    "C-03.fact_b": {
+      "covered": true,
+      "similarity": 0.6681531071662903,
+      "best_fact": "Rainy weather with wet roadway and reduced visibility",
+      "best_fact_origin": "extracted"
+    },
+    "C-04.fact_a": {
+      "covered": true,
+      "similarity": 0.8333333730697632,
+      "best_fact": "Reed traveling southbound on 14th Ave",
+      "best_fact_origin": "extracted"
+    },
+    "C-04.fact_b": {
+      "covered": true,
+      "similarity": 1.0,
+      "best_fact": "Reed traveling southbound on 14th Ave",
+      "best_fact_origin": "extracted"
+    },
+    "C-05.fact_a": {
+      "covered": false,
+      "similarity": 0.3535533845424652,
+      "best_fact": "Reed traveling southbound on 14th Ave",
+      "best_fact_origin": "extracted"
+    },
+    "C-05.fact_b": {
+      "covered": false,
+      "similarity": 0.24618299305438995,
+      "best_fact": "Reed traveling southbound on 14th Ave",
+      "best_fact_origin": "extracted"
+    },
+    "C-06.fact_a": {
+      "covered": false,
+      "similarity": 0.2499999850988388,
+      "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+      "best_fact_origin": "extracted"
+    },
+    "C-06.fact_b": {
+      "covered": false,
+      "similarity": 0.2499999850988388,
+      "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+      "best_fact_origin": "extracted"
+    },
+    "C-07.fact_a": {
+      "covered": true,
+      "similarity": 0.9999999403953552,
+      "best_fact": "Lopez was the sole occupant of her vehicle",
+      "best_fact_origin": "clean"
+    },
+    "C-07.fact_b": {
+      "covered": false,
+      "similarity": 0.28347334265708923,
+      "best_fact": "Lopez was the sole occupant of her vehicle",
+      "best_fact_origin": "clean"
+    },
+    "C-08.fact_a": {
+      "covered": false,
+      "similarity": 0.2499999850988388,
+      "best_fact": "Rainy weather with wet roadway and reduced visibility",
+      "best_fact_origin": "extracted"
+    },
+    "C-08.fact_b": {
+      "covered": false,
+      "similarity": 0.1767766922712326,
+      "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+      "best_fact_origin": "extracted"
+    },
+    "C-09.fact_a": {
+      "covered": false,
+      "similarity": 0.10660035908222198,
+      "best_fact": "Rainy weather with wet roadway and reduced visibility",
+      "best_fact_origin": "extracted"
+    },
+    "C-09.fact_b": {
+      "covered": false,
+      "similarity": 0.3651483654975891,
+      "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+      "best_fact_origin": "extracted"
+    },
+    "C-10.fact_a": {
+      "covered": false,
+      "similarity": 0.10206206887960434,
+      "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+      "best_fact_origin": "extracted"
+    },
+    "C-10.fact_b": {
+      "covered": false,
+      "similarity": 0.1961161345243454,
+      "best_fact": "Lopez was the sole occupant of her vehicle",
+      "best_fact_origin": "clean"
+    },
+    "C-11.fact_a": {
+      "covered": false,
+      "similarity": 0.0,
+      "best_fact": null,
+      "best_fact_origin": null
+    },
+    "C-11.fact_b": {
+      "covered": false,
+      "similarity": 0.0,
+      "best_fact": null,
+      "best_fact_origin": null
+    },
+    "C-12.fact_a": {
+      "covered": false,
+      "similarity": 0.0,
+      "best_fact": null,
+      "best_fact_origin": null
+    },
+    "C-12.fact_b": {
+      "covered": false,
+      "similarity": 0.0,
+      "best_fact": null,
+      "best_fact_origin": null
+    },
+    "C-13.fact_a": {
+      "covered": false,
+      "similarity": 0.0,
+      "best_fact": null,
+      "best_fact_origin": null
+    },
+    "C-13.fact_b": {
+      "covered": false,
+      "similarity": 0.10206206887960434,
+      "best_fact": "Rainy weather with wet roadway and reduced visibility",
+      "best_fact_origin": "extracted"
+    },
+    "C-14.fact_a": {
+      "covered": false,
+      "similarity": 0.2760262191295624,
+      "best_fact": "Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.",
+      "best_fact_origin": "extracted"
+    },
+    "C-14.fact_b": {
+      "covered": false,
+      "similarity": 0.07905694097280502,
+      "best_fact": "Rainy weather with wet roadway and reduced visibility",
+      "best_fact_origin": "extracted"
+    },
+    "C-15.fact_a": {
+      "covered": false,
+      "similarity": 0.27386125922203064,
+      "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+      "best_fact_origin": "extracted"
+    },
+    "C-15.fact_b": {
+      "covered": false,
+      "similarity": 0.23693954944610596,
+      "best_fact": "Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.",
+      "best_fact_origin": "extracted"
+    },
+    "D1-INTRA-01.fact_a": {
+      "covered": false,
+      "similarity": 0.2572478652000427,
+      "best_fact": "Lopez was the sole occupant of her vehicle",
+      "best_fact_origin": "clean"
+    },
+    "D1-INTRA-01.fact_b": {
+      "covered": false,
+      "similarity": 0.18898223340511322,
+      "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+      "best_fact_origin": "extracted"
+    },
+    "D1-INTRA-02.fact_a": {
+      "covered": false,
+      "similarity": 0.0,
+      "best_fact": null,
+      "best_fact_origin": null
+    },
+    "D1-INTRA-02.fact_b": {
+      "covered": false,
+      "similarity": 0.11180339753627777,
+      "best_fact": "Lopez was the sole occupant of her vehicle",
+      "best_fact_origin": "clean"
+    },
+    "D2-INTRA-01.fact_a": {
+      "covered": true,
+      "similarity": 1.0,
+      "best_fact": "Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.",
+      "best_fact_origin": "extracted"
+    },
+    "D2-INTRA-01.fact_b": {
+      "covered": true,
+      "similarity": 0.9999999403953552,
+      "best_fact": "A later audit confirms Reed was involved in a preventable rear-end collision on Feb 2, 2020 in Oakland, CA.",
+      "best_fact_origin": "extracted"
+    },
+    "D2-INTRA-02.fact_a": {
+      "covered": false,
+      "similarity": 0.25,
+      "best_fact": "Lopez said she was \u201cokay\u201d at the scene",
+      "best_fact_origin": "extracted"
+    },
+    "D2-INTRA-02.fact_b": {
+      "covered": false,
+      "similarity": 0.0883883461356163,
+      "best_fact": "Rainy weather with wet roadway and reduced visibility",
+      "best_fact_origin": "extracted"
+    }
+  }
+}

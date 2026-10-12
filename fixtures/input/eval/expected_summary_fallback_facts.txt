@@ -1,0 +1,40 @@
+
+=== Contradiction evaluation ===
+input:     fixtures/input/eval/e2e_synthetic.json
+key:       fixtures/keys/GREEN_VALLEY_CONTRA_KEY.md
+threshold: 0.6  model: token-cosine  value guard: on  assignment: optimal (scipy linear_sum_assignment)
+overall    recall 5/19 = 26.3% | precision 5/11 = 45.5% | F1 0.333
+inter-doc  recall 3/15 = 20.0% | precision 3/7 = 42.9% | F1 0.273
+intra-doc  recall 2/4 = 50.0% | precision 2/4 = 50.0% | F1 0.500
+fact coverage 13/38 = 34.2% (clean_facts+detected_pair_facts)
+
+Matched pairs (audit):
+  C-01  combined=1.000 (a=1.000, b=1.000)
+     key A: Collision date: March 5, 2023
+     key B: Collision date: March 4, 2023
+     det  : Collision date: March 5, 2023
+     vs   : Collision date: March 4, 2023  [contradiction 0.99]
+  C-02  combined=1.000 (a=1.000, b=1.000)
+     key A: Approximately 5:30 p.m.
+     key B: Approximately 9:20 p.m.
+     det  : Approximately 9:20 p.m.
+     vs   : Approximately 5:30 p.m.  [contradiction 0.93]
+  C-04  combined=0.772 (a=0.772, b=0.772)
+     key A: Reed traveling northbound on 14th Ave
+     key B: Reed traveling southbound on 14th Ave
+     det  : Reed was traveling northbound on 14th Avenue
+     vs   : Reed was traveling southbound on 14th Avenue  [contradiction 0.90]
+  D1-INTRA-01  combined=0.778 (a=0.778, b=0.886)
+     key A: Lopez “has not been involved in any prior motor vehicle collisions within the past ten (10) years.”
+     key B: Lopez was involved in a June 10, 2018 rear-end collision in SF with neck soreness.
+     det  : Lopez has not been involved in any prior collisions within the past ten years.
+     vs   : Lopez was involved in a June 10, 2018 rear-end collision in SF.  [contradiction 0.91]
+  D2-INTRA-01  combined=1.000 (a=1.000, b=1.000)
+     key A: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.
+     key B: A later audit confirms Reed was involved in a preventable rear-end collision on Feb 2, 2020 in Oakland, CA.
+     det  : A later audit confirms Reed was involved in a preventable rear-end collision on Feb 2, 2020 in Oakland, CA.
+     vs   : Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment.  [contradiction 0.97]
+
+Missed: C-03, C-05, C-06, C-07, C-08, C-09, C-10, C-11, C-12, C-13, C-14, C-15, D1-INTRA-02, D2-INTRA-02
+
+Report written to out/report_eval.json
