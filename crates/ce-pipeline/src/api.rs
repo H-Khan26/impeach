@@ -174,7 +174,7 @@ fn enable_review_store(config: &mut PipelineConfig, db_path: &Path, fail_on_sqli
     }
 }
 
-/// Opens the graph store of a `helix` config block: [`ce_store::HelixStore::from_config`] with
+/// Opens the graph store of a `helix` config block: `ce_store::HelixStore::from_config` with
 /// the `helix` feature; without it an in-memory [`ce_store::MemoryStore`] of
 /// `helix.embedding_dim` dimensions (nothing persists; a warning is logged).
 ///
