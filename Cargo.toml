@@ -14,10 +14,12 @@ rust-version = "1.99"
 ce-core = { path = "crates/ce-core" }
 ce-config = { path = "crates/ce-config" }
 ce-text = { path = "crates/ce-text" }
+ce-ingest = { path = "crates/ce-ingest" }
+ce-store = { path = "crates/ce-store" }
 
 # Serialization and errors
 serde = { version = "1.0.229", features = ["derive"] }
-serde_json = { version = "1.0.154", features = ["preserve_order"] }
+serde_json = { version = "1.0.154", features = ["preserve_order", "float_roundtrip"] }
 yaml_serde = "0.10.7"
 thiserror = "2.0.21"
 anyhow = "1.0.104"
@@ -37,6 +39,9 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
 
 # Storage
 rusqlite = { version = "0.40.2", features = ["bundled"] }
+helix-db = { git = "https://github.com/helixdb/helix-db", rev = "16b7a8374f7a97684472a3a1462aa8adaca55e79", default-features = false }
+tokio = { version = "1.53.2", features = ["rt-multi-thread", "sync", "time"] }
+fs4 = { version = "1.1.0", default-features = false, features = ["sync"] }
 
 # Models
 fastembed = { version = "7.1.1", default-features = false }
@@ -47,6 +52,8 @@ gliner2 = { version = "0.1.3", default-features = false }
 ollama-rs = { version = "0.3.6", default-features = false }
 
 # Ingestion and chunking
+csv = "1.4.0"
+unicode-general-category = "1.1.0"
 text-splitter = "0.33.0"
 pdf-extract = "0.12.1"
 

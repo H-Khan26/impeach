@@ -7,8 +7,9 @@
 //!
 //! Modules mirror the Python `schema` package: [`entities`] (mentions, relationships,
 //! coreference clusters), [`facts`], [`contradictions`], [`rag`] (documents, chunks, indexing
-//! results) and [`ed`] (entity disambiguation). [`ids`] holds the string id newtypes and
-//! [`vocab`] the value / property type vocabulary contract.
+//! results) and [`ed`] (entity disambiguation). [`ids`] holds the string id newtypes,
+//! [`vocab`] the value / property type vocabulary contract and [`pyjson`] the Python
+//! `json.dumps` byte format used for every diffable output.
 
 pub mod contradictions;
 pub mod ed;
@@ -16,6 +17,7 @@ pub mod entities;
 pub mod error;
 pub mod facts;
 pub mod ids;
+pub mod pyjson;
 pub mod rag;
 pub mod vocab;
 

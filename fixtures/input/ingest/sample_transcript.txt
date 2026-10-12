@@ -1,0 +1,26 @@
+                                                    Page 12
+Deposition of Jane Doe                                    Page 12
+Job Number: 4471
+ 1   MR. SMITH (ATTORNEY): Please state your name for the
+ 2   record.
+ 3   THE WITNESS: Jane Doe.
+ 4   BY MR. SMITH:
+ 5   Q. Were you the CEO of Acme Corporation from 2010
+ 6   until 2015?
+ 7   A. No. I was the Chief Operating Officer.
+ 8
+ 9   MS. JONES: Objection, form.
+10   THE COURT: Overruled.
+11   JANE DOE (witness): I joined Acme in 2012.
+12   ACME CORPORATION
+13
+14   Unlabeled continuation line.
+15   Q. When did you leave?
+16   A. In 2016.
+17
+                                                       13
+BY MS. JONES: Did you sign the contract?
+A. I did not.
+MR. SMITH:
+
+Q. Anything else?

@@ -1,0 +1,7 @@
+speaker,role,text,timestamp
+MR. SMITH,attorney,"Where were you on March 3, 2024?",2024-03-03T10:00:00Z
+Jane Doe,witness,"At the office, ""all day"".",
+
+Jane Doe,,I left at 5 p.m.,
+COURT,unknown,Sustained.,
+Bob,witness
