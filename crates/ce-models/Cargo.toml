@@ -24,18 +24,24 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
-process-wrap.workspace = true
-fastembed = { workspace = true, optional = true }
-ort = { workspace = true, optional = true }
-tokenizers = { workspace = true, optional = true }
-hf-hub = { workspace = true, optional = true }
-ollama-rs = { workspace = true, optional = true }
-tokio = { workspace = true, optional = true }
-gliner2 = { workspace = true, optional = true }
+process-wrap = { workspace = true, features = ["std"] }
+# ONNX Runtime binaries are downloaded at build time; no image models.
+fastembed = { workspace = true, optional = true, features = ["ort-download-binaries-native-tls", "hf-hub-native-tls"] }
+# Same ort version and feature set as fastembed so both share one ONNX Runtime.
+ort = { workspace = true, optional = true, features = ["std", "ndarray", "api-24", "download-binaries", "tls-native"] }
+tokenizers = { workspace = true, optional = true, features = ["onig"] }
+hf-hub = { workspace = true, optional = true, features = ["ureq", "native-tls"] }
+ollama-rs = { workspace = true, optional = true, features = ["default"] }
+tokio = { workspace = true, optional = true, features = ["rt"] }
+gliner2 = { workspace = true, optional = true, features = ["candle"] }
 
 [dev-dependencies]
 pretty_assertions.workspace = true
 tempfile.workspace = true
+
+[[test]]
+name = "sidecar"
+harness = false
 
 [lints]
 workspace = true

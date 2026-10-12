@@ -28,3 +28,19 @@ pub enum ModelError {
 
 /// Result alias for model operations.
 pub type Result<T, E = ModelError> = std::result::Result<T, E>;
+
+/// `error` and its sources joined with `: ` (many backend errors keep the cause in `source`).
+#[cfg_attr(not(any(feature = "fastembed", feature = "ollama")), allow(dead_code))]
+pub(crate) fn error_chain(error: &dyn std::error::Error) -> String {
+    let mut message = error.to_string();
+    let mut source = error.source();
+    while let Some(e) = source {
+        let text = e.to_string();
+        if !message.ends_with(&text) {
+            message.push_str(": ");
+            message.push_str(&text);
+        }
+        source = e.source();
+    }
+    message
+}
