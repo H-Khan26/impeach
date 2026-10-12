@@ -3,6 +3,7 @@
 use std::path::PathBuf;
 
 use ce_config::ConfigError;
+use ce_ed::EdError;
 use ce_ingest::IngestError;
 use ce_models::ModelError;
 use ce_store::StoreError;
@@ -26,6 +27,9 @@ pub enum PipelineError {
     /// A model could not be resolved or failed.
     #[error(transparent)]
     Model(#[from] ModelError),
+    /// Entity disambiguation failure.
+    #[error(transparent)]
+    Ed(#[from] EdError),
     /// No constructor is registered for a stage type.
     #[error("unknown stage type `{stage_type}`; registered stage types: {known:?}")]
     UnknownStage {
@@ -99,6 +103,7 @@ impl PipelineError {
     pub fn is_fatal(&self) -> bool {
         match self {
             Self::Store(error) => error.is_fatal(),
+            Self::Ed(error) => error.is_fatal(),
             Self::Stage { source, .. } => source.is_fatal(),
             _ => false,
         }
