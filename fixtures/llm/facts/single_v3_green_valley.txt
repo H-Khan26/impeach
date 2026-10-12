@@ -1,0 +1,127 @@
+```json
+{
+  "nodes": [
+    {
+      "node_type": "STATED_FACT",
+      "id": "STATED_FACT_0",
+      "text": "The collision occurred on March 4, 2023.",
+      "value_type": "TEMPORAL_POINT",
+      "property_type": "TEMPORAL",
+      "slot_name": "incident_date",
+      "value_raw": "March 4, 2023",
+      "assertion_triple": {
+        "subject": "collision",
+        "relationship": "occurred_on",
+        "object": "March 4, 2023"
+      },
+      "certainty": "0.95",
+      "temporal_context": "current_incident",
+      "is_denial": false,
+      "is_boilerplate": false,
+      "temporal_validity": {
+        "t_valid_from": "2023-03-04",
+        "t_valid_until": "2023-03-04"
+      },
+      "metadata": {}
+    },
+    {
+      "node_type": "STATED_FACT",
+      "id": "STATED_FACT_1",
+      "text": "Maria Lopez was traveling between 45 and 50 miles per hour.",
+      "value_type": "numeric",
+      "property_type": "Quantitative",
+      "slot_name": "speed",
+      "value_raw": "between forty-five (45) and fifty (50) miles per hour",
+      "assertion_triple": {
+        "subject": "Maria Lopez",
+        "relationship": "traveled_at_speed",
+        "object": "45-50 miles per hour"
+      },
+      "certainty": 0.9,
+      "temporal_context": "current_incident",
+      "is_denial": false,
+      "is_boilerplate": false,
+      "temporal_validity": {
+        "t_valid_from": null,
+        "t_valid_until": null
+      },
+      "metadata": {"source_paragraph": 5}
+    },
+    {
+      "node_type": "STATED_FACT",
+      "id": "STATED_FACT_2",
+      "text": "Daniel Reed has not been involved in any prior accidents in the past 10 years.",
+      "value_type": "BOOLEAN",
+      "property_type": "EXISTS",
+      "slot_name": "prior_accidents",
+      "value_raw": "has not been involved in any prior accidents",
+      "assertion_triple": {
+        "subject": "Daniel Reed",
+        "relationship": "was_involved_in",
+        "object": "prior accidents"
+      },
+      "certainty": "0.85",
+      "temporal_context": "prior_incident",
+      "is_denial": "true",
+      "is_boilerplate": false,
+      "temporal_validity": {
+        "t_valid_from": null,
+        "t_valid_until": null
+      },
+      "metadata": {"time_window": {"start": "2013-03-04", "end": "2023-03-04"}}
+    },
+    {
+      "node_type": "STATED_FACT",
+      "id": "STATED_FACT_3",
+      "text": "Green Valley Logistics employed Daniel Reed as a commercial driver.",
+      "value_type": "ENTITY_REF",
+      "property_type": "RELATION",
+      "slot_name": "employer",
+      "value_raw": "employed by Green Valley",
+      "assertion_triple": {
+        "subject": "Daniel Reed",
+        "relationship": "is_employee_of",
+        "object": "Green Valley Logistics, Inc."
+      },
+      "certainty": "0.92",
+      "temporal_context": "current_incident",
+      "is_denial": false,
+      "is_boilerplate": false,
+      "temporal_validity": {
+        "t_valid_from": null,
+        "t_valid_until": null
+      },
+      "metadata": {}
+    },
+    {
+      "node_type": "ENTITY",
+      "id": "ENTITY_0",
+      "text": "Maria Lopez"
+    },
+    {
+      "node_type": "STATED_FACT",
+      "id": "STATED_FACT_4",
+      "text": "Plaintiff demands a trial by jury.",
+      "value_type": "TEXT",
+      "property_type": "MODALITY",
+      "slot_name": "jury_demand",
+      "value_raw": "demands a trial by jury",
+      "assertion_triple": {
+        "subject": "Plaintiff",
+        "relationship": "demands",
+        "object": "trial by jury"
+      },
+      "certainty": "0.6",
+      "temporal_context": "general_claim",
+      "is_denial": false,
+      "is_boilerplate": true,
+      "temporal_validity": {
+        "t_valid_from": null,
+        "t_valid_until": null
+      },
+      "metadata": {}
+    }
+  ],
+  "edges": []
+}
+```
