@@ -600,4 +600,56 @@ mod tests {
         let second = store.create_document(&DocumentNode::default()).expect("created");
         assert_ne!(first.id, second.id);
     }
+
+    #[test]
+    fn edges_carry_python_properties_and_default_roles() {
+        let store = MemoryStore::new(2);
+        let doc = store.create_document(&DocumentNode::default()).expect("doc");
+        let chunk_node = ChunkNode { sequence_number: 4, ..ChunkNode::default() };
+        let chunk = store.create_document_chunk(&doc.id, &chunk_node).expect("chunk");
+        let span_node =
+            SpanNode { chunk_id: chunk.id.clone(), start_char: 12, ..SpanNode::default() };
+        let span = store.create_span_for_chunk(&span_node).expect("span");
+        let entity = store.create_entity(&EntityNode::new("Acme", "ORG")).expect("entity");
+        let fact = store.create_fact(&FactNode::new("x", "{}", "{}", 0.5)).expect("fact");
+        store.link_span_to_entity(&span.id, &entity.id, 0.8, "").expect("link");
+        store.link_fact_to_document(&fact.id, &doc.id, 3, "Facts").expect("link");
+        store.link_fact_to_entity(&fact.id, &entity.id, "").expect("link");
+        store.link_fact_to_span(&fact.id, &span.id, "", 1.0).expect("link");
+
+        let edges: Vec<(&str, Value)> = store
+            .edges()
+            .into_iter()
+            .map(|edge| (edge.label, Value::Object(edge.properties)))
+            .collect();
+        assert_eq!(
+            edges,
+            vec![
+                (CHUNK_OF_DOCUMENT, json!({"SequenceNumber": 4})),
+                (SPAN_OF_CHUNK, json!({"SequenceNumber": 12})),
+                (SPAN_REFERS_TO_ENTITY, json!({"Confidence": 0.8, "Method": "NER+ED"})),
+                (FACT_IN_DOCUMENT, json!({"PageNumber": 3, "Section": "Facts"})),
+                (FACT_ABOUT_ENTITY, json!({"Role": "RELATED"})),
+                (FACT_DERIVED_FROM_SPAN, json!({"Role": "SOURCE_SPAN", "Confidence": 1.0})),
+            ]
+        );
+        let edge = &store.edges()[1];
+        assert_eq!((edge.from.as_str(), edge.to.as_str()), (span.id.as_str(), chunk.id.as_str()));
+    }
+
+    #[test]
+    fn snapshots_expose_stored_properties_and_vectors() {
+        let store = MemoryStore::new(2);
+        let doc =
+            store.create_document(&DocumentNode { title: "T".into(), ..DocumentNode::default() });
+        let doc = doc.expect("doc");
+        let (label, properties) = store.node_snapshot(doc.id.as_str()).expect("snapshot");
+        assert_eq!(label, DOCUMENT);
+        assert_eq!(properties["Title"], json!("T"));
+        assert_eq!(store.node_snapshot("999"), None);
+        let entity = store.create_entity(&EntityNode::new("Acme", "ORG")).expect("entity");
+        assert_eq!(store.embedding(entity.id.as_str()), None);
+        store.create_entity_embedding(&entity.id, &[0.5, 0.5]).expect("vector");
+        assert_eq!(store.embedding(entity.id.as_str()), Some(vec![0.5, 0.5]));
+    }
 }
