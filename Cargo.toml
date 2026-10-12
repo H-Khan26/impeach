@@ -19,7 +19,7 @@ ce-store = { path = "crates/ce-store" }
 
 # Serialization and errors
 serde = { version = "1.0.229", features = ["derive"] }
-serde_json = { version = "1.0.154", features = ["preserve_order"] }
+serde_json = { version = "1.0.154", features = ["preserve_order", "float_roundtrip"] }
 yaml_serde = "0.10.7"
 thiserror = "2.0.21"
 anyhow = "1.0.104"

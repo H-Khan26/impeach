@@ -84,17 +84,63 @@ pub fn parse_json(path: &Path) -> Result<Vec<Utterance>> {
         Value::Object(map) => Ok(normalize_utterance(&map)),
         _ => Err(not_object()),
     };
-    match serde_json::from_str::<Value>(&content) {
-        Ok(Value::Array(items)) => items.into_iter().map(utterance).collect(),
-        Ok(other) => Ok(vec![utterance(other)?]),
-        Err(_) => content
+    match json_loads(&content) {
+        Some(Value::Array(items)) => items.into_iter().map(utterance).collect(),
+        Some(other) => Ok(vec![utterance(other)?]),
+        None => content
             .split_terminator('\n')
             .map(py_strip)
             .filter(|line| !line.is_empty())
-            .filter_map(|line| serde_json::from_str::<Value>(line).ok())
+            .filter_map(json_loads)
             .map(utterance)
             .collect(),
     }
+}
+
+/// Python `json.loads`, which also accepts the `NaN`, `Infinity` and `-Infinity` literals that
+/// `json.dumps` writes. Those literals become the strings `nan`, `inf` and `-inf`, which is what
+/// Python `str()` prints for them. Returns `None` when the text is not one JSON document.
+fn json_loads(text: &str) -> Option<Value> {
+    match serde_json::from_str(text) {
+        Ok(value) => Some(value),
+        Err(_) if text.contains("NaN") || text.contains("Infinity") => {
+            serde_json::from_str(&quote_non_finite(text)).ok()
+        }
+        Err(_) => None,
+    }
+}
+
+/// Replaces `NaN`, `Infinity` and `-Infinity` outside string literals with quoted `nan`, `inf`
+/// and `-inf`.
+fn quote_non_finite(text: &str) -> String {
+    const LITERALS: [(&str, &str); 3] =
+        [("-Infinity", "\"-inf\""), ("Infinity", "\"inf\""), ("NaN", "\"nan\"")];
+    let mut out = String::with_capacity(text.len() + 16);
+    let mut in_string = false;
+    let mut escaped = false;
+    let mut rest = text;
+    while let Some(c) = rest.chars().next() {
+        if in_string {
+            if escaped {
+                escaped = false;
+            } else if c == '\\' {
+                escaped = true;
+            } else if c == '"' {
+                in_string = false;
+            }
+        } else if c == '"' {
+            in_string = true;
+        } else if let Some((literal, quoted)) =
+            LITERALS.iter().find(|(literal, _)| rest.starts_with(literal))
+        {
+            out.push_str(quoted);
+            rest = &rest[literal.len()..];
+            continue;
+        }
+        out.push(c);
+        rest = &rest[c.len_utf8()..];
+    }
+    out
 }
 
 /// Parses a CSV transcript with a header row (`speaker,role,text[,timestamp]`) like Python's
@@ -436,9 +482,14 @@ pub struct FlattenedTranscript {
 /// Flattens utterances the way `run_ingestion` does, formatting values with Python `str()`.
 ///
 /// # Errors
-/// A message when a speaker is a list or object (unhashable in Python) or when speakers of
-/// different types would have to be sorted together.
-pub fn flatten_utterances(utterances: &[Utterance]) -> Result<FlattenedTranscript, String> {
+/// [`IngestError::InvalidTranscript`] for `path` when a speaker is a list or object
+/// (unhashable in Python) or when speakers of different types would have to be sorted together.
+pub fn flatten_utterances(path: &Path, utterances: &[Utterance]) -> Result<FlattenedTranscript> {
+    flatten(utterances)
+        .map_err(|reason| IngestError::InvalidTranscript { path: path.to_path_buf(), reason })
+}
+
+fn flatten(utterances: &[Utterance]) -> std::result::Result<FlattenedTranscript, String> {
     let mut lines = Vec::with_capacity(utterances.len());
     let mut speakers: Vec<&Value> = Vec::new();
     for utterance in utterances {
@@ -705,6 +756,20 @@ mod tests {
         let scalars = dir.path().join("scalars.json");
         std::fs::write(&scalars, "[1, 2]").expect("write");
         assert!(matches!(parse_json(&scalars), Err(IngestError::InvalidTranscript { .. })));
+
+        let non_finite = dir.path().join("non_finite.json");
+        std::fs::write(
+            &non_finite,
+            "[\n  {\"speaker\": \"A\", \"text\": \"NaN or -Infinity\", \"timestamp\": NaN},\n  \
+             {\"speaker\": -Infinity, \"text\": \"bye\", \"page\": Infinity}\n]",
+        )
+        .expect("write");
+        let utterances = parse_json(&non_finite).expect("parse");
+        assert_eq!(utterances.len(), 2);
+        assert_eq!(utterances[0].text, json!("NaN or -Infinity"));
+        assert_eq!(utterances[0].timestamp, json!("nan"));
+        assert_eq!(utterances[1].speaker, json!("-inf"));
+        assert_eq!(Value::Object(utterances[1].metadata.clone()), json!({"page": "inf"}));
     }
 
     #[test]
@@ -733,7 +798,7 @@ mod tests {
         assert_eq!(utterances[1].speaker, json!("multi\nline"));
         assert_eq!(utterances[1].text, json!("t\nx"));
         assert_eq!(utterances[3].role, Value::Null);
-        let flat = flatten_utterances(&utterances).expect("flatten");
+        let flat = flatten(&utterances).expect("flatten");
         assert_eq!(flat.text, "A (b): c\nmulti\nline (r): t\nx\n: \nshort: None");
         assert_eq!(
             flat.unique_speakers,
@@ -742,13 +807,13 @@ mod tests {
 
         let blank_header = dir.path().join("blank.csv");
         std::fs::write(&blank_header, "\nspeaker,role,text\nA,b,c\n").expect("write");
-        let flat = flatten_utterances(&parse_csv(&blank_header).expect("parse")).expect("flatten");
+        let flat = flatten(&parse_csv(&blank_header).expect("parse")).expect("flatten");
         assert_eq!(flat.text, "unknown: \nunknown: ");
         assert_eq!(flat.unique_speakers, [json!("unknown")]);
 
         let bom = dir.path().join("bom.csv");
         std::fs::write(&bom, "\u{feff}speaker,role,text\nA,b,c\n").expect("write");
-        let flat = flatten_utterances(&parse_csv(&bom).expect("parse")).expect("flatten");
+        let flat = flatten(&parse_csv(&bom).expect("parse")).expect("flatten");
         assert_eq!(flat.text, "A (b): c");
     }
 
@@ -771,7 +836,7 @@ mod tests {
             utterance(json!(1.0), json!("unknown"), json!([1, "a"])),
             utterance(json!(true), Value::Null, json!({"k": null})),
         ];
-        let flat = flatten_utterances(&utterances).expect("flatten");
+        let flat = flatten(&utterances).expect("flatten");
         assert_eq!(flat.text, "2 (True): 1.5\n1.0: [1, 'a']\nTrue: {'k': None}");
         assert_eq!(flat.unique_speakers, [json!(1.0), json!(2)]);
 
@@ -779,7 +844,7 @@ mod tests {
             utterance(json!(1e20), Value::Null, json!(1e-7)),
             utterance(json!(123_456_789_012_345_678_u64), Value::Null, json!(0.1)),
         ];
-        let flat = flatten_utterances(&big).expect("flatten");
+        let flat = flatten(&big).expect("flatten");
         assert_eq!(flat.text, "1e+20: 1e-07\n123456789012345678: 0.1");
         assert_eq!(flat.unique_speakers, [json!(123_456_789_012_345_678_u64), json!(1e20)]);
     }
@@ -790,11 +855,11 @@ mod tests {
             utterance(json!("A"), Value::Null, json!("")),
             utterance(Value::Null, Value::Null, json!("")),
         ];
-        assert!(flatten_utterances(&mixed).is_err());
+        assert!(flatten(&mixed).is_err());
         let unhashable = [utterance(json!(["A"]), Value::Null, json!(""))];
-        assert!(flatten_utterances(&unhashable).is_err());
+        assert!(flatten(&unhashable).is_err());
         let lone_null = [utterance(Value::Null, Value::Null, Value::Null)];
-        let flat = flatten_utterances(&lone_null).expect("flatten");
+        let flat = flatten(&lone_null).expect("flatten");
         assert_eq!(flat.text, "None: None");
         assert_eq!(flat.unique_speakers, [Value::Null]);
     }

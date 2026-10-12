@@ -182,9 +182,7 @@ fn ingest_transcript(file_path: &Path, options: &IngestOptions) -> Result<Docume
         ".txt" | ".text" => transcript::parse_plain_text(file_path)?,
         _ => return Err(IngestError::UnsupportedTranscriptFormat(ext)),
     };
-    let flat = transcript::flatten_utterances(&utterances).map_err(|reason| {
-        IngestError::InvalidTranscript { path: file_path.to_path_buf(), reason }
-    })?;
+    let flat = transcript::flatten_utterances(file_path, &utterances)?;
     let mut metadata = base_metadata(file_path, options, true);
     metadata.insert("utterance_count".to_owned(), Value::from(utterances.len()));
     metadata.insert("unique_speakers".to_owned(), Value::Array(flat.unique_speakers));

@@ -137,18 +137,9 @@ pub fn float_repr(value: f64) -> String {
     if value == 0.0 {
         return if value.is_sign_negative() { "-0.0" } else { "0.0" }.to_owned();
     }
-    let sci = format!("{value:e}");
-    let Some((mantissa, exponent)) = sci.split_once('e') else {
-        return sci;
+    let Some((sign, digits, exp)) = shortest_digits(value) else {
+        return value.to_string();
     };
-    let Ok(exp) = exponent.parse::<i32>() else {
-        return sci;
-    };
-    let (sign, mantissa) = match mantissa.strip_prefix('-') {
-        Some(rest) => ("-", rest),
-        None => ("", mantissa),
-    };
-    let digits: String = mantissa.chars().filter(|c| *c != '.').collect();
     let mut out = String::from(sign);
     if !(-4..16).contains(&exp) {
         out.push_str(&digits[..1]);
@@ -175,6 +166,31 @@ pub fn float_repr(value: f64) -> String {
         out.push_str(&digits);
     }
     out
+}
+
+/// Sign, significant digits (no leading or trailing zeros) and decimal exponent of the shortest
+/// round-trip representation of a finite non-zero `value`, as `ryu` (through `serde_json`)
+/// produces it with round-half-even ties like Python's `repr`.
+fn shortest_digits(value: f64) -> Option<(&'static str, String, i32)> {
+    let shortest = serde_json::Number::from_f64(value)?.to_string();
+    let (sign, unsigned) = match shortest.strip_prefix('-') {
+        Some(rest) => ("-", rest),
+        None => ("", shortest.as_str()),
+    };
+    let (mantissa, exponent) = match unsigned.split_once(['e', 'E']) {
+        Some((mantissa, exponent)) => (mantissa, exponent.parse::<i32>().ok()?),
+        None => (unsigned, 0),
+    };
+    let (int_part, frac_part) = mantissa.split_once('.').unwrap_or((mantissa, ""));
+    let all: String = int_part.chars().chain(frac_part.chars()).collect();
+    let leading = all.len() - all.trim_start_matches('0').len();
+    let digits = all.trim_matches('0').to_owned();
+    if digits.is_empty() {
+        return None;
+    }
+    let int_len = i32::try_from(int_part.len()).ok()?;
+    let leading = i32::try_from(leading).ok()?;
+    Some((sign, digits, exponent + int_len - 1 - leading))
 }
 
 #[cfg(test)]
@@ -223,6 +239,11 @@ mod tests {
             (-0.0, "-0.0"),
             (1.0e300, "1e+300"),
             (2.0e-308, "2e-308"),
+            (2_163_462_279_744_188.0 + 0.25, "2163462279744188.2"),
+            (5e-324, "5e-324"),
+            (1.7976931348623157e308, "1.7976931348623157e+308"),
+            (0.000123, "0.000123"),
+            (123_456_789.0, "123456789.0"),
         ];
         for (value, expected) in cases {
             assert_eq!(float_repr(value), expected, "{value}");
