@@ -412,6 +412,7 @@ fn batches(store: &dyn GraphStore) {
     assert_eq!(ids.len(), inputs.len(), "distinct ids");
     assert_eq!(store.get_document_chunks(&doc.id).expect("chunks").len(), inputs.len());
     assert!(store.create_chunks_batch(&doc.id, &[]).expect("empty").is_empty());
+    assert!(store.create_chunks_batch(&NodeId::new("987654"), &[]).expect("empty").is_empty());
     let missing = store.create_chunks_batch(&NodeId::new("987654"), &inputs[..2]).expect_err("doc");
     assert!(is_not_found(&missing));
 

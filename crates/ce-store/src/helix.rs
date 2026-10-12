@@ -169,8 +169,8 @@ impl HelixOptions {
         }
     }
 
-    /// Absolute data directory (embedded), `memory`, or the server URL without a trailing
-    /// slash.
+    /// Absolute, normalised data directory (embedded), `memory`, or the server URL without a
+    /// trailing slash.
     fn location(&self) -> Result<String> {
         match self.mode {
             HelixMode::Embedded => {
@@ -179,9 +179,8 @@ impl HelixOptions {
                 } else {
                     self.data_dir.clone()
                 };
-                let absolute =
-                    if dir.is_absolute() { dir } else { std::env::current_dir()?.join(dir) };
-                Ok(absolute.to_string_lossy().into_owned())
+                // Normalised so every spelling of one directory shares a registry entry.
+                Ok(std::path::absolute(dir)?.to_string_lossy().into_owned())
             }
             HelixMode::Memory => Ok("memory".to_owned()),
             HelixMode::Server => match self.url.as_deref().filter(|url| !url.is_empty()) {
@@ -1478,6 +1477,11 @@ mod tests {
         no_url.url = None;
         assert!(matches!(no_url.location(), Err(StoreError::Connection(_))));
         let embedded = HelixOptions::embedded("data/helix", "ns", 3);
-        assert!(Path::new(&embedded.location().expect("embedded")).is_absolute());
+        let location = embedded.location().expect("embedded");
+        assert!(Path::new(&location).is_absolute());
+        for spelling in ["./data/helix", "data/./helix"] {
+            let same = HelixOptions::embedded(spelling, "ns", 3);
+            assert_eq!(same.location().expect("embedded"), location, "{spelling}");
+        }
     }
 }

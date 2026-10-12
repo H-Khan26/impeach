@@ -530,6 +530,10 @@ impl GraphStore for MemoryStore {
         doc_id: &NodeId,
         chunks: &[ChunkNode],
     ) -> Result<Vec<StoredChunk>> {
+        if chunks.is_empty() {
+            parse_node_id("doc_id", doc_id.as_str())?;
+            return Ok(Vec::new());
+        }
         let mut graph = self.write();
         let parent = graph.require(DOCUMENT, "doc_id", doc_id.as_str())?;
         Ok(chunks.iter().map(|chunk| insert_chunk(&mut graph, chunk, parent)).collect())

@@ -190,10 +190,11 @@ pub trait GraphStore: Send + Sync + std::fmt::Debug {
 
     /// Batch `CreateDocumentChunk`: adds every chunk under one document, results in input
     /// order. All or nothing per transaction; backends may split very large inputs into
-    /// several transactions.
+    /// several transactions. An empty input writes nothing and does not look up `doc_id`.
     ///
     /// # Errors
-    /// `NotFound` when `doc_id` is not a document.
+    /// `Validation` for a malformed `doc_id`; `NotFound` when `chunks` is not empty and
+    /// `doc_id` is not a document.
     fn create_chunks_batch(
         &self,
         doc_id: &NodeId,
