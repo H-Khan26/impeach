@@ -14,16 +14,14 @@ path = "src/main.rs"
 [features]
 default = ["helix", "fastembed", "ort-nli", "ollama"]
 helix = ["ce-pipeline/helix"]
-fastembed = ["ce-pipeline/fastembed", "ce-eval/fastembed"]
+fastembed = ["ce-pipeline/fastembed", "ce-eval/fastembed", "ce-models/fastembed"]
 ort-nli = ["ce-pipeline/ort-nli"]
 ollama = ["ce-pipeline/ollama"]
 gliner2 = ["ce-pipeline/gliner2"]
 
 [dependencies]
-ce-core.workspace = true
 ce-config.workspace = true
 ce-ingest.workspace = true
-ce-store.workspace = true
 ce-models.workspace = true
 ce-pipeline.workspace = true
 ce-eval.workspace = true
@@ -33,9 +31,6 @@ clap.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 tempfile.workspace = true
-
-[dev-dependencies]
-pretty_assertions.workspace = true
 
 [lints]
 workspace = true
