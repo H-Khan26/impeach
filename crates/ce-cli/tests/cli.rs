@@ -31,6 +31,12 @@ fn path_arg(path: &Path) -> &str {
     path.to_str().expect("UTF-8 path")
 }
 
+/// Disables `RelationStage`, which would load the GLiNER2 model.
+const RELATION_STAGE_OFF: (&str, &str) = (
+    "    name: relation_extraction\n    enabled: true",
+    "    name: relation_extraction\n    enabled: false",
+);
+
 /// The packaged config with the given replacements applied, written to `dir/config.yaml`.
 fn write_config(dir: &Path, replacements: &[(&str, &str)]) -> PathBuf {
     let source = workspace_root().join("assets/config/processing/processing_v17.yaml");
@@ -166,7 +172,7 @@ fn eval_rejects_a_missing_key() {
 }
 
 #[test]
-fn process_runs_mention_definition_and_rule_coreference_stages() {
+fn process_runs_mention_definition_coreference_and_ed_stages() {
     let dir = tempfile::tempdir().expect("tempdir");
     let config = write_config(
         dir.path(),
@@ -178,13 +184,16 @@ fn process_runs_mention_definition_and_rule_coreference_stages() {
             ),
             ("backend: \"fastcoref\"", "backend: \"rule\""),
             ("mode: \"embedded\"", "mode: \"memory\""),
+            RELATION_STAGE_OFF,
         ],
     );
     let jsonl = fixture("input/green_valley_incident_report.jsonl");
     let output = run(&["-v", "process", path_arg(&jsonl), "-c", path_arg(&config)]);
     assert!(output.status.success(), "{}", stderr(&output));
     let log = stderr(&output);
-    for stage in ["rag_index", "mention_detection", "definition_extraction", "coreference"] {
+    for stage in
+        ["rag_index", "mention_detection", "definition_extraction", "coreference", "ed_resolution"]
+    {
         assert!(log.contains(&format!("stage finished stage=\"{stage}\"")), "{stage}: {log}");
     }
 }
@@ -201,6 +210,7 @@ fn default_fastcoref_backend_falls_back_to_rules_with_a_warning() {
                 "",
             ),
             ("mode: \"embedded\"", "mode: \"memory\""),
+            RELATION_STAGE_OFF,
         ],
     );
     let jsonl = fixture("input/green_valley_incident_report.jsonl");

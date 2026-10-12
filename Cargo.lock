@@ -688,6 +688,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "ce-ed"
+version = "0.1.0"
+dependencies = [
+ "ce-config",
+ "ce-core",
+ "ce-models",
+ "ce-ner",
+ "ce-store",
+ "ce-text",
+ "indexmap",
+ "once_cell",
+ "pretty_assertions",
+ "regex",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tracing",
+]
+
+[[package]]
 name = "ce-eval"
 version = "0.1.0"
 dependencies = [
@@ -771,6 +791,7 @@ dependencies = [
  "ce-config",
  "ce-core",
  "ce-coref",
+ "ce-ed",
  "ce-ingest",
  "ce-models",
  "ce-ner",
