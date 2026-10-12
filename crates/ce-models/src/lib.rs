@@ -29,6 +29,8 @@
 pub mod error;
 #[cfg(feature = "fastembed")]
 pub mod fastembed;
+#[cfg(feature = "gliner2")]
+pub mod gliner2;
 pub mod json;
 pub mod mock;
 #[cfg(feature = "ollama")]
@@ -42,6 +44,8 @@ pub mod traits;
 pub use error::{ModelError, Result};
 #[cfg(feature = "fastembed")]
 pub use fastembed::{FastEmbedOptions, FastEmbedder};
+#[cfg(feature = "gliner2")]
+pub use gliner2::{Gliner2Ner, Gliner2Options};
 pub use mock::{MockCoref, MockEmbedder, MockLlm, MockNer, MockNli};
 #[cfg(feature = "ollama")]
 pub use ollama::{OllamaLlm, OllamaOptions};

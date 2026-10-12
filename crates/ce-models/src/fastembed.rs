@@ -204,9 +204,11 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "downloads BAAI/bge-small-en-v1.5 (~130 MB) into .fastembed_cache/"]
+    #[ignore = "downloads BAAI/bge-small-en-v1.5 (~130 MB) into <workspace>/.fastembed_cache/"]
     fn bge_small_embeds_normalised_384_dim_vectors() {
-        let embedder = FastEmbedder::new(&FastEmbedOptions::default()).expect("load bge-small");
+        let cache = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../.fastembed_cache");
+        let options = FastEmbedOptions { cache_dir: Some(cache), ..FastEmbedOptions::default() };
+        let embedder = FastEmbedder::new(&options).expect("load bge-small");
         assert_eq!(embedder.dimension(), 384);
         let texts = ["The car was red.", "The vehicle was red.", "Interest rates rose in May."];
         let vectors = embedder.embed(&texts).expect("embed");

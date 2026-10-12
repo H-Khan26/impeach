@@ -324,7 +324,8 @@ impl ModelRegistry {
             Some(command) => Ok(Arc::new(SidecarCoref::new(command.clone())?)),
             None => Err(ModelError::Unavailable {
                 backend: "coref".to_owned(),
-                reason: "fastcoref has no Rust backend; configure a coreference sidecar with                          ModelRegistry::with_coref_sidecar"
+                reason: "fastcoref has no Rust backend; set a coreference sidecar with \
+                         ModelRegistry::with_coref_sidecar"
                     .to_owned(),
             }),
         }
