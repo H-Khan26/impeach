@@ -48,7 +48,7 @@ use ce_config::prompts::ExtractionPrompt;
 use ce_core::{
     AssertionTriple, EntityId, ExtractedFact, TemporalContext, TemporalValidity, TimeWindow,
 };
-use ce_models::json::{extract_json, repair_json};
+use ce_models::json::{excerpt, extract_json, repair_json};
 use ce_models::{Llm, LlmRequest};
 use ce_text::normalize::py_strip;
 use serde_json::{Map, Value};
@@ -123,16 +123,11 @@ pub fn build_entity_context(entities: &[PromptEntity]) -> String {
 /// (plain string replacement; other braces are left alone).
 #[must_use]
 pub fn render_prompt(template: &str, segments: &str, entity_context: &str) -> String {
-    let prompt = template.replace("{segments}", segments);
-    if prompt.contains("{resolved_entities}") {
-        prompt.replace("{resolved_entities}", entity_context)
-    } else {
-        prompt
-    }
+    template.replace("{segments}", segments).replace("{resolved_entities}", entity_context)
 }
 
 /// Parses an LLM response into facts: `STATED_FACT` nodes of the `nodes` list, ids prefixed
-/// with `pass_name` when given.
+/// with `pass_name` when given and not already starting with it.
 ///
 /// A response without a `nodes` key yields no facts. A response that does not parse as a
 /// whole but holds a `nodes` list (typically output cut off by the model's length limit)
@@ -243,7 +238,7 @@ impl LlmFactExtractor {
         &self.template
     }
 
-    /// Facts of `chunk_text`, ids prefixed with `pass_name` when given.
+    /// Facts of `chunk_text`, ids prefixed with `pass_name` as in [`parse_facts`].
     ///
     /// Empty text or an empty template yields no facts without calling the LLM; LLM and parse
     /// failures are logged and yield no facts.
@@ -329,11 +324,8 @@ impl MultiPassFactExtractor {
         entities: &[PromptEntity],
     ) -> Vec<ExtractedFact> {
         let (pass_name, extractor) = &self.passes[index];
-        let mut facts = extractor.extract_with_pass(chunk_text, entities, None);
+        let mut facts = extractor.extract_with_pass(chunk_text, entities, Some(pass_name));
         for fact in &mut facts {
-            if !fact.id.as_str().starts_with(pass_name.as_str()) {
-                fact.id = format!("{pass_name}_{}", fact.id).into();
-            }
             fact.metadata.insert("pass_name".to_owned(), Value::String(pass_name.clone()));
         }
         debug!("Pass '{pass_name}' extracted {} facts", facts.len());
@@ -525,8 +517,8 @@ fn facts_from_nodes(nodes: &[Value], pass_name: Option<&str>) -> Vec<ExtractedFa
         };
         let id = unique_id(node.get("id"), index, &mut used_ids);
         fact.id = match pass_name {
-            Some(pass) => format!("{pass}_{id}").into(),
-            None => id.into(),
+            Some(pass) if !id.starts_with(pass) => format!("{pass}_{id}").into(),
+            _ => id.into(),
         };
         facts.push(fact);
     }
@@ -712,13 +704,6 @@ fn json_kind(value: &Value) -> &'static str {
         Value::String(_) => "a string",
         Value::Array(_) => "a list",
         Value::Object(_) => "an object",
-    }
-}
-
-fn excerpt(text: &str, max_chars: usize) -> &str {
-    match text.char_indices().nth(max_chars) {
-        Some((i, _)) => &text[..i],
-        None => text,
     }
 }
 

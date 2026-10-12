@@ -6,10 +6,11 @@
 //!    (`index_persisted == false` or no context `embedder`; Python: no `helix_client` /
 //!    `embedding_service`) and a missing LLM (`<pipeline.name>_<model_type>` not in the
 //!    registry or not buildable) log a warning and leave the context unchanged.
+//!    The registry-backed extractor is built on first use and cached for the stage's lifetime.
 //! 2. Lookups from `ed_results`, `resolved_mentions`, `doc_mentions` and `role_map`
 //!    ([`FactLinker::build_entity_lookup`], [`build_canonical_lookup`]).
-//! 3. Per chunk of `rag_index_result` in order, skipping chunks without a graph id or shorter
-//!    than [`MIN_CHUNK_CHARS`] characters: the prompt entities of the chunk's resolved
+//! 3. Per chunk of `rag_index_result` in order (keyed by its graph id), skipping chunks
+//!    shorter than [`MIN_CHUNK_CHARS`] characters: the prompt entities of the chunk's resolved
 //!    mentions, the sentence spans of the chunk, the text (the resolved-text view when
 //!    `use_resolved_text_view`, also stored in `resolved_text_by_chunk`), then extraction.
 //! 4. Per fact: boilerplate facts are dropped; the source chunk / document ids and the
@@ -27,7 +28,7 @@
 //! stage. LLM and parse failures yield no facts for the affected chunk or pass.
 
 use std::borrow::Cow;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use ce_config::mappings::Taxonomy;
 use ce_config::pipeline::FactStageConfig;
@@ -35,8 +36,7 @@ use ce_config::prompts::ExtractionPrompt;
 use ce_config::{MappingsRegistry, StageConfig};
 use ce_core::processing::FactLinkingStats;
 use ce_core::{
-    ChunkId, ChunkWriteResult, DocId, EntityId, ExtractedFact, IndexingResult, Mention, MentionId,
-    NodeId, SpanId,
+    ChunkId, DocId, EntityId, ExtractedFact, IndexingResult, Mention, MentionId, NodeId, SpanId,
 };
 use ce_facts::{
     build_canonical_lookup, build_resolved_text_view, create_extractor, fact_node, load_prompts,
@@ -66,7 +66,7 @@ pub struct FactStage {
     taxonomy: &'static Taxonomy,
     alias_exclusion: &'static IndexSet<String>,
     linker: FactLinker,
-    extractor: Option<Arc<dyn FactExtractor>>,
+    extractor: OnceLock<Arc<dyn FactExtractor>>,
 }
 
 /// Lookups shared by every chunk of one run.
@@ -113,7 +113,7 @@ impl FactStage {
             taxonomy: &mappings.taxonomy,
             alias_exclusion: &mappings.normalization.alias_exclusion,
             linker: FactLinker::new(mappings, Some(roles)),
-            extractor: None,
+            extractor: OnceLock::new(),
         })
     }
 
@@ -139,7 +139,7 @@ impl FactStage {
     /// Replaces the extractor built from the registry's LLM and the prompt files.
     #[must_use]
     pub fn with_extractor(mut self, extractor: Arc<dyn FactExtractor>) -> Self {
-        self.extractor = Some(extractor);
+        self.extractor = OnceLock::from(extractor);
         self
     }
 
@@ -152,10 +152,11 @@ impl FactStage {
         }
     }
 
-    /// The injected extractor, else one over the registry's `<pipeline>_<model_type>` LLM;
-    /// `None` (logged) when that model is unavailable.
+    /// The injected or cached extractor, else one over the registry's
+    /// `<pipeline>_<model_type>` LLM, built once per stage; `None` (logged) when that model is
+    /// unavailable.
     fn extractor(&self, registry: &ModelRegistry) -> Option<Arc<dyn FactExtractor>> {
-        if let Some(extractor) = &self.extractor {
+        if let Some(extractor) = self.extractor.get() {
             return Some(Arc::clone(extractor));
         }
         let key = format!("{}_{}", self.pipeline_name, self.config.model_type);
@@ -167,12 +168,15 @@ impl FactStage {
                     prompts = self.prompts.len(),
                     "FactStage: extractor ready"
                 );
-                Some(Arc::from(create_extractor(
-                    llm,
-                    &self.prompts,
-                    self.config.parallel,
-                    self.config.max_workers,
-                )))
+                let extractor = self.extractor.get_or_init(|| {
+                    Arc::from(create_extractor(
+                        llm,
+                        &self.prompts,
+                        self.config.parallel,
+                        self.config.max_workers,
+                    ))
+                });
+                Some(Arc::clone(extractor))
             }
             Err(ModelError::UnknownModel { .. }) => {
                 tracing::warn!(
@@ -224,17 +228,16 @@ impl FactStage {
         if self.config.use_resolved_text_view {
             extraction.resolved_text_by_chunk = Some(IndexMap::new());
         }
+        let spans_by_chunk = spans_by_chunk(index);
         for chunk_result in &index.chunks {
             let chunk = &chunk_result.chunk;
-            let Some(chunk_id) = chunk.helix_id.as_ref().map(|id| ChunkId::new(id.as_str())) else {
-                continue;
-            };
             if chunk.text.chars().count() < MIN_CHUNK_CHARS {
                 continue;
             }
+            let chunk_id = ChunkId::new(chunk_result.helix_id.as_str());
             let chunk_mentions = lookups
                 .mentions_by_chunk
-                .and_then(|by_chunk| by_chunk.get(chunk_result.helix_id.as_str()))
+                .and_then(|by_chunk| by_chunk.get(&chunk_id))
                 .map_or(&[][..], Vec::as_slice);
             let entities = prompt_entities(
                 chunk_mentions,
@@ -243,7 +246,8 @@ impl FactStage {
                 self.alias_exclusion,
                 self.linker.roles(),
             );
-            let span_ids = chunk_span_ids(index, chunk_result);
+            let span_ids =
+                spans_by_chunk.get(&chunk.sequence_number).map_or(&[][..], Vec::as_slice);
 
             let text: Cow<'_, str> = match extraction.resolved_text_by_chunk.as_mut() {
                 Some(resolved_texts) => {
@@ -274,7 +278,7 @@ impl FactStage {
                     );
                     continue;
                 }
-                self.annotate(&mut fact, &chunk_id, lookups.source_doc_id.as_ref(), &span_ids);
+                self.annotate(&mut fact, &chunk_id, lookups.source_doc_id.as_ref(), span_ids);
                 let (subject, object) = self.linker.link_fact(
                     &mut fact,
                     &lookups.entity_lookup,
@@ -365,16 +369,13 @@ fn extraction_mode_name(mode: ce_config::pipeline::ExtractionMode) -> &'static s
     }
 }
 
-/// Graph ids of the sentence spans written for the chunk.
-fn chunk_span_ids<'a>(index: &'a IndexingResult, chunk: &ChunkWriteResult) -> Vec<&'a SpanId> {
-    index
-        .spans
-        .iter()
-        .filter(|span| {
-            span.chunk_sequence == chunk.chunk.sequence_number && !span.span_id.as_str().is_empty()
-        })
-        .map(|span| &span.span_id)
-        .collect()
+/// Graph ids of the written sentence spans, grouped by chunk sequence number.
+fn spans_by_chunk(index: &IndexingResult) -> IndexMap<usize, Vec<&SpanId>> {
+    let mut by_chunk: IndexMap<usize, Vec<&SpanId>> = IndexMap::new();
+    for span in index.spans.iter().filter(|span| !span.span_id.as_str().is_empty()) {
+        by_chunk.entry(span.chunk_sequence).or_default().push(&span.span_id);
+    }
+    by_chunk
 }
 
 impl Stage for FactStage {

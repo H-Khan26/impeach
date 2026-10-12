@@ -531,6 +531,17 @@ fn link_both_via_bracket_tokens() {
 }
 
 #[test]
+fn bracket_token_with_blank_id_is_unlinked() {
+    let mut fact = fact("[ :Maria Lopez]", "SUSTAINED_INJURY", "injury");
+    let mut stats = FactLinkingStats::default();
+    let linked = linker().link_fact(&mut fact, &EntityLookup::default(), &no_canonical(), None);
+    record_link(&mut stats, linked.0.as_ref(), linked.1.as_ref());
+    assert_eq!(ids(&linked), (None, None));
+    assert_eq!(fact.assertion_triple.subject, "Maria Lopez");
+    assert_eq!(stats.linked_either, 0);
+}
+
+#[test]
 fn bracket_token_takes_precedence_over_normalization() {
     let lookup = lookup(&[(&norm("Maria Lopez", Some("PERSON")), "e_wrong", "PERSON")]);
     let mut fact = fact("[e_correct:Maria Lopez]", "SUSTAINED_INJURY", "injury");

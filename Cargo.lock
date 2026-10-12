@@ -737,7 +737,6 @@ dependencies = [
  "ce-store",
  "ce-text",
  "indexmap",
- "once_cell",
  "pretty_assertions",
  "regex",
  "serde",

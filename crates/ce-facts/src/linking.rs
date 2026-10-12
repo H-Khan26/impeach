@@ -411,10 +411,11 @@ impl FactLinker {
             return None;
         }
         if let Some((entity_id, canonical_name)) = parse_bracket_token(text) {
-            let entity_id = EntityId::new(entity_id);
-            tracing::debug!(side, text = text.as_str(), entity = %entity_id, "linked via bracket token");
+            // An empty (whitespace-only) id leaves the side unlinked, as Python's `if subject_id:`.
+            let entity_id = (!entity_id.is_empty()).then(|| EntityId::new(entity_id));
+            tracing::debug!(side, text = text.as_str(), entity = ?entity_id, "bracket token");
             *text = canonical_name.to_owned();
-            return Some(entity_id);
+            return entity_id;
         }
 
         let linked = self.lookup_name(text, lookup);

@@ -509,7 +509,7 @@ fn chunks_without_sentence_spans_get_no_span_ids() {
 }
 
 #[test]
-fn short_chunks_and_chunks_without_graph_ids_are_skipped() {
+fn short_chunks_are_skipped() {
     let extractor = ScriptedExtractor::new(|_, _| text_facts());
     let env = setup(common::default_config(), None);
     let stage = env.stage().with_extractor(extractor.clone());
@@ -521,13 +521,6 @@ fn short_chunks_and_chunks_without_graph_ids_are_skipped() {
     assert_eq!(short.data.extraction_mode, Some(ExtractionMode::Processing));
     assert!(short.data.indexed_facts_count.is_none());
     assert!(short.data.fact_nodes_pending.is_none());
-
-    let mut no_id = env.indexed(TEXT);
-    for chunk in &mut no_id.data.rag_index_result.as_mut().expect("indexed").chunks {
-        chunk.chunk.helix_id = None;
-    }
-    stage.run(&mut no_id).expect("runs");
-    assert!(extractor.calls().is_empty());
 }
 
 #[test]

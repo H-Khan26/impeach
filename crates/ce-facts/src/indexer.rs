@@ -16,6 +16,7 @@ use std::sync::Arc;
 
 use ce_core::pyjson::to_python_json_ascii;
 use ce_core::{EntityId, ExtractedFact, FactId, Metadata, NodeId, SpanId, TypeVocabulary};
+use ce_models::json::excerpt;
 use ce_models::Embedder;
 use ce_store::{EmbeddingWrite, FactNode, GraphStore, StoreError, VectorLabel};
 use serde::Serialize;
@@ -146,7 +147,7 @@ impl FactIndexer {
                 Err(error) if error.is_fatal() => return Err(error.into()),
                 Err(error) => {
                     tracing::error!(
-                        fact = truncate(&node.fact_text, 30),
+                        fact = excerpt(&node.fact_text, 30),
                         error = %error,
                         "failed to index fact"
                     );
@@ -313,11 +314,6 @@ fn log_link_error(
     }
 }
 
-/// The first `max_chars` characters of `text`.
-fn truncate(text: &str, max_chars: usize) -> &str {
-    text.char_indices().nth(max_chars).map_or(text, |(end, _)| &text[..end])
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -341,11 +337,5 @@ mod tests {
         assert!(source_span_ids(&metadata(json!({"source_span_ids": "not json"}))).is_empty());
         assert!(source_span_ids(&metadata(json!({"source_span_ids": 3}))).is_empty());
         assert!(source_span_ids(&Metadata::new()).is_empty());
-    }
-
-    #[test]
-    fn truncate_counts_characters() {
-        assert_eq!(truncate("héllo world", 5), "héllo");
-        assert_eq!(truncate("abc", 30), "abc");
     }
 }

@@ -1,7 +1,6 @@
 //! Error type of the fact crate.
 
 use ce_config::ConfigError;
-use ce_models::ModelError;
 use ce_store::StoreError;
 
 /// Result alias for fact extraction and indexing.
@@ -17,9 +16,6 @@ pub enum FactError {
     /// A prompt file or mapping could not be loaded.
     #[error(transparent)]
     Config(#[from] ConfigError),
-    /// A model failure that cannot be skipped.
-    #[error(transparent)]
-    Model(#[from] ModelError),
     /// A fatal graph store failure.
     #[error(transparent)]
     Store(#[from] StoreError),

@@ -559,6 +559,17 @@ fn missing_and_duplicate_ids() {
     assert_eq!(ids(&parse_facts(&response, Some("")).expect("ok"))[0], "STATED_FACT_0");
 }
 
+#[test]
+fn pass_prefix_is_not_repeated() {
+    let response = json!({"nodes": [
+        {"node_type": "STATED_FACT", "id": "pass_x_STATED_FACT_0", "text": "a"},
+        {"node_type": "STATED_FACT", "id": "STATED_FACT_1", "text": "b"}
+    ]})
+    .to_string();
+    let facts = parse_facts(&response, Some("pass_x")).expect("ok");
+    assert_eq!(ids(&facts), ["pass_x_STATED_FACT_0", "pass_x_STATED_FACT_1"]);
+}
+
 // ---------------------------------------------------------------------------------------------
 // Multi-pass extraction
 // ---------------------------------------------------------------------------------------------
