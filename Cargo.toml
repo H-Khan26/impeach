@@ -89,5 +89,9 @@ uninlined_format_args = "warn"
 unnested_or_patterns = "warn"
 unwrap_used = "warn"
 
+[profile.dev]
+debug = "line-tables-only"
+
 [profile.dev.package."*"]
 opt-level = 1
+debug = false
