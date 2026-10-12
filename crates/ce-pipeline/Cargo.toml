@@ -28,6 +28,7 @@ thiserror.workspace = true
 tracing.workspace = true
 chrono.workspace = true
 text-splitter.workspace = true
+indexmap.workspace = true
 
 [dev-dependencies]
 pretty_assertions.workspace = true
