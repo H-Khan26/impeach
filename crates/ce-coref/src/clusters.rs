@@ -9,9 +9,9 @@ use ce_models::CorefCluster;
 use ce_text::normalize::py_strip;
 use indexmap::{IndexMap, IndexSet};
 
-use crate::roles::RoleTerms;
 use crate::settings::CorefSettings;
 use crate::text::CharText;
+use ce_ner::definitions::RoleConfig;
 
 /// One span of a resolver cluster (Python `CorefMention`), doc-global character offsets.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -106,12 +106,12 @@ pub(crate) fn mentions_by_id(mentions: &[Mention]) -> MentionsById<'_> {
 #[derive(Debug, Clone)]
 pub struct ClusterBuilder<'a> {
     settings: &'a CorefSettings,
-    roles: &'a RoleTerms,
+    roles: &'a RoleConfig,
 }
 
 impl<'a> ClusterBuilder<'a> {
     /// A builder applying `settings`, ranking canonical mentions with `roles`.
-    pub fn new(settings: &'a CorefSettings, roles: &'a RoleTerms) -> Self {
+    pub fn new(settings: &'a CorefSettings, roles: &'a RoleConfig) -> Self {
         Self { settings, roles }
     }
 
@@ -465,7 +465,7 @@ impl<'a> ClusterBuilder<'a> {
         for candidate in candidates {
             if self.roles.is_hybrid_role_name(&candidate.name) {
                 hybrid.push(candidate);
-            } else if self.roles.is_role_term(&candidate.name) {
+            } else if self.roles.is_valid_role_term(&candidate.name) {
                 role.push(candidate);
             } else {
                 real.push(candidate);
@@ -508,7 +508,7 @@ mod tests {
     }
 
     fn dedupe(settings: &CorefSettings, clusters: Vec<WorkCluster>) -> Vec<WorkCluster> {
-        ClusterBuilder::new(settings, &RoleTerms::default()).deduplicate(clusters)
+        ClusterBuilder::new(settings, &RoleConfig::default()).deduplicate(clusters)
     }
 
     #[test]

@@ -5,7 +5,7 @@ use std::collections::HashSet;
 
 use ce_core::{Mention, MentionId, Span};
 use ce_coref::{
-    ClusterBuilder, ClusterContext, ClusterSpan, CorefSettings, ResolvedCluster, RoleTerms,
+    ClusterBuilder, ClusterContext, ClusterSpan, CorefSettings, ResolvedCluster, RoleConfig,
 };
 use pretty_assertions::assert_eq;
 
@@ -38,7 +38,7 @@ fn build(
     clusters: &[ResolvedCluster],
     mentions: &[Mention],
 ) -> ClusterContext {
-    ClusterBuilder::new(settings, &RoleTerms::default()).build(clusters, mentions)
+    ClusterBuilder::new(settings, &RoleConfig::default()).build(clusters, mentions)
 }
 
 fn person_vehicle() -> (Vec<Mention>, Vec<ResolvedCluster>) {
@@ -263,7 +263,7 @@ fn span_mapping_respects_overlap_and_eligibility() {
         mention("reed", "PER", "Reed", 30, 34),
         mention("reed2", "PER", "Reed", 40, 44),
     ];
-    let roles = RoleTerms::default();
+    let roles = RoleConfig::default();
     let builder = ClusterBuilder::new(&settings, &roles);
     let index: Vec<&Mention> = mentions.iter().collect();
     // "Lopez" covers 5/5 of its span but 5/11 of the mention: quality 1.0.

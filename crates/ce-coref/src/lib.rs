@@ -9,7 +9,7 @@
 //!   `max_mentions_per_span`, `eligible_types`), exclusive membership, deduplication
 //!   (`cluster_jaccard_threshold`, `merge_overlapping_clusters`), type-safety guards
 //!   (`incompatible_type_groups`, `max_type_groups_per_cluster`, `drop_mixed_type_clusters`)
-//!   and canonical mention selection with [`RoleTerms`].
+//!   and canonical mention selection with [`RoleConfig`] (shared with the definition stage).
 //! - [`CorefPostProcessor::process`]: all of the above plus pronoun mention synthesis
 //!   (`synthesize_pronoun_mentions`, `pronoun_confidence`), producing a [`CorefOutput`].
 //!
@@ -17,18 +17,17 @@
 
 mod clusters;
 mod pronouns;
-mod roles;
 mod settings;
 mod text;
 
 use ce_core::{ChunkId, ChunkWriteResult, CorefClusterContext, DocId, Mention, MentionId};
 use indexmap::IndexMap;
 
+pub use ce_ner::definitions::RoleConfig;
 pub use clusters::{
     is_pronoun, label_clusters, ClusterBuilder, ClusterContext, ClusterSpan, ResolvedCluster,
 };
 pub use pronouns::{PronounSynthesis, PRONOUN_SOURCE};
-pub use roles::RoleTerms;
 pub use settings::{default_incompatible_type_groups, CorefSettings, DEFAULT_ELIGIBLE_TYPES};
 pub use text::reconstruct_doc_text;
 
@@ -55,12 +54,12 @@ pub struct CorefOutput {
 #[derive(Debug, Clone)]
 pub struct CorefPostProcessor {
     settings: CorefSettings,
-    roles: RoleTerms,
+    roles: RoleConfig,
 }
 
 impl CorefPostProcessor {
     /// A post-processor applying `settings`, ranking canonical mentions with `roles`.
-    pub fn new(settings: CorefSettings, roles: RoleTerms) -> Self {
+    pub fn new(settings: CorefSettings, roles: RoleConfig) -> Self {
         Self { settings, roles }
     }
 

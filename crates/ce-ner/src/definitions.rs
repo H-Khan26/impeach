@@ -37,8 +37,9 @@ pub struct DefinitionPattern {
     pub description: String,
 }
 
-/// Role vocabulary and definition patterns from `roles.yaml` (Python `RoleConfig`).
-#[derive(Debug, Clone)]
+/// Role vocabulary and definition patterns from `roles.yaml` (Python `RoleConfig`). The
+/// default is an empty vocabulary that recognises no role.
+#[derive(Debug, Clone, Default)]
 pub struct RoleConfig {
     role_seed_terms: IndexSet<String>,
     /// Seed terms ordered longest first (stable), the order prefix checks try them in.
@@ -482,6 +483,14 @@ impl<'a> CharCursor<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn default_config_recognises_no_role() {
+        let roles = RoleConfig::default();
+        assert!(!roles.is_valid_role_term("Plaintiff"));
+        assert!(!roles.is_hybrid_role_name("Defendant Reed"));
+        assert_eq!(roles.strip_role_prefix("Defendant Reed"), None);
+    }
 
     #[test]
     fn char_cursor_counts_characters() {

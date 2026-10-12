@@ -2,7 +2,7 @@
 //! synthesis.
 
 use ce_core::{Chunk, ChunkWriteResult, DocId, Mention, NodeId, Span};
-use ce_coref::{CorefPostProcessor, CorefSettings, RoleTerms, PRONOUN_SOURCE};
+use ce_coref::{CorefPostProcessor, CorefSettings, RoleConfig, PRONOUN_SOURCE};
 use ce_models::CorefCluster;
 use pretty_assertions::assert_eq;
 use serde_json::json;
@@ -33,7 +33,7 @@ fn raw() -> Vec<CorefCluster> {
 }
 
 fn processor(settings: CorefSettings) -> CorefPostProcessor {
-    CorefPostProcessor::new(settings, RoleTerms::default())
+    CorefPostProcessor::new(settings, RoleConfig::default())
 }
 
 #[test]

@@ -1,4 +1,5 @@
-//! `CoreferenceStage`: coreference clusters, canonical mentions and pronoun mentions (Python `stages/coreference.py`).
+//! `CoreferenceStage`: coreference clusters, canonical mentions and pronoun mentions
+//! (Python `stages/coreference.py`).
 //!
 //! Flow:
 //! 1. Skip (context unchanged) without `rag_index_result`, without mentions, or when
@@ -22,10 +23,9 @@
 use std::borrow::Cow;
 use std::sync::Arc;
 
-use ce_config::mappings::{Roles, ROLES_PATH};
 use ce_config::pipeline::CoreferenceStageConfig;
 use ce_config::StageConfig;
-use ce_coref::{reconstruct_doc_text, CorefPostProcessor, CorefSettings, RoleTerms};
+use ce_coref::{reconstruct_doc_text, CorefPostProcessor, CorefSettings, RoleConfig};
 use ce_models::{CorefMention, ModelError, ModelRegistry};
 
 use crate::context::{PipelineContext, StageBuildContext};
@@ -51,7 +51,7 @@ impl CoreferenceStage {
     /// # Errors
     /// [`PipelineError::Config`] when `roles.yaml` cannot be loaded.
     pub fn new(config: &CoreferenceStageConfig, services: &StageBuildContext) -> Result<Self> {
-        let roles = RoleTerms::from_roles(&Roles::load(ROLES_PATH)?);
+        let roles = RoleConfig::load(None)?;
         Ok(Self {
             name: config.name.clone(),
             registry: Arc::clone(&services.registry),

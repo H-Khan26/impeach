@@ -3,9 +3,8 @@
 
 use std::collections::HashMap;
 
-use ce_config::mappings::{Roles, ROLES_PATH};
 use ce_core::{Mention, MentionId, Span};
-use ce_coref::{ClusterBuilder, CorefSettings, RoleTerms};
+use ce_coref::{ClusterBuilder, CorefSettings, RoleConfig};
 
 fn mention(id: &str, name: &str, start: usize, end: usize, score: Option<f64>) -> Mention {
     let mut m = Mention::new(id, "PER", name, Span::new(start, end));
@@ -17,7 +16,7 @@ fn mention(id: &str, name: &str, start: usize, end: usize, score: Option<f64>) -
 
 /// The canonical id among `mentions` (all members) with the shipped `roles.yaml`.
 fn canonical(mentions: &[Mention]) -> Option<String> {
-    let roles = RoleTerms::from_roles(&Roles::load(ROLES_PATH).expect("roles.yaml loads"));
+    let roles = RoleConfig::load(None).expect("roles.yaml loads");
     let settings = CorefSettings::default();
     let builder = ClusterBuilder::new(&settings, &roles);
     let by_id: HashMap<&str, &Mention> = mentions.iter().map(|m| (m.id.as_str(), m)).collect();
@@ -105,12 +104,12 @@ fn within_tier_higher_score_breaks_ties() {
 
 #[test]
 fn role_detection() {
-    let roles = RoleTerms::from_roles(&Roles::load(ROLES_PATH).expect("roles.yaml loads"));
+    let roles = RoleConfig::load(None).expect("roles.yaml loads");
     for role in ["Plaintiff", "Defendant", "Manager"] {
-        assert!(roles.is_role_term(role), "{role}");
+        assert!(roles.is_valid_role_term(role), "{role}");
     }
     for name in ["Maria Lopez", "John Smith"] {
-        assert!(!roles.is_role_term(name), "{name}");
+        assert!(!roles.is_valid_role_term(name), "{name}");
         assert!(!roles.is_hybrid_role_name(name), "{name}");
     }
     for hybrid in ["Defendant Reed", "Plaintiff Smith", "Manager Johnson"] {

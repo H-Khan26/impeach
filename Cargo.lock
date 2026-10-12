@@ -680,6 +680,7 @@ dependencies = [
  "ce-config",
  "ce-core",
  "ce-models",
+ "ce-ner",
  "ce-text",
  "indexmap",
  "pretty_assertions",
