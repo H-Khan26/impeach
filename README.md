@@ -68,7 +68,8 @@ crates/
   ce-eval/                 evaluator: parse a markdown key, match detected pairs to key pairs by
                            embedding similarity with a value guard, optimal one-to-one assignment,
                            recall / precision / F1 report.
-  ce-cli/                  the `contradiction-engine` binary: ingest, process, run, eval, store reset.
+  ce-cli/                  the `contradiction-engine` binary: ingest, process, run, run-e2e, eval,
+                           store reset.
 assets/
   config/processing/       pipeline YAML (same files as the Python prototype)
   config/mappings/         vocabulary and rule YAML
