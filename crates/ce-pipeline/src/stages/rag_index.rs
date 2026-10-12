@@ -6,19 +6,21 @@
 //!    the [`DocumentStateStore`] (key `<store_id>#<namespace>|db_id|case_id|doc_id`) and reuse
 //!    the cached `Document` node. Off by default: every run creates a fresh node.
 //! 2. Create the `Document` node, or update it when the document carries a `helix_id`. When a
-//!    cached id turns out to be stale (the update fails), drop it and create a new node.
-//! 3. Chunk (rules in [`crate::rag::chunker`]); write chunks with
-//!    [`GraphStore::create_chunks_batch`] (chunks of a reused document whose sequence number
-//!    already exists are updated in place); with `include_sentence_spans`, write sentence spans
+//!    cached id turns out to be stale (the update fails with `NotFound`), drop it and create a
+//!    new node; any other update error fails the stage.
+//! 3. Chunk (rules in [`crate::rag::chunker`]); a reused document first loses its old chunks,
+//!    spans and chunk vectors ([`GraphStore::delete_document_chunks`]); write chunks with
+//!    [`GraphStore::create_chunks_batch`]; with `include_sentence_spans`, write sentence spans
 //!    with [`GraphStore::create_spans_batch`].
-//! 4. Embed every chunk text with the registry's `<pipeline.name>_bge` embedder and store the
-//!    vectors with [`GraphStore::create_embeddings_batch`].
+//! 4. When there are chunks, resolve the registry's `<pipeline.name>_bge` embedder, embed
+//!    every chunk text and store the vectors with [`GraphStore::create_embeddings_batch`].
 //!
 //! `offline: true` writes nothing and embeds nothing: ids are fabricated (`doc:<doc_id>`,
 //! `<doc_id>:chunk-00000`, `<doc_id>:sent-00000`) and the context gets no embedder.
 //!
-//! Context writes: `document` (with `helix_id`), `helix_doc_id`, `doc_id`, `rag_index_result`,
-//! `doc_text`, and `embedder` in online mode.
+//! Context writes: `document` (with `helix_id`; restored on error as well), `helix_doc_id`,
+//! `doc_id`, `rag_index_result`, `doc_text`, and `embedder` in online mode when the document
+//! has chunks.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -30,8 +32,8 @@ use ce_core::{
     ChunkWriteResult, DocumentPayload, DocumentWriteResult, EmbeddingWriteResult, IndexingResult,
     NodeId, SpanWriteResult,
 };
-use ce_models::{ModelKind, ModelRegistry};
-use ce_store::GraphStore;
+use ce_models::{Embedder, ModelKind, ModelRegistry};
+use ce_store::{GraphStore, StoreError};
 use indexmap::IndexMap;
 
 use crate::context::{PipelineContext, SharedEmbedder, StageBuildContext};
@@ -134,6 +136,15 @@ impl RagIndexStage {
     /// Store and model errors; [`PipelineError::EmbeddingCount`] /
     /// [`PipelineError::EmbeddingDimension`] when the embedder output does not fit.
     pub fn index_document(&self, document: &mut DocumentPayload) -> Result<IndexingResult> {
+        self.index_online(document).map(|(result, _)| result)
+    }
+
+    /// [`RagIndexStage::index_document`], also returning the embedder when one was resolved
+    /// (only documents with chunks resolve it).
+    fn index_online(
+        &self,
+        document: &mut DocumentPayload,
+    ) -> Result<(IndexingResult, Option<Arc<dyn Embedder>>)> {
         let mut timings = IndexMap::new();
 
         let started = Instant::now();
@@ -161,7 +172,7 @@ impl RagIndexStage {
         timings.insert("chunking".to_owned(), started.elapsed().as_secs_f64());
 
         let started = Instant::now();
-        let embeddings = self.embed_chunks(&chunk_writes)?;
+        let (embeddings, embedder) = self.embed_chunks(&chunk_writes)?;
         timings.insert("embeddings".to_owned(), started.elapsed().as_secs_f64());
 
         tracing::info!(
@@ -172,14 +183,15 @@ impl RagIndexStage {
             embeddings = embeddings.count,
             "indexed document"
         );
-        Ok(IndexingResult {
+        let result = IndexingResult {
             document: doc_write,
             chunks: chunk_writes,
             spans: span_writes,
             embeddings,
             doc_text: Some(document.text.clone()),
             timings,
-        })
+        };
+        Ok((result, embedder))
     }
 
     /// Offline indexing: chunks with fabricated ids, no store writes, no embeddings, no
@@ -240,7 +252,10 @@ impl RagIndexStage {
         document: &mut DocumentPayload,
     ) -> Result<DocumentWriteResult> {
         match writer::ensure_document(&*self.store, document) {
-            Err(error) if !error.is_fatal() && document.helix_id.is_some() => {
+            Err(PipelineError::Store(error @ StoreError::NotFound { .. }))
+                if document.helix_id.is_some() =>
+            {
+                let error = PipelineError::Store(error);
                 let Some(cache) = &self.document_cache else {
                     return Err(error);
                 };
@@ -257,9 +272,14 @@ impl RagIndexStage {
         }
     }
 
-    fn embed_chunks(&self, chunks: &[ChunkWriteResult]) -> Result<EmbeddingWriteResult> {
+    /// Embeds and stores the chunk vectors; resolves the embedder only when there are chunks
+    /// and returns it.
+    fn embed_chunks(
+        &self,
+        chunks: &[ChunkWriteResult],
+    ) -> Result<(EmbeddingWriteResult, Option<Arc<dyn Embedder>>)> {
         if chunks.is_empty() {
-            return Ok(EmbeddingWriteResult::default());
+            return Ok((EmbeddingWriteResult::default(), None));
         }
         let embedder = self.registry.embedder(&self.embedder_key)?;
         let texts: Vec<&str> = chunks.iter().map(|w| w.chunk.text.as_str()).collect();
@@ -274,7 +294,8 @@ impl RagIndexStage {
         if let Some(bad) = vectors.iter().find(|v| v.len() != expected) {
             return Err(PipelineError::EmbeddingDimension { actual: bad.len(), expected });
         }
-        writer::upsert_chunk_embeddings(&*self.store, chunks, &vectors)
+        let written = writer::upsert_chunk_embeddings(&*self.store, chunks, &vectors)?;
+        Ok((written, Some(embedder)))
     }
 }
 
@@ -288,25 +309,19 @@ impl Stage for RagIndexStage {
             PipelineError::MissingContext { stage: self.name.clone(), key: "document" }
         })?;
         let indexed = if self.offline {
-            Ok(self.index_offline(&document))
+            Ok((self.index_offline(&document), None))
         } else {
-            self.index_document(&mut document)
+            self.index_online(&mut document)
         };
-        let result = match indexed {
-            Ok(result) => result,
-            Err(error) => {
-                ctx.data.document = Some(document);
-                return Err(error);
-            }
-        };
-        if !self.offline {
-            ctx.data.embedder = Some(SharedEmbedder(self.registry.embedder(&self.embedder_key)?));
+        ctx.data.document = Some(document);
+        let (result, embedder) = indexed?;
+        if let Some(embedder) = embedder {
+            ctx.data.embedder = Some(SharedEmbedder(embedder));
         }
         ctx.data.helix_doc_id = Some(result.document.helix_id.clone());
         ctx.data.doc_id = Some(result.document.doc_id.clone());
         ctx.data.doc_text = result.doc_text.clone();
         ctx.data.rag_index_result = Some(result);
-        ctx.data.document = Some(document);
         Ok(())
     }
 }

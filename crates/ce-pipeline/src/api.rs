@@ -25,7 +25,7 @@ pub struct ProcessingOptions {
     /// Pipeline config YAML; `None` uses the packaged `processing_v17.yaml`.
     pub config_path: Option<PathBuf>,
     /// SQLite review database; when set, the first `ContradictionCheckStage` gets an enabled
-    /// `review_store` at this path.
+    /// `review_store` at this path. The result reports it only when that stage ran.
     pub db_path: Option<PathBuf>,
     /// Whether SQLite write errors fail the run (only with `db_path`); default true.
     pub fail_on_sqlite_error: bool,
@@ -72,7 +72,8 @@ pub struct ProcessingRun {
 /// 3. Opens the graph store and builds the registered stages.
 /// 4. Seeds the context with `doc_metadata` (when not empty) and `case_id` (when present),
 ///    then runs the pipeline on the record.
-/// 5. Collects the result from the context.
+/// 5. Collects the result from the context. `sqlite_db_path` is `options.db_path` only when a
+///    `ContradictionCheckStage` with the review store was built and ran; otherwise `None`.
 ///
 /// # Errors
 /// [`crate::PipelineError::Ingest`] for path / JSONL problems (empty path, missing or empty
@@ -101,11 +102,11 @@ pub fn run_processing_with(
         Some(store) => store,
         None => open_store(&config.helix)?,
     };
+    let stage_registry = env.stages.unwrap_or_else(StageRegistry::builtin);
+    let review_store_attached = review_store_stage_is_built(&config, &stage_registry);
     let services = StageBuildContext::new(config, registry, store);
-    let pipeline = env
-        .stages
-        .unwrap_or_else(StageRegistry::builtin)
-        .build(services, env.unregistered.unwrap_or(UnregisteredStages::Skip))?;
+    let pipeline =
+        stage_registry.build(services, env.unregistered.unwrap_or(UnregisteredStages::Skip))?;
 
     let mut ctx = pipeline.new_context();
     if !document.metadata.is_empty() {
@@ -122,10 +123,29 @@ pub fn run_processing_with(
         data.committed_fact_ids.clone().unwrap_or_default(),
         data.extracted_facts.clone().unwrap_or_default(),
         data.ed_results.clone().unwrap_or_default(),
-        options.db_path.as_ref().map(|p| p.to_string_lossy().into_owned()),
+        options
+            .db_path
+            .as_ref()
+            .filter(|_| review_store_attached)
+            .map(|p| p.to_string_lossy().into_owned()),
     );
     let stages = pipeline.stage_names().into_iter().map(str::to_owned).collect();
     Ok(ProcessingRun { result, data, report, stages })
+}
+
+/// Whether the pipeline built from `config` includes a stage that writes the SQLite review
+/// store: an enabled `ContradictionCheckStage` with an enabled `review_store` whose type has a
+/// constructor in `stages`. Unregistered stage types are skipped or fail the build, so a stage
+/// counted here is built and, when the run succeeds, has run.
+fn review_store_stage_is_built(config: &PipelineConfig, stages: &StageRegistry) -> bool {
+    config.stages.iter().any(|stage| match stage {
+        StageConfig::ContradictionCheck(check) => {
+            stage.enabled()
+                && check.review_store.as_ref().is_some_and(|review| review.enabled)
+                && stages.is_registered(stage.type_name())
+        }
+        _ => false,
+    })
 }
 
 /// A truthy `case_id` as text (Python `if case_id:`).

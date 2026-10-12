@@ -131,9 +131,10 @@ pub fn ensure_document(
     Ok(DocumentWriteResult { doc_id: document.doc_id.clone(), helix_id: stored.id, created: true })
 }
 
-/// Writes the chunks of document `doc`: chunks whose sequence number already exists under a
-/// reused document are updated in place, the rest are created in one batch. Sets each chunk's
-/// `helix_id`; results are in chunk order.
+/// Writes the chunks of document `doc` in one batch and sets each chunk's `helix_id`; results
+/// are in chunk order. A reused document (`doc.created == false`) first loses its existing
+/// chunks, their spans and vectors ([`GraphStore::delete_document_chunks`]), so re-indexing
+/// leaves exactly the new chunks and one set of spans.
 ///
 /// # Errors
 /// Store errors.
@@ -142,44 +143,32 @@ pub fn write_chunks(
     doc: &DocumentWriteResult,
     chunks: Vec<Chunk>,
 ) -> Result<Vec<ChunkWriteResult>> {
-    let existing: HashMap<i64, ChunkId> = if doc.created {
-        HashMap::new()
-    } else {
-        store
-            .get_document_chunks(&doc.helix_id)?
-            .into_iter()
-            .map(|stored| (stored.node.sequence_number, stored.id))
-            .collect()
-    };
+    if !doc.created {
+        let removed = store.delete_document_chunks(&doc.helix_id)?;
+        tracing::debug!(helix_doc_id = %doc.helix_id, removed, "deleted chunks of reused Document");
+    }
     let nodes: Vec<ChunkNode> = chunks.iter().map(chunk_node).collect();
-    let mut ids: Vec<Option<(ChunkId, bool)>> = vec![None; chunks.len()];
-    let mut new_indexes = Vec::new();
-    for (index, node) in nodes.iter().enumerate() {
-        match existing.get(&node.sequence_number) {
-            Some(chunk_id) => {
-                store.update_document_chunk(chunk_id, node)?;
-                ids[index] = Some((chunk_id.clone(), false));
-            }
-            None => new_indexes.push(index),
+    let created = store.create_chunks_batch(&doc.helix_id, &nodes)?;
+    if created.len() != chunks.len() {
+        return Err(ce_store::StoreError::Query {
+            query: ce_store::graph::query_names::CREATE_DOCUMENT_CHUNK.to_owned(),
+            message: format!(
+                "the store returned {} chunks for {} requested",
+                created.len(),
+                chunks.len()
+            ),
         }
+        .into());
     }
-    let new_nodes: Vec<ChunkNode> = new_indexes.iter().map(|&i| nodes[i].clone()).collect();
-    let created = store.create_chunks_batch(&doc.helix_id, &new_nodes)?;
-    for (index, stored) in new_indexes.into_iter().zip(created) {
-        ids[index] = Some((stored.id, true));
-    }
-    chunks
+    Ok(chunks
         .into_iter()
-        .zip(ids)
-        .map(|(mut chunk, id)| {
-            let (helix_id, created) = id.ok_or_else(|| ce_store::StoreError::Query {
-                query: ce_store::graph::query_names::CREATE_DOCUMENT_CHUNK.to_owned(),
-                message: "the store returned fewer chunks than requested".to_owned(),
-            })?;
-            chunk.helix_id = Some(helix_id.as_str().into());
-            Ok(ChunkWriteResult { chunk, helix_id: helix_id.as_str().into(), created })
+        .zip(created)
+        .map(|(mut chunk, stored)| {
+            let helix_id = NodeId::from(stored.id.as_str());
+            chunk.helix_id = Some(helix_id.clone());
+            ChunkWriteResult { chunk, helix_id, created: true }
         })
-        .collect()
+        .collect())
 }
 
 /// Writes sentence spans under their chunks in one batch. When the batch fails (non-fatally)

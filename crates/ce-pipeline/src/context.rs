@@ -110,8 +110,9 @@ pub struct ContextData {
     pub rag_index_result: Option<IndexingResult>,
     /// RAGIndexStage: full document text.
     pub doc_text: Option<String>,
-    /// RAGIndexStage (online mode only): the chunk embedder (Python `embedding_service`).
-    /// Later stages treat `None` as "no embeddings available" (offline runs).
+    /// RAGIndexStage (online mode, documents with chunks): the chunk embedder (Python
+    /// `embedding_service`). Later stages treat `None` as "no embeddings available" (offline
+    /// runs and empty documents).
     pub embedder: Option<SharedEmbedder>,
 
     /// MentionStage (augmented by CoreferenceStage): mentions per chunk graph id.

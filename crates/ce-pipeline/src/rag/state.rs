@@ -1,6 +1,7 @@
 //! Persistent document-identity cache (Python `services/rag/state.py`).
 
 use std::collections::BTreeMap;
+use std::io::Write as _;
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
@@ -142,13 +143,21 @@ fn load(path: &Path) -> BTreeMap<String, String> {
     }
 }
 
+/// Writes the cache to a temporary file next to `path` and renames it over `path`, so a crash
+/// leaves either the old or the new file, never a truncated one.
 fn persist(path: &Path, cache: &BTreeMap<String, String>) {
     let write = || -> std::io::Result<()> {
-        if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent)?;
-        }
+        let dir = match path.parent() {
+            Some(parent) if !parent.as_os_str().is_empty() => parent,
+            _ => Path::new("."),
+        };
+        std::fs::create_dir_all(dir)?;
         let json = serde_json::to_string_pretty(cache).map_err(std::io::Error::other)?;
-        std::fs::write(path, json)
+        let mut file = tempfile::NamedTempFile::new_in(dir)?;
+        file.write_all(json.as_bytes())?;
+        file.as_file().sync_all()?;
+        file.persist(path).map_err(|error| error.error)?;
+        Ok(())
     };
     if let Err(error) = write() {
         tracing::warn!(path = %path.display(), "failed to persist document state cache: {error}");
@@ -215,6 +224,27 @@ mod tests {
         assert_eq!(DocumentStateStore::open(&path, "store-1#ns").lookup("001", Some(&c)), None);
         let written = std::fs::read_to_string(&path).expect("cache file");
         assert_eq!(written, "{}");
+    }
+
+    #[test]
+    fn persist_replaces_the_file_atomically_without_leftovers() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let path = dir.path().join("cache.json");
+        std::fs::write(&path, "{\"old\": \"1\"}").expect("write");
+        let store = DocumentStateStore::open(&path, "s");
+        store.record("001", &NodeId::from("7"), None);
+        store.record("002", &NodeId::from("8"), None);
+        let entries: Vec<String> = std::fs::read_dir(dir.path())
+            .expect("read dir")
+            .map(|entry| entry.expect("entry").file_name().to_string_lossy().into_owned())
+            .collect();
+        assert_eq!(entries, ["cache.json"], "no temporary files are left behind");
+        let reopened = DocumentStateStore::open(&path, "s");
+        assert_eq!(reopened.lookup("001", None), Some(NodeId::from("7")));
+        assert_eq!(reopened.lookup("002", None), Some(NodeId::from("8")));
+        let written: Value =
+            serde_json::from_str(&std::fs::read_to_string(&path).expect("read")).expect("json");
+        assert_eq!(written, json!({"old": "1", "s|||001": "7", "s|||002": "8"}));
     }
 
     #[test]

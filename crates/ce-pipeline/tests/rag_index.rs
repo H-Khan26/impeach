@@ -2,13 +2,18 @@
 
 mod common;
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-use ce_core::{DocumentPayload, IndexingResult};
+use ce_core::{ChunkId, DocumentPayload, EntityId, FactId, IndexingResult, NodeId, SpanId};
 use ce_models::{Embedder, ModelError, ModelKind, ModelRegistry};
 use ce_pipeline::{PipelineError, PipelineInput, RagIndexStage, Stage};
 use ce_store::graph::{CHUNK_OF_DOCUMENT, DOCUMENT, DOCUMENT_CHUNK, SPAN, SPAN_OF_CHUNK};
-use ce_store::{GraphStore, MemoryStore};
+use ce_store::{
+    ChunkNode, DocumentNode, EmbeddingWrite, EntityHit, EntityNode, FactHit, FactNode, GraphStore,
+    MemoryStore, SpanNode, StoreError, StoredChunk, StoredDocument, StoredEntity, StoredFact,
+    StoredSpan, VectorLabel,
+};
 use common::{char_slice, config_with, default_config, read_fixture, Harness, DIM};
 use pretty_assertions::assert_eq;
 use serde_json::json;
@@ -295,13 +300,14 @@ fn cache_reuses_the_node_only_when_identity_matches() {
     assert_ne!(green.document.helix_id, billy.document.helix_id);
     assert_eq!(harness.count_label(DOCUMENT), 2);
 
-    // The reused document's chunk is updated in place, not duplicated.
-    assert_eq!(again.chunks[0].helix_id, billy.chunks[0].helix_id);
-    assert!(!again.chunks[0].created);
+    // The reused document's chunks are replaced, not duplicated.
+    assert_ne!(again.chunks[0].helix_id, billy.chunks[0].helix_id);
+    assert!(again.chunks[0].created);
     assert_eq!(
         harness.store.get_document_chunks(&billy.document.helix_id).expect("chunks").len(),
         billy.chunks.len()
     );
+    assert!(harness.store.node_snapshot(billy.chunks[0].helix_id.as_str()).is_none());
 
     let written = std::fs::read_to_string(&cache_path).expect("cache file");
     let scope = format!("{}#processing_v17", harness.store.store_id());
@@ -437,6 +443,268 @@ fn missing_embedder_is_a_model_error() {
     ctx.data.document = Some(read_fixture("Mason_billy.jsonl"));
     let error = stage.run(&mut ctx).expect_err("no embedder");
     assert!(matches!(error, PipelineError::Model(ModelError::UnknownModel { .. })), "{error}");
+    let document = ctx.data.document.as_ref().expect("document is restored after an error");
+    assert_eq!(document.doc_id.as_str(), "001");
+    assert!(ctx.data.embedder.is_none() && ctx.data.rag_index_result.is_none());
+}
+
+#[test]
+fn empty_document_does_not_resolve_the_embedder() {
+    let config = default_config();
+    let store: Arc<dyn GraphStore> = Arc::new(MemoryStore::new(DIM));
+    let services = ce_pipeline::StageBuildContext::new(
+        Arc::new(config),
+        Arc::new(ModelRegistry::empty("processing_v17")),
+        store,
+    );
+    let rag = Harness::new(default_config()).rag_config();
+    let stage = RagIndexStage::new(&rag, &services).expect("stage");
+    let mut ctx = ce_pipeline::PipelineContext::new(&services);
+    ctx.data.document = Some(DocumentPayload::new("empty", ""));
+    stage.run(&mut ctx).expect("an empty document needs no embedder");
+    let result = ctx.data.rag_index_result.as_ref().expect("result");
+    assert!(result.chunks.is_empty() && result.spans.is_empty());
+    assert_eq!(result.embeddings.count, 0);
+    assert!(ctx.data.embedder.is_none());
+    assert!(ctx.data.document.as_ref().is_some_and(|doc| doc.helix_id.is_some()));
+}
+
+/// `count` numbered sentences; with 40-character recursive chunks each is a chunk of its own.
+fn numbered_sentences(count: usize) -> String {
+    (0..count).map(|i| format!("Sentence number {i} is here.")).collect::<Vec<_>>().join(" ")
+}
+
+#[test]
+fn reindexing_a_cached_document_replaces_chunks_and_spans() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let cache_path = dir.path().join("cache.json");
+    let harness = Harness::new(common::recursive_config(40, 0));
+    let cached_stage = || harness.stage().with_document_cache_at(&cache_path);
+    let document = |sentences| DocumentPayload::new("doc-1", numbered_sentences(sentences));
+
+    let first = harness.run_stage(cached_stage(), PipelineInput::from(document(10)));
+    let first = first.rag_index_result.expect("result");
+    assert_eq!(first.chunks.len(), 10);
+    assert!(!first.spans.is_empty());
+
+    let second = harness.run_stage(cached_stage(), PipelineInput::from(document(6)));
+    let second = second.rag_index_result.expect("result");
+    assert!(!second.document.created);
+    assert_eq!(second.document.helix_id, first.document.helix_id);
+    assert_eq!(second.chunks.len(), 6);
+
+    let stored = harness.store.get_document_chunks(&first.document.helix_id).expect("chunks");
+    assert_eq!(stored.len(), 6);
+    let mut sequences: Vec<i64> = stored.iter().map(|c| c.node.sequence_number).collect();
+    sequences.sort_unstable();
+    assert_eq!(sequences, [0, 1, 2, 3, 4, 5]);
+    assert_eq!(harness.count_label(DOCUMENT), 1);
+    assert_eq!(harness.count_label(DOCUMENT_CHUNK), 6);
+    assert_eq!(harness.count_edges(CHUNK_OF_DOCUMENT), 6);
+    assert_eq!(harness.count_label(SPAN), second.spans.len(), "one set of sentence spans");
+    assert_eq!(harness.count_edges(SPAN_OF_CHUNK), second.spans.len());
+    assert!(stored.iter().all(|chunk| harness.store.embedding(chunk.id.as_str()).is_some()));
+}
+
+/// A `MemoryStore` whose `update_document` fails with a query error while `fail_updates` is
+/// set.
+#[derive(Debug)]
+struct FailingUpdateStore {
+    inner: MemoryStore,
+    fail_updates: AtomicBool,
+}
+
+impl GraphStore for FailingUpdateStore {
+    fn store_id(&self) -> String {
+        self.inner.store_id()
+    }
+    fn embedding_dim(&self) -> usize {
+        self.inner.embedding_dim()
+    }
+    fn reset(&self) -> ce_store::Result<()> {
+        self.inner.reset()
+    }
+    fn create_document(&self, document: &DocumentNode) -> ce_store::Result<StoredDocument> {
+        self.inner.create_document(document)
+    }
+    fn update_document(
+        &self,
+        doc_id: &NodeId,
+        document: &DocumentNode,
+    ) -> ce_store::Result<StoredDocument> {
+        if self.fail_updates.load(Ordering::SeqCst) {
+            return Err(StoreError::Query {
+                query: "UpdateDocument".into(),
+                message: "transient failure".into(),
+            });
+        }
+        self.inner.update_document(doc_id, document)
+    }
+    fn get_document_chunks(&self, doc_id: &NodeId) -> ce_store::Result<Vec<StoredChunk>> {
+        self.inner.get_document_chunks(doc_id)
+    }
+    fn create_document_chunk(
+        &self,
+        doc_id: &NodeId,
+        chunk: &ChunkNode,
+    ) -> ce_store::Result<StoredChunk> {
+        self.inner.create_document_chunk(doc_id, chunk)
+    }
+    fn update_document_chunk(
+        &self,
+        chunk_id: &ChunkId,
+        chunk: &ChunkNode,
+    ) -> ce_store::Result<StoredChunk> {
+        self.inner.update_document_chunk(chunk_id, chunk)
+    }
+    fn create_chunk_embedding(
+        &self,
+        chunk_id: &ChunkId,
+        embedding: &[f32],
+    ) -> ce_store::Result<()> {
+        self.inner.create_chunk_embedding(chunk_id, embedding)
+    }
+    fn create_span_for_chunk(&self, span: &SpanNode) -> ce_store::Result<StoredSpan> {
+        self.inner.create_span_for_chunk(span)
+    }
+    fn create_entity(&self, entity: &EntityNode) -> ce_store::Result<StoredEntity> {
+        self.inner.create_entity(entity)
+    }
+    fn create_entity_embedding(
+        &self,
+        entity_id: &EntityId,
+        embedding: &[f32],
+    ) -> ce_store::Result<()> {
+        self.inner.create_entity_embedding(entity_id, embedding)
+    }
+    fn find_entity_by_name(&self, name: &str) -> ce_store::Result<Vec<EntityHit>> {
+        self.inner.find_entity_by_name(name)
+    }
+    fn find_similar_entities(
+        &self,
+        embedding: &[f32],
+        limit: usize,
+    ) -> ce_store::Result<Vec<EntityHit>> {
+        self.inner.find_similar_entities(embedding, limit)
+    }
+    fn get_all_entities(&self, limit: usize) -> ce_store::Result<Vec<StoredEntity>> {
+        self.inner.get_all_entities(limit)
+    }
+    fn link_span_to_entity(
+        &self,
+        span_id: &SpanId,
+        entity_id: &EntityId,
+        confidence: f64,
+        method: &str,
+    ) -> ce_store::Result<()> {
+        self.inner.link_span_to_entity(span_id, entity_id, confidence, method)
+    }
+    fn create_fact(&self, fact: &FactNode) -> ce_store::Result<StoredFact> {
+        self.inner.create_fact(fact)
+    }
+    fn create_fact_embedding(&self, fact_id: &FactId, embedding: &[f32]) -> ce_store::Result<()> {
+        self.inner.create_fact_embedding(fact_id, embedding)
+    }
+    fn link_fact_to_document(
+        &self,
+        fact_id: &FactId,
+        doc_id: &NodeId,
+        page_number: i64,
+        section: &str,
+    ) -> ce_store::Result<()> {
+        self.inner.link_fact_to_document(fact_id, doc_id, page_number, section)
+    }
+    fn link_fact_to_entity(
+        &self,
+        fact_id: &FactId,
+        entity_id: &EntityId,
+        role: &str,
+    ) -> ce_store::Result<()> {
+        self.inner.link_fact_to_entity(fact_id, entity_id, role)
+    }
+    fn link_fact_to_span(
+        &self,
+        fact_id: &FactId,
+        span_id: &SpanId,
+        role: &str,
+        confidence: f64,
+    ) -> ce_store::Result<()> {
+        self.inner.link_fact_to_span(fact_id, span_id, role, confidence)
+    }
+    fn get_entity_facts(&self, entity_id: &EntityId) -> ce_store::Result<Vec<StoredFact>> {
+        self.inner.get_entity_facts(entity_id)
+    }
+    fn find_facts_by_text(&self, keywords: &str, limit: usize) -> ce_store::Result<Vec<FactHit>> {
+        self.inner.find_facts_by_text(keywords, limit)
+    }
+    fn find_similar_facts(
+        &self,
+        embedding: &[f32],
+        limit: usize,
+    ) -> ce_store::Result<Vec<FactHit>> {
+        self.inner.find_similar_facts(embedding, limit)
+    }
+    fn create_chunks_batch(
+        &self,
+        doc_id: &NodeId,
+        chunks: &[ChunkNode],
+    ) -> ce_store::Result<Vec<StoredChunk>> {
+        self.inner.create_chunks_batch(doc_id, chunks)
+    }
+    fn delete_document_chunks(&self, doc_id: &NodeId) -> ce_store::Result<usize> {
+        self.inner.delete_document_chunks(doc_id)
+    }
+    fn create_spans_batch(&self, spans: &[SpanNode]) -> ce_store::Result<Vec<StoredSpan>> {
+        self.inner.create_spans_batch(spans)
+    }
+    fn create_embeddings_batch(
+        &self,
+        label: VectorLabel,
+        items: &[EmbeddingWrite<'_>],
+    ) -> ce_store::Result<usize> {
+        self.inner.create_embeddings_batch(label, items)
+    }
+}
+
+#[test]
+fn non_not_found_update_errors_propagate_without_a_new_document() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let cache_path = dir.path().join("cache.json");
+    let store = Arc::new(FailingUpdateStore {
+        inner: MemoryStore::new(DIM),
+        fail_updates: AtomicBool::new(false),
+    });
+    let config = default_config();
+    let registry = ModelRegistry::from_config(&config);
+    registry
+        .insert_embedder(registry.key(ModelKind::Bge), Arc::new(ce_models::MockEmbedder::new(DIM)));
+    let dyn_store: Arc<dyn GraphStore> = store.clone();
+    let services =
+        ce_pipeline::StageBuildContext::new(Arc::new(config), Arc::new(registry), dyn_store);
+    let rag = Harness::new(default_config()).rag_config();
+    let stage =
+        || RagIndexStage::new(&rag, &services).expect("stage").with_document_cache_at(&cache_path);
+
+    let mut ctx = ce_pipeline::PipelineContext::new(&services);
+    ctx.data.document = Some(read_fixture("Mason_watson.jsonl"));
+    stage().run(&mut ctx).expect("first run creates the document");
+    let first = ctx.data.helix_doc_id.clone().expect("doc id");
+
+    store.fail_updates.store(true, Ordering::SeqCst);
+    let mut ctx = ce_pipeline::PipelineContext::new(&services);
+    ctx.data.document = Some(read_fixture("Mason_watson.jsonl"));
+    let error = stage().run(&mut ctx).expect_err("update fails");
+    assert!(matches!(error, PipelineError::Store(StoreError::Query { .. })), "{error}");
+    assert!(ctx.data.document.is_some(), "document is restored after an error");
+    let documents = (0..5000_u64)
+        .filter_map(|id| store.inner.node_snapshot(&id.to_string()))
+        .filter(|(label, _)| *label == DOCUMENT)
+        .count();
+    assert_eq!(documents, 1, "no second Document node");
+    let document = read_fixture("Mason_watson.jsonl");
+    let reopened = stage();
+    let cached = reopened.document_cache().expect("cache").lookup("002", Some(&document.metadata));
+    assert_eq!(cached, Some(first), "the cached id is kept");
 }
 
 #[test]

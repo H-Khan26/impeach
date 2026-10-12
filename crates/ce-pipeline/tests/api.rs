@@ -88,6 +88,20 @@ impl Stage for DummyProcessingStage {
     }
 }
 
+/// A stage that does nothing.
+#[derive(Debug)]
+struct NoopStage;
+
+impl Stage for NoopStage {
+    fn name(&self) -> &str {
+        "noop"
+    }
+
+    fn run(&self, _: &mut PipelineContext) -> ce_pipeline::Result<()> {
+        Ok(())
+    }
+}
+
 /// An env whose only stage is the dummy (registered for the first config stage type).
 fn dummy_env() -> (ProcessingEnv, Seen) {
     let seen: Seen = Arc::default();
@@ -241,9 +255,34 @@ fn run_processing_db_path_enables_review_store() {
             if check.review_store.as_ref().is_some_and(|r| !r.fail_on_sqlite_error)
     )));
 
+    // Only a built ContradictionCheckStage writes the review store.
     let (env, _) = dummy_env();
     let result = run_processing_with(create_test_jsonl(dir.path()), &options, env).expect("runs");
+    assert_eq!(result.result.sqlite_db_path, None);
+
+    let (mut env, _) = dummy_env();
+    env.stages = env.stages.map(|stages| {
+        stages.with("ContradictionCheckStage", |_: &StageConfig, _: &StageBuildContext| {
+            Ok(Box::new(NoopStage) as Box<dyn Stage>)
+        })
+    });
+    let result = run_processing_with(create_test_jsonl(dir.path()), &options, env).expect("runs");
+    assert_eq!(result.stages, ["dummy", "noop"]);
     assert_eq!(result.result.sqlite_db_path, Some(db_path.to_string_lossy().into_owned()));
+}
+
+#[test]
+fn db_path_is_not_reported_when_only_rag_index_runs() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let options = ProcessingOptions {
+        db_path: Some(dir.path().join("review.sqlite3")),
+        ..ProcessingOptions::default()
+    };
+    let (env, _) = mock_env();
+    let run = run_processing_with(fixture("Mason_billy.jsonl"), &options, env).expect("runs");
+    assert_eq!(run.stages, ["rag_index"]);
+    assert_eq!(run.result.sqlite_db_path, None);
+    assert!(!dir.path().join("review.sqlite3").exists());
 }
 
 #[test]

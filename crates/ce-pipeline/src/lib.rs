@@ -31,10 +31,13 @@
 //! - Chunks, spans and embeddings are written with the store's batch methods. A failed span or
 //!   embedding batch falls back to one-by-one writes so a single bad item is skipped (spans) or
 //!   reported in `errors` (embeddings) as in Python.
-//! - When a document node is reused through the document cache, its existing chunks are read
-//!   back and updated by sequence number; Python only did that within one process and created
-//!   duplicate chunks under a node reused from the on-disk cache. Sentence spans are re-created
-//!   on reuse in both.
+//! - When a document node is reused (document cache or explicit `helix_id`), its existing
+//!   chunks, their sentence spans and chunk vectors are deleted in one store call and the new
+//!   chunks and spans are created, so re-indexing leaves exactly one set of each. Python updated
+//!   chunks by sequence number within one process, created duplicate chunks under a node reused
+//!   from the on-disk cache, and re-created sentence spans on every reuse.
+//! - `ProcessingResult.sqlite_db_path` is set only when a `ContradictionCheckStage` with the
+//!   review store was built and ran; Python echoed `db_path` whenever it was given.
 //! - Embedder output whose count or dimension does not match the chunks / store fails the stage
 //!   instead of producing one store error per vector.
 //! - Without the `helix` feature, [`run_processing`] uses an in-memory store.

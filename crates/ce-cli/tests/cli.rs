@@ -99,13 +99,24 @@ fn process_without_enabled_stages_writes_the_summary() {
         &[("    enabled: true", "    enabled: false"), ("mode: \"embedded\"", "mode: \"memory\"")],
     );
     let summary = dir.path().join("summary.json");
+    let db_path = dir.path().join("review.sqlite3");
     let jsonl = fixture("input/Mason_intra.jsonl");
-    let output =
-        run(&["process", path_arg(&jsonl), "-c", path_arg(&config), "-o", path_arg(&summary)]);
+    let output = run(&[
+        "process",
+        path_arg(&jsonl),
+        "-c",
+        path_arg(&config),
+        "-o",
+        path_arg(&summary),
+        "--db-path",
+        path_arg(&db_path),
+    ]);
     assert!(output.status.success(), "{}", stderr(&output));
     let text = stdout(&output);
     assert!(text.contains("Contradiction Detection Report"), "{text}");
     assert!(text.contains("Results written to:"), "{text}");
+    // No ContradictionCheckStage ran, so nothing was written to SQLite.
+    assert!(!text.contains("SQLite output:"), "{text}");
 
     let value: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string(&summary).expect("read summary"))
@@ -125,6 +136,7 @@ fn process_without_enabled_stages_writes_the_summary() {
         ]
     );
     assert_eq!(value["total_facts_extracted"], 0);
+    assert_eq!(value["sqlite_db_path"], serde_json::Value::Null);
 }
 
 #[test]
