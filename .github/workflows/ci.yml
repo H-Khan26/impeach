@@ -14,7 +14,8 @@ jobs:
   check:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
+    # A cold Windows build of the helix feature (tantivy, slatedb, aws-lc) takes over 40 minutes.
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -26,6 +27,8 @@ jobs:
           toolchain: 1.99.0
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
       - name: Format
         run: cargo fmt --all --check
       - name: Clippy
