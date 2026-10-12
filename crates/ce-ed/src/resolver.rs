@@ -203,7 +203,7 @@ pub fn collect_cluster_aliases(
         .collect()
 }
 
-/// Per-run inputs of [`CoreEdResolver::resolve`] (the Python context keys it reads).
+/// Per-run inputs of [`EdResolver::resolve`] (the Python context keys it reads).
 #[derive(Clone, Copy)]
 pub struct ResolveInput<'a> {
     /// Graph store holding the entities.
@@ -232,6 +232,31 @@ impl std::fmt::Debug for ResolveInput<'_> {
             .field("has_embedder", &self.embedder.is_some())
             .field("has_llm", &self.llm.is_some())
             .finish_non_exhaustive()
+    }
+}
+
+/// Resolves a document's mentions to entities (Python `EDResolver` protocol of
+/// `interfaces.py`).
+pub trait EdResolver: Send + Sync + std::fmt::Debug {
+    /// Mention id -> result for the mentions that could be resolved or attempted, in input
+    /// order.
+    ///
+    /// # Errors
+    /// Fatal store errors; prompt errors of the LLM tie-break.
+    fn resolve(
+        &self,
+        mentions: &[Mention],
+        input: &ResolveInput<'_>,
+    ) -> Result<IndexMap<MentionId, EdResult>>;
+}
+
+impl EdResolver for CoreEdResolver {
+    fn resolve(
+        &self,
+        mentions: &[Mention],
+        input: &ResolveInput<'_>,
+    ) -> Result<IndexMap<MentionId, EdResult>> {
+        CoreEdResolver::resolve(self, mentions, input)
     }
 }
 

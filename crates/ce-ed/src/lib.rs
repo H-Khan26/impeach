@@ -29,7 +29,9 @@ pub use entity_creator::{EntityCreator, EntityOutcome};
 pub use error::{recover_store, EdError, Result};
 pub use name_matching::{entity_types_compatible, names_match, normalize_for_matching};
 pub use name_similarity::{date_similarity, money_similarity, NameSimilarity};
-pub use resolver::{collect_cluster_aliases, CoreEdResolver, IntraDocumentMatcher, ResolveInput};
+pub use resolver::{
+    collect_cluster_aliases, CoreEdResolver, EdResolver, IntraDocumentMatcher, ResolveInput,
+};
 pub use retrieval::{
     candidate_from_entity, EdRetrieval, EdRetriever, RetrieverSettings, StructuredKeyQuery,
 };
