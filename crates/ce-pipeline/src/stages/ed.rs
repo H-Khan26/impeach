@@ -25,12 +25,12 @@
 
 use std::sync::Arc;
 
-use ce_config::mappings::EntityTypes;
+use ce_config::mappings::{types_compatible_in_groups, EntityTypes};
 use ce_config::pipeline::EdStageConfig;
 use ce_config::prompts::EdPrompt;
 use ce_config::{MappingsRegistry, StageConfig};
 use ce_core::{CorefClusterContext, EdResult, EntityId, Mention, MentionId, Metadata};
-use ce_ed::{entity_types_compatible, CoreEdResolver, EdResolver, ResolveInput};
+use ce_ed::{entity_types_compatible, CoreEdResolver, EdResolver, Resolution, ResolveInput};
 use ce_models::{Llm, ModelError, ModelRegistry};
 use ce_ner::definitions::{DefinitionExtractor, RoleConfig};
 use indexmap::{IndexMap, IndexSet};
@@ -42,6 +42,9 @@ use crate::stages::CoreferenceStage;
 
 /// Confidence of a `SpanRefersToEntity` edge written by the stage.
 pub const SPAN_LINK_CONFIDENCE: f64 = 0.85;
+
+/// Registry key of the tie-break LLM when `<pipeline.name>_ollama` is not registered.
+const FALLBACK_LLM_KEY: &str = "ollama";
 
 /// Method of a `SpanRefersToEntity` edge written by the stage.
 pub const SPAN_LINK_METHOD: &str = "NER+ED";
@@ -70,17 +73,20 @@ struct EdSummary {
 }
 
 impl EdSummary {
-    fn new(inputs: usize, results: &IndexMap<MentionId, EdResult>) -> Self {
+    /// Counts from the entity creator's outcomes (created / reused) and the strategies of the
+    /// other resolved results (intra-document matches vs rule, hybrid or LLM matches).
+    fn new(inputs: usize, resolution: &Resolution) -> Self {
         let mut summary = Self { inputs, ..Self::default() };
-        for result in results.values() {
-            let strategy = result.strategy_used.as_str();
+        for (mention_id, result) in &resolution.results {
             if result.chosen_entity_id.is_none() {
                 summary.unresolved += 1;
-            } else if strategy.ends_with("_create") {
-                summary.created += 1;
-            } else if strategy.ends_with("_reuse") || strategy == "vector_fuzzy" {
-                summary.reused += 1;
-            } else if strategy.starts_with("intra_doc") {
+            } else if let Some(outcome) = resolution.outcomes.get(mention_id) {
+                if outcome.is_new() {
+                    summary.created += 1;
+                } else {
+                    summary.reused += 1;
+                }
+            } else if result.strategy_used.starts_with("intra_doc") {
                 summary.intra_doc += 1;
             } else {
                 summary.matched += 1;
@@ -168,17 +174,17 @@ impl EdStage {
     /// The tie-break LLM: `<pipeline>_ollama`, else `ollama`; `None` when neither is
     /// registered or the model cannot be built.
     fn lookup_llm(&self, registry: &ModelRegistry) -> Option<Arc<dyn Llm>> {
-        let key = format!("{}_ollama", self.pipeline_name);
-        let found = match registry.llm(&key) {
+        let prefixed = format!("{}_ollama", self.pipeline_name);
+        let (key, found) = match registry.llm(&prefixed) {
             Err(ModelError::UnknownModel { .. }) => {
-                tracing::debug!(key = key.as_str(), "ED LLM not registered; trying `ollama`");
-                registry.llm("ollama")
+                tracing::debug!(key = prefixed.as_str(), "ED LLM not registered; trying `ollama`");
+                (FALLBACK_LLM_KEY, registry.llm(FALLBACK_LLM_KEY))
             }
-            other => other,
+            other => (prefixed.as_str(), other),
         };
         match found {
             Ok(llm) => {
-                tracing::info!(key = key.as_str(), "ED LLM service loaded");
+                tracing::info!(key, "ED LLM service loaded");
                 Some(llm)
             }
             Err(ModelError::UnknownModel { .. }) => {
@@ -198,11 +204,11 @@ impl EdStage {
         ctx: &PipelineContext,
         mentions: &[Mention],
         all_mentions_by_id: Option<&IndexMap<MentionId, Mention>>,
-    ) -> Result<IndexMap<MentionId, EdResult>> {
+    ) -> Result<Resolution> {
         let data = &ctx.data;
         if !data.index_persisted {
             tracing::debug!("EDStage: index not persisted (offline run); no resolution");
-            return Ok(IndexMap::new());
+            return Ok(Resolution::default());
         }
         let llm = if self.allow_llm { self.lookup_llm(&ctx.registry) } else { None };
         let embedder = data.embedder.as_ref().map(|e| Arc::clone(&e.0));
@@ -318,10 +324,11 @@ impl EdStage {
         &self,
         ctx: &mut PipelineContext,
         inputs: usize,
-        results: IndexMap<MentionId, EdResult>,
+        resolution: Resolution,
         resolved: IndexMap<MentionId, EntityId>,
     ) -> Result<()> {
-        let summary = EdSummary::new(inputs, &results);
+        let summary = EdSummary::new(inputs, &resolution);
+        let results = resolution.results;
         if let Some(defined_terms) = ctx.data.defined_terms.as_deref().filter(|t| !t.is_empty()) {
             let role_map = self.definitions.build_role_map(defined_terms, &resolved);
             if !role_map.is_empty() {
@@ -368,20 +375,6 @@ fn resolved_map(results: &IndexMap<MentionId, EdResult>) -> IndexMap<MentionId, 
         .collect()
 }
 
-/// CoreferenceStage type compatibility: a missing or equal type is compatible; types in
-/// different groups are not; a type in no group is compatible with all.
-#[must_use]
-pub fn types_compatible_in_groups(type_a: &str, type_b: &str, groups: &[IndexSet<String>]) -> bool {
-    if type_a.is_empty() || type_b.is_empty() || type_a == type_b {
-        return true;
-    }
-    let group_of = |t: &str| groups.iter().position(|g| g.contains(t));
-    match (group_of(type_a), group_of(type_b)) {
-        (Some(a), Some(b)) => a == b,
-        _ => true,
-    }
-}
-
 impl Stage for EdStage {
     fn name(&self) -> &str {
         &self.name
@@ -401,9 +394,9 @@ impl Stage for EdStage {
                 .into_iter()
                 .filter(|m| !skip_types.contains(m.entity_type.as_str()))
                 .collect();
-            let results = self.resolve(ctx, &inputs, ctx.data.all_mentions_by_id.as_ref())?;
-            let resolved = resolved_map(&results);
-            return self.finish(ctx, inputs.len(), results, resolved);
+            let resolution = self.resolve(ctx, &inputs, ctx.data.all_mentions_by_id.as_ref())?;
+            let resolved = resolved_map(&resolution.results);
+            return self.finish(ctx, inputs.len(), resolution, resolved);
         }
 
         let clusters: Vec<CorefClusterContext> =
@@ -445,14 +438,15 @@ impl Stage for EdStage {
             return Ok(());
         }
 
-        let results = self.resolve(ctx, &inputs, Some(&mention_by_id))?;
-        let mut resolved = resolved_map(&results);
+        let resolution = self.resolve(ctx, &inputs, Some(&mention_by_id))?;
+        let mut resolved = resolved_map(&resolution.results);
 
         for cluster in &clusters {
             let Some(canonical_id) = canonical_for_cluster.get(&cluster.id) else {
                 continue;
             };
-            let Some(entity_id) = results
+            let Some(entity_id) = resolution
+                .results
                 .get(canonical_id)
                 .and_then(|r| r.chosen_entity_id.as_ref())
                 .filter(|id| !id.as_str().is_empty())
@@ -488,25 +482,6 @@ impl Stage for EdStage {
         }
 
         ctx.data.all_mentions_by_id = Some(mention_by_id);
-        self.finish(ctx, inputs.len(), results, resolved)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn groups(raw: &[&[&str]]) -> Vec<IndexSet<String>> {
-        raw.iter().map(|g| g.iter().map(|t| (*t).to_owned()).collect()).collect()
-    }
-
-    #[test]
-    fn coref_group_rule() {
-        let groups = groups(&[&["PER"], &["PRODUCT", "FACILITY"], &["DATE", "TIME"]]);
-        assert!(types_compatible_in_groups("PRODUCT", "FACILITY", &groups));
-        assert!(types_compatible_in_groups("ORG", "PER", &groups));
-        assert!(types_compatible_in_groups("", "PER", &groups));
-        assert!(!types_compatible_in_groups("PER", "PRODUCT", &groups));
-        assert!(!types_compatible_in_groups("DATE", "FACILITY", &groups));
+        self.finish(ctx, inputs.len(), resolution, resolved)
     }
 }

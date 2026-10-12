@@ -363,6 +363,8 @@ fn exhibit_without_match_is_unresolved() {
     let result =
         resolve_exhibit_rule(&ctx("Exhibit 12A", "EXHIBIT"), &retriever, &patterns()).expect("ok");
     assert_eq!(result, None);
+    // The simple-pattern key is looked up once, not again by the fallback.
+    assert_eq!(retriever.calls(), vec!["exhibit 12A None Some(\"CASE-1\")"]);
     let none = FakeRetriever::empty();
     assert_eq!(
         resolve_exhibit_rule(&ctx("the photo", "EXHIBIT"), &none, &patterns()).expect("ok"),

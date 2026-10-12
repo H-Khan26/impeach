@@ -128,7 +128,11 @@ pub fn resolve_statute_rule(
     Ok(unique(candidates, 0.95, "rule_statute_exact"))
 }
 
-/// EXHIBIT mentions via exhibit keys scoped to the document's case.
+/// EXHIBIT mentions via exhibit keys scoped to the document's case: the key's lookup, then a
+/// party match among several candidates, then (for a key with a party) the party-less
+/// `exhibit_id_simple` lookup. [`extract_exhibit_key`] already falls back to
+/// `exhibit_id_simple`, so without a key nothing matches and a key without a party is that
+/// lookup itself.
 ///
 /// # Errors
 /// Fatal store errors.
@@ -139,23 +143,27 @@ pub fn resolve_exhibit_rule(
 ) -> Result<Option<EdResult>> {
     let text = ctx.mention.name.as_str();
     let case_id = ctx.doc_context.case_id.as_deref();
+    let Some(key) = extract_exhibit_key(patterns, text, case_id) else {
+        return Ok(None);
+    };
 
-    if let Some(key) = extract_exhibit_key(patterns, text, case_id) {
-        let party = key.party_attribution.as_deref();
-        let query = StructuredKeyQuery::Exhibit { id: &key.exhibit_id, party_attribution: party };
-        let candidates = retriever.find_by_structured_key(&query, case_id)?;
-        if candidates.len() == 1 {
-            return Ok(unique(candidates, 0.95, "rule_exhibit_id"));
-        }
-        if let Some(party) = party.filter(|p| !p.is_empty() && candidates.len() > 1) {
-            let party = party.to_lowercase();
-            let mut party_matches = candidates
-                .iter()
-                .filter(|candidate| candidate.canonical_name.to_lowercase().contains(&party));
-            if let (Some(chosen), None) = (party_matches.next(), party_matches.next()) {
-                let chosen = chosen.entity_id.clone();
-                return Ok(Some(rule_result(chosen, candidates, 0.90, "rule_exhibit_party")));
-            }
+    let party = key.party_attribution.as_deref();
+    let query = StructuredKeyQuery::Exhibit { id: &key.exhibit_id, party_attribution: party };
+    let candidates = retriever.find_by_structured_key(&query, case_id)?;
+    if candidates.len() == 1 {
+        return Ok(unique(candidates, 0.95, "rule_exhibit_id"));
+    }
+    let Some(party) = party else {
+        return Ok(None);
+    };
+    if !party.is_empty() && candidates.len() > 1 {
+        let party = party.to_lowercase();
+        let mut party_matches = candidates
+            .iter()
+            .filter(|candidate| candidate.canonical_name.to_lowercase().contains(&party));
+        if let (Some(chosen), None) = (party_matches.next(), party_matches.next()) {
+            let chosen = chosen.entity_id.clone();
+            return Ok(Some(rule_result(chosen, candidates, 0.90, "rule_exhibit_party")));
         }
     }
 

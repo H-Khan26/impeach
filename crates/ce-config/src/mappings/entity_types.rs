@@ -137,10 +137,42 @@ impl EntityTypes {
         if norm_a == default || norm_b == default {
             return true;
         }
-        let group_of = |t: &str| self.incompatible_type_groups.iter().position(|g| g.contains(t));
-        match (group_of(norm_a), group_of(norm_b)) {
-            (Some(a), Some(b)) => a == b,
-            _ => true,
-        }
+        types_compatible_in_groups(norm_a, norm_b, &self.incompatible_type_groups)
+    }
+}
+
+/// Type compatibility under `groups` (the `incompatible_type_groups` rule shared by
+/// [`EntityTypes::are_types_compatible`] and the coreference-aware ED propagation): a missing
+/// or equal type is compatible; types in different groups are not; a type in no group is
+/// compatible with all. Labels are compared as given.
+#[must_use]
+pub fn types_compatible_in_groups(type_a: &str, type_b: &str, groups: &[IndexSet<String>]) -> bool {
+    if type_a.is_empty() || type_b.is_empty() || type_a == type_b {
+        return true;
+    }
+    let group_of = |t: &str| groups.iter().position(|g| g.contains(t));
+    match (group_of(type_a), group_of(type_b)) {
+        (Some(a), Some(b)) => a == b,
+        _ => true,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn groups(raw: &[&[&str]]) -> Vec<IndexSet<String>> {
+        raw.iter().map(|g| g.iter().map(|t| (*t).to_owned()).collect()).collect()
+    }
+
+    #[test]
+    fn group_rule() {
+        let groups = groups(&[&["PER"], &["PRODUCT", "FACILITY"], &["DATE", "TIME"]]);
+        assert!(types_compatible_in_groups("PRODUCT", "FACILITY", &groups));
+        assert!(types_compatible_in_groups("ORG", "PER", &groups));
+        assert!(types_compatible_in_groups("", "PER", &groups));
+        assert!(types_compatible_in_groups("PER", "PER", &groups));
+        assert!(!types_compatible_in_groups("PER", "PRODUCT", &groups));
+        assert!(!types_compatible_in_groups("DATE", "FACILITY", &groups));
     }
 }

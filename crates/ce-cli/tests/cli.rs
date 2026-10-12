@@ -31,15 +31,13 @@ fn path_arg(path: &Path) -> &str {
     path.to_str().expect("UTF-8 path")
 }
 
-/// The packaged config with the given replacements applied, written to `dir/config.yaml`.
 /// Disables `RelationStage`, which would load the GLiNER2 model.
 const RELATION_STAGE_OFF: (&str, &str) = (
-    "    name: relation_extraction
-    enabled: true",
-    "    name: relation_extraction
-    enabled: false",
+    "    name: relation_extraction\n    enabled: true",
+    "    name: relation_extraction\n    enabled: false",
 );
 
+/// The packaged config with the given replacements applied, written to `dir/config.yaml`.
 fn write_config(dir: &Path, replacements: &[(&str, &str)]) -> PathBuf {
     let source = workspace_root().join("assets/config/processing/processing_v17.yaml");
     let mut text = std::fs::read_to_string(source).expect("read packaged config");

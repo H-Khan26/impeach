@@ -26,7 +26,9 @@ use serde::Deserialize;
 
 pub use detection_patterns::{DetectionPatterns, PatternDef};
 pub use detector_config::DetectorConfig;
-pub use entity_types::{EntityRouting, EntityTypeDefaults, EntityTypes};
+pub use entity_types::{
+    types_compatible_in_groups, EntityRouting, EntityTypeDefaults, EntityTypes,
+};
 pub use gliner2::{Gliner2Defaults, Gliner2Labels};
 pub use name_matching::{NameMatching, NameMatchingSettings, NameMatchingThresholds};
 pub use normalization::Normalization;

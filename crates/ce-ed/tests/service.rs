@@ -153,6 +153,16 @@ fn llm_without_choice_or_with_errors_leaves_the_mention_unresolved() {
         assert_eq!(result.strategy_used, "hybrid_unresolved");
     }
 
+    // An id that is not one of the candidates (the prompt's format placeholder echoed back)
+    // is ignored.
+    let echo = Arc::new(MockLlm::with_responses([
+        "{\"chosen_entity_id\": \"entity-id-or-null\", \"confidence\": 0.95, \"rationale\": \"x\"}",
+    ]));
+    let result = fixture.service(Some(echo)).resolve_span(&mention, true, 10).expect("runs");
+    assert_eq!(result.chosen_entity_id, None);
+    assert_eq!(result.strategy_used, "hybrid_llm");
+    assert!(!result.resolved_by_llm);
+
     // allow_llm = false never calls the model.
     let llm = Arc::new(MockLlm::new());
     let result =
@@ -185,8 +195,8 @@ fn other_labels_are_llm_first() {
 fn llm_only_routes_every_label_through_the_llm() {
     let fixture = Fixture::new(None);
     let id = seed_entity(&fixture.memory, "Maria Lopez", "PER", "[]", "{}");
-    let llm: Arc<dyn Llm> =
-        Arc::new(MockLlm::with_responses([format!("{{\"chosen_entity_id\": \"{id}\"}}")]));
+    let mock = Arc::new(MockLlm::with_responses([format!("{{\"chosen_entity_id\": \"{id}\"}}")]));
+    let llm: Arc<dyn Llm> = mock.clone();
     let service = EdService::new(
         &fixture.retriever,
         EdServiceSettings { llm_only: true, ..EdServiceSettings::default() },
@@ -200,6 +210,8 @@ fn llm_only_routes_every_label_through_the_llm() {
     assert_eq!(result.chosen_entity_id, Some(id));
     assert!(result.resolved_by_llm);
     assert!(result.confidence.abs() < f64::EPSILON);
+    // Person mentions (span label PER) get the person guidance.
+    assert!(mock.prompts()[0].contains("PERSON Entity Guidelines:"));
 }
 
 #[test]

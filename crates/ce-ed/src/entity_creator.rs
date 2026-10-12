@@ -74,7 +74,7 @@ pub struct EntityCreator {
     role_config: Option<RoleConfig>,
     reuse_similarity_threshold: f64,
     retrieval_strategy: EntityRetrievalStrategy,
-    all_entities_cache: Mutex<Option<Vec<StoredEntity>>>,
+    all_entities_cache: Mutex<Option<Arc<Vec<StoredEntity>>>>,
 }
 
 impl std::fmt::Debug for EntityCreator {
@@ -181,7 +181,7 @@ impl EntityCreator {
         let cross_type_threshold = self.reuse_similarity_threshold.max(CROSS_TYPE_REUSE_THRESHOLD);
         let entity_types = self.similarity.entity_types();
 
-        for entity in &entities {
+        for entity in entities.iter() {
             let node = &entity.node;
             if searching_for_real_name && !node.name.is_empty() && self.is_role_term(&node.name) {
                 tracing::debug!(
@@ -270,12 +270,12 @@ impl EntityCreator {
     }
 
     /// Reuse candidates by strategy: BM25 name search, vector search over the embedded name
-    /// (top [`VECTOR_REUSE_LIMIT`]), or every entity (cached). Entities without a name are
-    /// dropped.
+    /// (top [`VECTOR_REUSE_LIMIT`]), or every entity (cached and shared until the next entity
+    /// is created). Entities without a name are dropped.
     ///
     /// # Errors
     /// Fatal store errors.
-    pub fn fetch_entity_candidates(&self, query_name: &str) -> Result<Vec<StoredEntity>> {
+    pub fn fetch_entity_candidates(&self, query_name: &str) -> Result<Arc<Vec<StoredEntity>>> {
         let entities = match self.retrieval_strategy {
             EntityRetrievalStrategy::Bm25 => {
                 let hits = recover_store(
@@ -287,7 +287,7 @@ impl EntityCreator {
             EntityRetrievalStrategy::VectorFuzzy => self.fetch_via_vector(query_name)?,
             EntityRetrievalStrategy::AllEntitiesFuzzy => return self.all_entities_cached(),
         };
-        Ok(with_name(entities))
+        Ok(Arc::new(with_name(entities)))
     }
 
     fn fetch_via_vector(&self, query_name: &str) -> Result<Vec<StoredEntity>> {
@@ -310,21 +310,21 @@ impl EntityCreator {
         Ok(hits.into_iter().map(|hit| hit.node).collect())
     }
 
-    fn all_entities_cached(&self) -> Result<Vec<StoredEntity>> {
+    fn all_entities_cached(&self) -> Result<Arc<Vec<StoredEntity>>> {
         let mut cache = self.all_entities_cache.lock().unwrap_or_else(PoisonError::into_inner);
         if let Some(entities) = cache.as_ref() {
-            return Ok(entities.clone());
+            return Ok(Arc::clone(entities));
         }
-        let entities = with_name(recover_store(
+        let entities = Arc::new(with_name(recover_store(
             self.store.get_all_entities(ALL_ENTITIES_LIMIT),
             "fetching all entities",
-        )?);
+        )?));
         tracing::info!(count = entities.len(), "loaded entities into the EntityCreator cache");
-        *cache = Some(entities.clone());
+        *cache = Some(Arc::clone(&entities));
         Ok(entities)
     }
 
-    /// Drops the `all_entities_fuzzy` cache.
+    /// Drops the `all_entities_fuzzy` cache; called after every entity this creator writes.
     pub fn invalidate_cache(&self) {
         *self.all_entities_cache.lock().unwrap_or_else(PoisonError::into_inner) = None;
     }
@@ -520,6 +520,8 @@ impl EntityCreator {
             name = canonical_name.as_str(),
             "created new entity"
         );
+        // Later mentions of the document must see the new entity.
+        self.invalidate_cache();
         self.create_entity_embedding(&created.id, &canonical_name, &description, &alias_list)?;
         Ok(Some(EntityOutcome::Created(created.id)))
     }
@@ -587,8 +589,23 @@ impl EntityCreator {
         aliases: &[String],
         metadata: Option<&Metadata>,
     ) -> Result<EdResult> {
+        Ok(self.create_entity_with_outcome(ctx, result, aliases, metadata)?.0)
+    }
+
+    /// [`EntityCreator::create_entity_from_ed_result`] together with whether an entity was
+    /// created or reused (`None` when the result was left unchanged or not resolved).
+    ///
+    /// # Errors
+    /// Fatal store errors.
+    pub fn create_entity_with_outcome(
+        &self,
+        ctx: &EdContext,
+        result: EdResult,
+        aliases: &[String],
+        metadata: Option<&Metadata>,
+    ) -> Result<(EdResult, Option<EntityOutcome>)> {
         if result.chosen_entity_id.is_some() {
-            return Ok(result);
+            return Ok((result, None));
         }
         let entity_type =
             if ctx.span_label.is_empty() { &ctx.mention.entity_type } else { &ctx.span_label };
@@ -598,17 +615,18 @@ impl EntityCreator {
                 name = ctx.mention.name.as_str(),
                 "skipping entity creation for a value type"
             );
-            return Ok(EdResult {
+            let result = EdResult {
                 resolved_by_llm: false,
                 confidence: 0.0,
                 strategy_used: "skip_value_type".to_owned(),
                 ..result
-            });
+            };
+            return Ok((result, None));
         }
 
         let Some(outcome) = self.create_or_reuse_entity_for_mention(ctx, aliases, metadata)? else {
             let strategy_used = format!("{}_skip_role", result.strategy_used);
-            return Ok(EdResult { strategy_used, ..result });
+            return Ok((EdResult { strategy_used, ..result }, None));
         };
         let (strategy_used, confidence) = match &outcome {
             EntityOutcome::Created(_) => (format!("{}_create", result.strategy_used), 0.7),
@@ -619,16 +637,14 @@ impl EntityCreator {
             }
             EntityOutcome::Reused(_) => (format!("{}_reuse", result.strategy_used), 0.85),
         };
-        let chosen = match outcome {
-            EntityOutcome::Created(id) | EntityOutcome::Reused(id) => id,
-        };
-        Ok(EdResult {
-            chosen_entity_id: Some(chosen),
+        let result = EdResult {
+            chosen_entity_id: Some(outcome.entity_id().clone()),
             resolved_by_llm: false,
             confidence,
             strategy_used,
             ..result
-        })
+        };
+        Ok((result, Some(outcome)))
     }
 }
 

@@ -5,12 +5,13 @@ mod ed_support;
 
 use std::sync::Arc;
 
+use ce_config::pipeline::EntityRetrievalStrategy;
 use ce_config::prompts::EdPrompt;
 use ce_core::{
     Chunk, ChunkWriteResult, CorefClusterContext, EdResult, Mention, MentionId, Metadata, NodeId,
     Span,
 };
-use ce_ed::{CoreEdResolver, ResolveInput};
+use ce_ed::{CoreEdResolver, EntityOutcome, ResolveInput};
 use ce_models::{Embedder, MockEmbedder};
 use ce_store::GraphStore;
 use ed_support::{ed_config, entities, mappings, roles, store, DIM};
@@ -101,7 +102,7 @@ fn resolves_a_document_with_intra_doc_matching_and_creation() {
         canonical: None,
         all: None,
     };
-    let results = resolver(true).resolve(&mentions, &run.input()).expect("resolves");
+    let results = resolver(true).resolve(&mentions, &run.input()).expect("resolves").results;
 
     // m6 is outside the indexed chunks: no result.
     let ids: Vec<&str> = results.keys().map(MentionId::as_str).collect();
@@ -133,7 +134,7 @@ fn resolves_a_document_with_intra_doc_matching_and_creation() {
         mention("n5", "LOC", "Riverside Arena", 0, "200"),
     ];
     let run2 = Run { chunks: &chunks2, ..run };
-    let results2 = resolver(true).resolve(&mentions2, &run2.input()).expect("resolves");
+    let results2 = resolver(true).resolve(&mentions2, &run2.input()).expect("resolves").results;
     assert_eq!(chosen(&results2, "n1"), chosen(&results, "m1"));
     assert_eq!(chosen(&results2, "n2"), chosen(&results, "m2"));
     assert_eq!(chosen(&results2, "n5"), chosen(&results, "m5"));
@@ -167,7 +168,7 @@ fn canonical_mentions_get_cluster_aliases() {
         canonical: Some(&canonical_map),
         all: Some(&all),
     };
-    let results = resolver(true).resolve(&[canonical], &run.input()).expect("resolves");
+    let results = resolver(true).resolve(&[canonical], &run.input()).expect("resolves").results;
     assert_eq!(strategy(&results, "m1"), "hybrid_unresolved_create");
     let stored = entities(&memory);
     assert_eq!(stored.len(), 1);
@@ -193,7 +194,7 @@ fn without_create_if_missing_mentions_stay_unresolved() {
         all: None,
     };
     let mentions = [mention("m1", "PER", "Maria Lopez", 0, "100")];
-    let results = resolver(false).resolve(&mentions, &run.input()).expect("resolves");
+    let results = resolver(false).resolve(&mentions, &run.input()).expect("resolves").results;
     assert_eq!(chosen(&results, "m1"), None);
     assert_eq!(strategy(&results, "m1"), "hybrid_unresolved");
     assert!(entities(&memory).is_empty());
@@ -220,7 +221,45 @@ fn intra_doc_matching_can_be_disabled() {
         mention("m1", "PER", "Maria Lopez", 0, "100"),
         mention("m3", "PER", "Ms. Lopez", 0, "100"),
     ];
-    let results = resolver.resolve(&mentions, &run.input()).expect("resolves");
+    let results = resolver.resolve(&mentions, &run.input()).expect("resolves").results;
     assert!(!strategy(&results, "m3").starts_with("intra_doc"), "{}", strategy(&results, "m3"));
     assert_eq!(chosen(&results, "m3"), chosen(&results, "m1"));
+}
+
+#[test]
+fn all_entities_fuzzy_sees_entities_created_earlier_in_the_document() {
+    // With intra-document matching off, the second "Mercury Freight" must find the entity the
+    // first one created through the refreshed `all_entities_fuzzy` caches.
+    let (memory, store) = store();
+    let chunks = [chunk("doc-1", "100")];
+    let metadata = Metadata::new();
+    let mut config = ed_config();
+    config.enable_intra_doc_matching = false;
+    config.entity_retrieval_strategy = EntityRetrievalStrategy::AllEntitiesFuzzy;
+    // BM25 similarity retrieval would find the entity outside the cache.
+    config.enable_similarity_retrieval = false;
+    let resolver = CoreEdResolver::new(&config, mappings(), None, Some(roles()));
+    let run = Run {
+        store: &store,
+        embedder: None,
+        chunks: &chunks,
+        metadata: &metadata,
+        clusters: None,
+        canonical: None,
+        all: None,
+    };
+    let mentions = [
+        mention("m1", "ORG", "Mercury Freight", 0, "100"),
+        mention("m2", "ORG", "Mercury Freight", 0, "100"),
+    ];
+    let resolution = resolver.resolve(&mentions, &run.input()).expect("resolves");
+    assert_eq!(entities(&memory).len(), 1);
+    assert!(matches!(
+        resolution.outcomes.get(&MentionId::from("m1")),
+        Some(EntityOutcome::Created(_))
+    ));
+    // The retriever's refreshed cache resolves it before the entity creator is needed.
+    assert_eq!(resolution.outcomes.get(&MentionId::from("m2")), None);
+    assert_eq!(strategy(&resolution.results, "m2"), "hybrid_heuristic");
+    assert_eq!(chosen(&resolution.results, "m2"), chosen(&resolution.results, "m1"));
 }

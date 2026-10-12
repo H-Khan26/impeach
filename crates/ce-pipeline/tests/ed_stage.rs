@@ -10,9 +10,9 @@ use ce_config::{PipelineConfig, StageConfig};
 use ce_core::processing::DefinedTerm;
 use ce_core::{
     Chunk, ChunkWriteResult, CorefClusterContext, DocumentWriteResult, EdResult, EntityId,
-    IndexingResult, Mention, MentionId, NodeId, Span, SpanId,
+    IndexingResult, Mention, NodeId, Span, SpanId,
 };
-use ce_ed::{EdResolver, ResolveInput};
+use ce_ed::{EdResolver, Resolution, ResolveInput};
 use ce_models::{MockLlm, ModelRegistry};
 use ce_pipeline::{EdStage, PipelineContext, PipelineError, Stage, StageBuildContext};
 use ce_store::{EntityNode, GraphStore, MemoryStore};
@@ -27,14 +27,10 @@ struct StubResolver {
 }
 
 impl EdResolver for StubResolver {
-    fn resolve(
-        &self,
-        mentions: &[Mention],
-        input: &ResolveInput<'_>,
-    ) -> ce_ed::Result<IndexMap<MentionId, EdResult>> {
+    fn resolve(&self, mentions: &[Mention], input: &ResolveInput<'_>) -> ce_ed::Result<Resolution> {
         *self.inputs.lock().expect("lock") = mentions.iter().map(|m| m.id.to_string()).collect();
         *self.saw_all_mentions.lock().expect("lock") = input.all_mentions_by_id.map(IndexMap::len);
-        Ok(mentions
+        let results = mentions
             .iter()
             .map(|m| {
                 let result = EdResult {
@@ -47,7 +43,8 @@ impl EdResolver for StubResolver {
                 };
                 (m.id.clone(), result)
             })
-            .collect())
+            .collect();
+        Ok(Resolution { results, outcomes: IndexMap::new() })
     }
 }
 

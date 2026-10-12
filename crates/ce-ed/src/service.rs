@@ -29,11 +29,12 @@ use crate::rule_resolvers::{
 };
 use crate::structured_keys::KeyPatterns;
 
-/// Entity-type guidance inserted into the system prompt (`{type_specific_guidance}`), looked
-/// up by the exact mention label; other labels get an empty string.
+/// Entity-type guidance inserted into the system prompt (`{type_specific_guidance}`), keyed by
+/// the normalised span label (`entity_types.yaml` types, so persons are `PER`); other labels
+/// get an empty string.
 pub const TYPE_SPECIFIC_GUIDANCE: [(&str, &str); 4] = [
     (
-        "PERSON",
+        "PER",
         "PERSON Entity Guidelines:\n\
          - Consider roles (plaintiff, defendant, witness, attorney, judge).\n\
          - Names may appear with titles (Dr., Atty., Hon.) or without.\n\
@@ -63,7 +64,7 @@ pub const TYPE_SPECIFIC_GUIDANCE: [(&str, &str); 4] = [
     ),
 ];
 
-/// Guidance for `entity_type` from [`TYPE_SPECIFIC_GUIDANCE`], or `""`.
+/// Guidance for the normalised label `entity_type` from [`TYPE_SPECIFIC_GUIDANCE`], or `""`.
 #[must_use]
 pub fn type_specific_guidance(entity_type: &str) -> &'static str {
     TYPE_SPECIFIC_GUIDANCE
@@ -386,6 +387,16 @@ impl<'a> EdService<'a> {
         };
 
         let chosen = match data.get("chosen_entity_id") {
+            Some(Value::String(id))
+                if !id.is_empty() && !candidates.iter().any(|c| c.entity_id.as_str() == id) =>
+            {
+                tracing::warn!(
+                    mention = %ctx.mention.id,
+                    chosen = id.as_str(),
+                    "ED LLM chose an id that is not a candidate; ignored"
+                );
+                None
+            }
             Some(Value::String(id)) if !id.is_empty() => Some(id.clone()),
             Some(Value::Null | Value::String(_)) | None => None,
             Some(other) => {
@@ -749,10 +760,13 @@ mod tests {
     }
 
     #[test]
-    fn guidance_is_looked_up_by_exact_label() {
-        assert!(type_specific_guidance("PERSON").starts_with("PERSON Entity Guidelines:\n"));
+    fn guidance_is_looked_up_by_normalised_label() {
+        assert!(type_specific_guidance("PER").starts_with("PERSON Entity Guidelines:\n"));
         assert!(type_specific_guidance("ORG").ends_with("law firm naming patterns.\n"));
-        assert_eq!(type_specific_guidance("PER"), "");
+        assert!(type_specific_guidance("CASE").starts_with("CASE Entity Guidelines:\n"));
+        assert!(type_specific_guidance("EXHIBIT").starts_with("EXHIBIT Entity Guidelines:\n"));
+        assert_eq!(type_specific_guidance("PERSON"), "");
+        assert_eq!(type_specific_guidance("LOC"), "");
     }
 
     #[test]

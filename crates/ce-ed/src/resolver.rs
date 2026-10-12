@@ -28,7 +28,7 @@ use ce_text::normalize::py_strip;
 use indexmap::{IndexMap, IndexSet};
 
 use crate::context_builder::ContextBuilder;
-use crate::entity_creator::EntityCreator;
+use crate::entity_creator::{EntityCreator, EntityOutcome};
 use crate::error::Result;
 use crate::name_matching::{entity_types_compatible, names_match, normalize_for_matching};
 use crate::name_similarity::NameSimilarity;
@@ -236,27 +236,28 @@ impl std::fmt::Debug for ResolveInput<'_> {
     }
 }
 
+/// Output of [`EdResolver::resolve`].
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct Resolution {
+    /// Mention id -> result for the mentions that could be resolved or attempted, in input
+    /// order.
+    pub results: IndexMap<MentionId, EdResult>,
+    /// Mention id -> entity created or reused for it by the entity creator.
+    pub outcomes: IndexMap<MentionId, EntityOutcome>,
+}
+
 /// Resolves a document's mentions to entities (Python `EDResolver` protocol of
 /// `interfaces.py`).
 pub trait EdResolver: Send + Sync + std::fmt::Debug {
-    /// Mention id -> result for the mentions that could be resolved or attempted, in input
-    /// order.
+    /// Results per mention and the entity creator's outcomes.
     ///
     /// # Errors
     /// Fatal store errors; prompt errors of the LLM tie-break.
-    fn resolve(
-        &self,
-        mentions: &[Mention],
-        input: &ResolveInput<'_>,
-    ) -> Result<IndexMap<MentionId, EdResult>>;
+    fn resolve(&self, mentions: &[Mention], input: &ResolveInput<'_>) -> Result<Resolution>;
 }
 
 impl EdResolver for CoreEdResolver {
-    fn resolve(
-        &self,
-        mentions: &[Mention],
-        input: &ResolveInput<'_>,
-    ) -> Result<IndexMap<MentionId, EdResult>> {
+    fn resolve(&self, mentions: &[Mention], input: &ResolveInput<'_>) -> Result<Resolution> {
         CoreEdResolver::resolve(self, mentions, input)
     }
 }
@@ -303,16 +304,13 @@ impl CoreEdResolver {
         self.similarity.entity_types()
     }
 
-    /// Resolves `mentions`; the result maps mention id -> result in input order (mentions
-    /// without a context have none).
+    /// Resolves `mentions`: results by mention id in input order (mentions without a context
+    /// have none) and the entity creator's outcomes. Every created entity drops the
+    /// `all_entities_fuzzy` caches so later mentions of the document can reuse it.
     ///
     /// # Errors
     /// Fatal store errors; prompt errors of the LLM tie-break.
-    pub fn resolve(
-        &self,
-        mentions: &[Mention],
-        input: &ResolveInput<'_>,
-    ) -> Result<IndexMap<MentionId, EdResult>> {
+    pub fn resolve(&self, mentions: &[Mention], input: &ResolveInput<'_>) -> Result<Resolution> {
         let config = &self.config;
         let entity_types = self.similarity.entity_types();
         let retriever = EdRetriever::new(
@@ -362,7 +360,7 @@ impl CoreEdResolver {
         let mut matcher = config
             .enable_intra_doc_matching
             .then(|| IntraDocumentMatcher::new(entity_creator.as_ref(), entity_types));
-        let mut results: IndexMap<MentionId, EdResult> = IndexMap::new();
+        let mut resolution = Resolution::default();
 
         for mention in mentions {
             let Some(ed_ctx) = context_builder.build_context(mention) else {
@@ -378,7 +376,7 @@ impl CoreEdResolver {
                     strategy,
                     "intra-doc match"
                 );
-                results.insert(
+                resolution.results.insert(
                     mention.id.clone(),
                     EdResult {
                         mention_id: Some(mention.id.clone()),
@@ -396,24 +394,31 @@ impl CoreEdResolver {
                 service.resolve_span(&ed_ctx, config.allow_llm, config.max_candidates)?;
             attach_mention_id(&mut result, mention);
 
+            let aliases = aliases_of(&mention.id);
             if result.chosen_entity_id.is_none() {
                 if let Some(creator) = &entity_creator {
-                    let aliases = aliases_of(&mention.id);
-                    result =
-                        creator.create_entity_from_ed_result(&ed_ctx, result, &aliases, None)?;
+                    let (created, outcome) =
+                        creator.create_entity_with_outcome(&ed_ctx, result, &aliases, None)?;
+                    result = created;
                     attach_mention_id(&mut result, mention);
+                    if let Some(outcome) = outcome {
+                        if outcome.is_new() {
+                            retriever.invalidate_cache();
+                        }
+                        resolution.outcomes.insert(mention.id.clone(), outcome);
+                    }
                 }
             }
 
             if let (Some(entity_id), Some(matcher)) = (&result.chosen_entity_id, matcher.as_mut()) {
                 matcher.register_resolution(&mention.name, &mention.entity_type, entity_id);
-                for alias in aliases_of(&mention.id) {
-                    matcher.register_resolution(&alias, &mention.entity_type, entity_id);
+                for alias in &aliases {
+                    matcher.register_resolution(alias, &mention.entity_type, entity_id);
                 }
             }
-            results.insert(mention.id.clone(), result);
+            resolution.results.insert(mention.id.clone(), result);
         }
-        Ok(results)
+        Ok(resolution)
     }
 }
 
