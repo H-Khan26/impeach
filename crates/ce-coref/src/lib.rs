@@ -24,10 +24,8 @@ use ce_core::{ChunkId, ChunkWriteResult, CorefClusterContext, DocId, Mention, Me
 use indexmap::IndexMap;
 
 pub use ce_ner::definitions::RoleConfig;
-pub use clusters::{
-    is_pronoun, label_clusters, ClusterBuilder, ClusterContext, ClusterSpan, ResolvedCluster,
-};
-pub use pronouns::{PronounSynthesis, PRONOUN_SOURCE};
+pub use clusters::{label_clusters, ClusterBuilder, ClusterContext, ClusterSpan, ResolvedCluster};
+pub use pronouns::PRONOUN_SOURCE;
 pub use settings::{default_incompatible_type_groups, CorefSettings, DEFAULT_ELIGIBLE_TYPES};
 pub use text::reconstruct_doc_text;
 
@@ -110,16 +108,7 @@ impl CorefPostProcessor {
                 self.settings.pronoun_confidence,
             );
             if !synthesis.mentions.is_empty() {
-                let mut synthetic_to_canonical = IndexMap::new();
-                for mention in &synthesis.mentions {
-                    let canonical = mention
-                        .metadata
-                        .get("canonical_mention_id")
-                        .and_then(serde_json::Value::as_str)
-                        .unwrap_or_default();
-                    synthetic_to_canonical.insert(mention.id.clone(), MentionId::new(canonical));
-                }
-                output.synthetic_pronoun_mentions = Some(synthetic_to_canonical);
+                output.synthetic_pronoun_mentions = Some(synthesis.synthetic_to_canonical);
                 output.synthetic_mentions = synthesis.mentions;
                 output.synthetic_by_chunk = synthesis.by_chunk;
             }

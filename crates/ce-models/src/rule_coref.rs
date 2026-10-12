@@ -12,6 +12,10 @@
 //!    (`GVL` / `Green Valley Logistics`). An alias joins its longer names only when those names
 //!    are nested in each other; an alias of two unrelated names (`Lopez` with `Maria Lopez` and
 //!    `Carlos Lopez`) is ambiguous and stays unlinked.
+//!
+//!    A gendered honorific (`mr`, `sir` masculine; `mrs`, `ms`, `miss`, `madam` feminine) is
+//!    kept as a constraint: `Mr. Lopez` and `Mrs. Lopez` are different names, a bare `Lopez`
+//!    beside both is ambiguous, and a bare `Lopez` beside only `Mr. Lopez` is its alias.
 //! 2. **Pronoun linking**: every pronoun in the text that does not overlap a mention, and every
 //!    mention whose text is a pronoun, links to the nearest preceding compatible mention (or
 //!    already linked pronoun of the same kind) that starts in the same sentence or at most
@@ -19,7 +23,7 @@
 //!
 //!    | Pronouns | Compatible entity types |
 //!    | --- | --- |
-//!    | `he him his she her hers` | person (`PER`, `PERSON`) |
+//!    | `he him his` / `she her hers` | person (`PER`, `PERSON`) |
 //!    | `it its` | anything but person and temporal (`DATE`, `TIME`) |
 //!    | `they them their theirs` | anything but person and temporal (groups, organisations) |
 //!    | `we us our ours` | not linked (they usually include the speaker) |
@@ -28,18 +32,16 @@
 //!    whitespace, except after common abbreviations (`Mr.`, `Inc.`, `No.`, ...) and single
 //!    capital initials; a blank line also ends a sentence.
 //!
+//! **Gender**: a cluster never mixes masculine and feminine evidence (gendered honorifics and
+//! pronouns). A name alias or a pronoun link that would mix them is skipped; a pronoun then
+//! tries its next nearest candidate.
+//!
 //! Output clusters hold at least two distinct spans sorted by start, ordered by their first span.
 
 use std::collections::{BTreeSet, HashMap};
 
 use crate::error::ModelError;
 use crate::traits::{Coref, CorefCluster, CorefMention};
-
-/// Pronouns flagged as such in coreference output (the Python `CorefService` list).
-pub const PRONOUNS: [&str; 16] = [
-    "he", "she", "they", "them", "him", "her", "his", "hers", "their", "theirs", "it", "its", "we",
-    "us", "our", "ours",
-];
 
 /// How many sentences before its own a pronoun's antecedent may start in (0 = same sentence).
 pub const PRONOUN_SENTENCE_WINDOW: usize = 1;
@@ -94,10 +96,41 @@ impl Coref for RuleCoref {
     }
 }
 
+/// Grammatical gender evidence.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum Gender {
+    Masculine,
+    Feminine,
+}
+
+impl Gender {
+    fn bit(self) -> u8 {
+        match self {
+            Self::Masculine => 1,
+            Self::Feminine => 2,
+        }
+    }
+
+    /// The gender of a lowercase honorific.
+    fn of_honorific(token: &str) -> Option<Self> {
+        match token {
+            "mr" | "sir" => Some(Self::Masculine),
+            "mrs" | "ms" | "miss" | "madam" => Some(Self::Feminine),
+            _ => None,
+        }
+    }
+}
+
+/// Whether two optional genders can describe the same entity.
+fn genders_agree(a: Option<Gender>, b: Option<Gender>) -> bool {
+    !matches!((a, b), (Some(x), Some(y)) if x != y)
+}
+
 /// Pronoun kinds that link to an antecedent.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum PronounKind {
-    Person,
+    Masculine,
+    Feminine,
     Neuter,
     Plural,
 }
@@ -106,10 +139,19 @@ impl PronounKind {
     /// The kind of a lowercase pronoun; `None` for other words and unlinked pronouns.
     fn of(word: &str) -> Option<Self> {
         match word {
-            "he" | "him" | "his" | "she" | "her" | "hers" => Some(Self::Person),
+            "he" | "him" | "his" => Some(Self::Masculine),
+            "she" | "her" | "hers" => Some(Self::Feminine),
             "it" | "its" => Some(Self::Neuter),
             "they" | "them" | "their" | "theirs" => Some(Self::Plural),
             _ => None,
+        }
+    }
+
+    fn gender(self) -> Option<Gender> {
+        match self {
+            Self::Masculine => Some(Gender::Masculine),
+            Self::Feminine => Some(Gender::Feminine),
+            Self::Neuter | Self::Plural => None,
         }
     }
 
@@ -118,26 +160,25 @@ impl PronounKind {
         let person = is(&["PER", "PERSON"]);
         let temporal = is(&["DATE", "TIME"]);
         match self {
-            Self::Person => person,
+            Self::Masculine | Self::Feminine => person,
             Self::Neuter | Self::Plural => !person && !temporal,
         }
     }
 }
 
-/// Whether `word` (any case, surrounding whitespace ignored) is one of [`PRONOUNS`].
-pub fn is_pronoun(word: &str) -> bool {
-    let word = word.trim().to_lowercase();
-    PRONOUNS.contains(&word.as_str())
-}
-
-/// Disjoint-set forest over span nodes.
+/// Disjoint-set forest over span nodes; each root carries the gender bits of its set and a
+/// union that would combine masculine and feminine is refused.
 struct UnionFind {
     parent: Vec<usize>,
+    genders: Vec<u8>,
 }
 
 impl UnionFind {
-    fn new(len: usize) -> Self {
-        Self { parent: (0..len).collect() }
+    fn new(genders: &[Option<Gender>]) -> Self {
+        Self {
+            parent: (0..genders.len()).collect(),
+            genders: genders.iter().map(|g| g.map_or(0, Gender::bit)).collect(),
+        }
     }
 
     fn find(&mut self, mut node: usize) -> usize {
@@ -148,35 +189,53 @@ impl UnionFind {
         node
     }
 
-    fn union(&mut self, a: usize, b: usize) {
+    /// Joins the sets of `a` and `b`; `false` (nothing joined) when that would mix genders.
+    fn union(&mut self, a: usize, b: usize) -> bool {
         let (ra, rb) = (self.find(a), self.find(b));
-        if ra != rb {
-            // The smaller root wins so results do not depend on union order.
-            let (keep, drop) = if ra < rb { (ra, rb) } else { (rb, ra) };
-            self.parent[drop] = keep;
+        if ra == rb {
+            return true;
         }
+        let combined = self.genders[ra] | self.genders[rb];
+        if combined == Gender::Masculine.bit() | Gender::Feminine.bit() {
+            return false;
+        }
+        // The smaller root wins so results do not depend on union order.
+        let (keep, drop) = if ra < rb { (ra, rb) } else { (rb, ra) };
+        self.parent[drop] = keep;
+        self.genders[keep] = combined;
+        true
     }
 }
 
-/// Mentions sharing one entity type and normalised name.
+/// Mentions sharing one entity type, normalised name and honorific gender.
 struct NameGroup<'a> {
     entity_type: &'a str,
     tokens: Vec<String>,
     set: BTreeSet<String>,
+    gender: Option<Gender>,
     acronym: Option<String>,
     nodes: Vec<usize>,
 }
 
 impl NameGroup<'_> {
-    /// Whether this group's name is an alias of `other`'s.
+    /// Whether this group's name is an alias of `other`'s: a proper token subset, the same
+    /// tokens without the other's gendered honorific, or an acronym; genders must agree.
     fn is_alias_of(&self, other: &NameGroup<'_>) -> bool {
-        if self.entity_type != other.entity_type {
+        if self.entity_type != other.entity_type || !genders_agree(self.gender, other.gender) {
             return false;
         }
-        let subset = self.set.len() < other.set.len()
-            && self.set.iter().any(|t| t.chars().count() >= 2)
-            && self.set.is_subset(&other.set);
-        subset || self.acronym.as_ref().is_some_and(|a| other.matches_acronym(a))
+        let meaningful = self.set.iter().any(|t| t.chars().count() >= 2);
+        let subset =
+            meaningful && self.set.len() < other.set.len() && self.set.is_subset(&other.set);
+        let ungendered_twin =
+            meaningful && self.gender.is_none() && other.gender.is_some() && self.set == other.set;
+        subset || ungendered_twin || self.acronym.as_ref().is_some_and(|a| other.matches_acronym(a))
+    }
+
+    /// Whether two alias targets can be the same entity: nested names, agreeing genders.
+    fn nests_with(&self, other: &NameGroup<'_>) -> bool {
+        genders_agree(self.gender, other.gender)
+            && (self.set.is_subset(&other.set) || other.set.is_subset(&self.set))
     }
 
     fn matches_acronym(&self, acronym: &str) -> bool {
@@ -194,8 +253,8 @@ impl NameGroup<'_> {
     }
 }
 
-/// Normalised name tokens (see the module docs).
-fn name_tokens(name: &str) -> Vec<String> {
+/// Normalised name tokens and the gender of a leading honorific (see the module docs).
+fn name_tokens(name: &str) -> (Vec<String>, Option<Gender>) {
     let lowered: String = name
         .to_lowercase()
         .chars()
@@ -205,11 +264,12 @@ fn name_tokens(name: &str) -> Vec<String> {
     let mut tokens: Vec<&str> = lowered.split_whitespace().collect();
     let leading =
         tokens.iter().take_while(|t| ARTICLES.contains(t) || HONORIFICS.contains(t)).count();
+    let gender = tokens[..leading].iter().find_map(|t| Gender::of_honorific(t));
     tokens.drain(..leading);
     while tokens.len() > 1 && tokens.last().is_some_and(|t| DESIGNATORS.contains(t)) {
         tokens.pop();
     }
-    tokens.into_iter().map(str::to_owned).collect()
+    (tokens.into_iter().map(str::to_owned).collect(), gender)
 }
 
 /// The lowercase acronym spelled by `name` (`GVL`, `G.V.L.`), if it looks like one.
@@ -288,32 +348,35 @@ fn cluster_mentions(text: &str, mentions: &[CorefMention<'_>]) -> Vec<CorefClust
         mentions.iter().filter(|m| m.start < m.end && m.end <= n).collect();
     valid.sort_by_key(|m| (m.start, m.end));
 
-    // Span nodes: named mentions first, then pronouns.
+    // Span nodes: named mentions first, then pronouns, each with its gender evidence.
     let mut spans: Vec<(usize, usize)> = Vec::new();
+    let mut genders: Vec<Option<Gender>> = Vec::new();
     // (node, entity type) of each named mention, in text order.
     let mut named: Vec<(usize, &str)> = Vec::new();
     let mut groups: Vec<NameGroup<'_>> = Vec::new();
-    let mut group_index: HashMap<(&str, String), usize> = HashMap::new();
+    let mut group_index: HashMap<(&str, String, Option<Gender>), usize> = HashMap::new();
     // (node, kind) of each pronoun occurrence.
     let mut pronouns: Vec<(usize, PronounKind)> = Vec::new();
 
     for m in &valid {
-        let lowered = m.text.trim().to_lowercase();
-        if PRONOUNS.contains(&lowered.as_str()) {
+        if crate::traits::is_pronoun(m.text) {
+            let lowered = ce_text::normalize::py_strip(m.text).to_lowercase();
             if let Some(kind) = PronounKind::of(&lowered) {
                 spans.push((m.start, m.end));
+                genders.push(kind.gender());
                 pronouns.push((spans.len() - 1, kind));
             }
             continue;
         }
-        let tokens = name_tokens(m.text);
+        let (tokens, gender) = name_tokens(m.text);
         if tokens.is_empty() {
             continue;
         }
         spans.push((m.start, m.end));
+        genders.push(gender);
         let node = spans.len() - 1;
         named.push((node, m.entity_type));
-        let key = (m.entity_type, tokens.join(" "));
+        let key = (m.entity_type, tokens.join(" "), gender);
         let index = match group_index.get(&key) {
             Some(&index) => index,
             None => {
@@ -321,6 +384,7 @@ fn cluster_mentions(text: &str, mentions: &[CorefMention<'_>]) -> Vec<CorefClust
                     entity_type: m.entity_type,
                     set: tokens.iter().cloned().collect(),
                     tokens,
+                    gender,
                     acronym: None,
                     nodes: Vec::new(),
                 });
@@ -349,6 +413,7 @@ fn cluster_mentions(text: &str, mentions: &[CorefMention<'_>]) -> Vec<CorefClust
                     continue;
                 }
                 spans.push((start, i));
+                genders.push(kind.gender());
                 pronouns.push((spans.len() - 1, kind));
             }
             _ => {}
@@ -356,7 +421,7 @@ fn cluster_mentions(text: &str, mentions: &[CorefMention<'_>]) -> Vec<CorefClust
     }
     pronouns.sort_by_key(|(node, _)| spans[*node]);
 
-    let mut forest = UnionFind::new(spans.len());
+    let mut forest = UnionFind::new(&genders);
     for group in &groups {
         for pair in group.nodes.windows(2) {
             forest.union(pair[0], pair[1]);
@@ -369,13 +434,13 @@ fn cluster_mentions(text: &str, mentions: &[CorefMention<'_>]) -> Vec<CorefClust
             .filter(|(h, other)| *h != g && group.is_alias_of(other))
             .map(|(_, other)| other)
             .collect();
-        let nested = longer.iter().enumerate().all(|(i, a)| {
-            longer[i + 1..].iter().all(|b| a.set.is_subset(&b.set) || b.set.is_subset(&a.set))
-        });
+        let nested =
+            longer.iter().enumerate().all(|(i, a)| longer[i + 1..].iter().all(|b| a.nests_with(b)));
         if !nested {
             continue;
         }
         for other in longer {
+            // Refused when the two sets already carry different genders.
             forest.union(group.nodes[0], other.nodes[0]);
         }
     }
@@ -396,12 +461,12 @@ fn cluster_mentions(text: &str, mentions: &[CorefMention<'_>]) -> Vec<CorefClust
             .map(|(c, _)| *c);
         let earlier_pronouns =
             linked.iter().filter(|(c, k)| *k == kind && in_window(*c)).map(|(c, _)| *c);
-        // Nearest: latest end, then the longer span.
-        let antecedent = names
-            .chain(earlier_pronouns)
-            .max_by_key(|c| (spans[*c].1, std::cmp::Reverse(spans[*c].0)));
-        if let Some(antecedent) = antecedent {
-            forest.union(node, antecedent);
+        // Nearest first: latest end, then the longer span; the first candidate whose cluster
+        // does not carry the other gender wins.
+        let mut candidates: Vec<usize> = names.chain(earlier_pronouns).collect();
+        candidates
+            .sort_by_key(|c| std::cmp::Reverse((spans[*c].1, std::cmp::Reverse(spans[*c].0))));
+        if candidates.into_iter().any(|antecedent| forest.union(node, antecedent)) {
             linked.push((node, kind));
         }
     }
@@ -460,13 +525,16 @@ mod tests {
 
     #[test]
     fn normalises_names() {
-        assert_eq!(name_tokens("Ms. Lopez"), vec!["lopez"]);
+        let tokens = |name: &str| name_tokens(name).0;
+        assert_eq!(name_tokens("Ms. Lopez"), (vec!["lopez".to_owned()], Some(Gender::Feminine)));
+        assert_eq!(name_tokens("Mr. Lopez").1, Some(Gender::Masculine));
+        assert_eq!(name_tokens("Dr. Lopez"), (vec!["lopez".to_owned()], None));
         assert_eq!(
-            name_tokens("The Green Valley Logistics, Inc."),
+            tokens("The Green Valley Logistics, Inc."),
             vec!["green", "valley", "logistics"]
         );
-        assert_eq!(name_tokens("O'Brien & Co"), vec!["obrien"]);
-        assert_eq!(name_tokens("Inc"), vec!["inc"]);
+        assert_eq!(tokens("O'Brien & Co"), vec!["obrien"]);
+        assert_eq!(tokens("Inc"), vec!["inc"]);
         assert_eq!(acronym("G.V.L."), Some("gvl".to_owned()));
         assert_eq!(acronym("Reed"), None);
     }
@@ -529,6 +597,29 @@ mod tests {
         let text = "Acme Corp fired Reed after he complained. Its manager said they had no choice.";
         let got = resolve(text, &[("Acme Corp", "ORG"), ("Reed", "PER")]);
         assert_eq!(got, vec![vec!["Acme Corp", "Its", "they"], vec!["Reed", "he"]]);
+    }
+
+    #[test]
+    fn pronouns_respect_gender() {
+        let text = "Maria Lopez called Carlos Reed. He said she was late.";
+        let got = resolve(text, &[("Maria Lopez", "PER"), ("Carlos Reed", "PER")]);
+        assert_eq!(got, vec![vec!["Maria Lopez", "she"], vec!["Carlos Reed", "He"]]);
+    }
+
+    #[test]
+    fn gendered_honorifics_constrain_name_matching() {
+        let text = "Mr. Lopez and Mrs. Lopez arrived. Lopez spoke first.";
+        let got = resolve(text, &[("Mr. Lopez", "PER"), ("Mrs. Lopez", "PER"), ("Lopez", "PER")]);
+        assert!(got.is_empty(), "{got:?}");
+
+        let text = "Mr. Lopez arrived. Lopez said he was late.";
+        let got = resolve(text, &[("Mr. Lopez", "PER"), ("Lopez", "PER")]);
+        assert_eq!(got, vec![vec!["Mr. Lopez", "Lopez", "he"]]);
+
+        // A feminine pronoun does not join the Mr. Lopez cluster.
+        let text = "Mr. Lopez arrived. She was late.";
+        let got = resolve(text, &[("Mr. Lopez", "PER")]);
+        assert!(got.is_empty(), "{got:?}");
     }
 
     #[test]

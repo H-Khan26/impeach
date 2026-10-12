@@ -133,6 +133,19 @@ pub struct CorefCluster {
     pub spans: Vec<(usize, usize)>,
 }
 
+/// Pronouns flagged as such in coreference output (the Python `CorefService` list).
+pub const PRONOUNS: [&str; 16] = [
+    "he", "she", "they", "them", "him", "her", "his", "hers", "their", "theirs", "it", "its", "we",
+    "us", "our", "ours",
+];
+
+/// Whether `text`, stripped of Python whitespace and lowercased, is one of [`PRONOUNS`]
+/// (Python `CorefService`: `text.strip().lower() in pronouns`).
+pub fn is_pronoun(text: &str) -> bool {
+    let lowered = ce_text::normalize::py_strip(text).to_lowercase();
+    PRONOUNS.contains(&lowered.as_str())
+}
+
 /// A detected mention handed to a coreference resolver: character offsets into the resolved
 /// text, the surface text and the entity type label.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

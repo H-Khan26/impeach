@@ -52,16 +52,16 @@ pub use error::{ModelError, Result};
 pub use fastembed::{FastEmbedOptions, FastEmbedder};
 #[cfg(feature = "gliner2")]
 pub use gliner2::{Gliner2Ner, Gliner2Options};
-pub use llm_coref::{LlmCoref, LlmCorefPrompt, LLM_COREF_PROMPT_PATH};
+pub use llm_coref::{LlmCoref, LLM_COREF_PROMPT_PATH};
 pub use mock::{MockCoref, MockEmbedder, MockLlm, MockNer, MockNli};
 #[cfg(feature = "ollama")]
 pub use ollama::{OllamaLlm, OllamaOptions};
 #[cfg(feature = "ort-nli")]
 pub use ort_nli::{OrtNli, OrtNliOptions};
 pub use registry::{model_key, ModelKind, ModelRegistry};
-pub use rule_coref::{RuleCoref, PRONOUNS, PRONOUN_SENTENCE_WINDOW};
+pub use rule_coref::{RuleCoref, PRONOUN_SENTENCE_WINDOW};
 pub use sidecar::{SidecarCommand, SidecarCoref, SidecarProcess};
 pub use traits::{
-    normalize_l2, Coref, CorefCluster, CorefMention, Embedder, Llm, LlmRequest, NerModel, NerSpan,
-    NliJudge, NliScores, RelationHit,
+    is_pronoun, normalize_l2, Coref, CorefCluster, CorefMention, Embedder, Llm, LlmRequest,
+    NerModel, NerSpan, NliJudge, NliScores, RelationHit, PRONOUNS,
 };

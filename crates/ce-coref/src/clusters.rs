@@ -5,8 +5,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 
 use ce_core::{CorefClusterContext, Mention, MentionId, Span};
-use ce_models::CorefCluster;
-use ce_text::normalize::py_strip;
+use ce_models::{is_pronoun, CorefCluster};
 use indexmap::{IndexMap, IndexSet};
 
 use crate::settings::CorefSettings;
@@ -33,12 +32,6 @@ pub struct ResolvedCluster {
     pub id: String,
     /// Valid, distinct spans in resolver order.
     pub spans: Vec<ClusterSpan>,
-}
-
-/// Whether `text` (stripped, lowercased) is one of [`ce_models::PRONOUNS`].
-pub fn is_pronoun(text: &str) -> bool {
-    let lowered = py_strip(text).to_lowercase();
-    ce_models::PRONOUNS.contains(&lowered.as_str())
 }
 
 /// Validates resolver output like the Python `CorefService`: spans with `end <= start` or past
@@ -591,7 +584,5 @@ mod tests {
                 },
             ]
         );
-        assert!(is_pronoun(" Their\n"));
-        assert!(!is_pronoun("Maria"));
     }
 }

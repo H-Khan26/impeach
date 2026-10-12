@@ -12,12 +12,14 @@ pub const PRONOUN_SOURCE: &str = "coref_pronoun_synthesis";
 
 /// Synthetic pronoun mentions of a document.
 #[derive(Debug, Clone, Default, PartialEq)]
-pub struct PronounSynthesis {
+pub(crate) struct PronounSynthesis {
     /// One mention per pronoun span of each cluster with a canonical mention, in cluster order.
-    pub mentions: Vec<Mention>,
+    pub(crate) mentions: Vec<Mention>,
     /// The same mentions grouped by the graph id of the chunk containing them (mentions
     /// outside every chunk are left out).
-    pub by_chunk: IndexMap<ChunkId, Vec<Mention>>,
+    pub(crate) by_chunk: IndexMap<ChunkId, Vec<Mention>>,
+    /// Synthetic mention id -> canonical mention id.
+    pub(crate) synthetic_to_canonical: IndexMap<MentionId, MentionId>,
 }
 
 /// A chunk's character range, logical id (`<doc_id>_<sequence_number>`) and graph id.
@@ -113,6 +115,7 @@ pub(crate) fn synthesize(
             if let Some(chunk) = chunk.filter(|c| !c.helix_id.is_empty()) {
                 out.by_chunk.entry(ChunkId::new(chunk.helix_id)).or_default().push(mention.clone());
             }
+            out.synthetic_to_canonical.insert(mention.id.clone(), canonical_id.clone());
             out.mentions.push(mention);
         }
     }

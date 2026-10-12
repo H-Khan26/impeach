@@ -16,7 +16,7 @@ fn mention(id: &str, entity_type: &str, name: &str, start: usize, end: usize) ->
 }
 
 fn span(start: usize, end: usize, text: &str) -> ClusterSpan {
-    ClusterSpan { start, end, text: text.to_owned(), is_pronoun: ce_coref::is_pronoun(text) }
+    ClusterSpan { start, end, text: text.to_owned(), is_pronoun: ce_models::is_pronoun(text) }
 }
 
 fn cluster(id: &str, spans: Vec<ClusterSpan>) -> ResolvedCluster {

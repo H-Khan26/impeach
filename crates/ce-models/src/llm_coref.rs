@@ -1,7 +1,7 @@
 //! LLM-prompted coreference: [`LlmCoref`], the `llm` backend of `models.coref`.
 //!
-//! The prompt ([`LlmCorefPrompt`], default [`LLM_COREF_PROMPT_PATH`]) has the same shape as the
-//! ED prompt: `system_template` and `user_template` strings with Python `str.format`
+//! The prompt (default [`LLM_COREF_PROMPT_PATH`]) is an ED-shaped prompt file loaded as a
+//! [`EdPrompt`]: `system_template` and `user_template` strings with Python `str.format`
 //! placeholders (`{mentions_json}`, `{text}`; `{{` / `}}` are literal braces). The user prompt
 //! lists the detected mentions as JSON (`index`, `text`, `type`, `start`) followed by the text.
 //!
@@ -19,7 +19,7 @@
 
 use std::sync::Arc;
 
-use serde::Deserialize;
+use ce_config::prompts::EdPrompt;
 use serde_json::{json, Value};
 
 use crate::error::ModelError;
@@ -28,42 +28,18 @@ use crate::traits::{Coref, CorefCluster, CorefMention, Llm, LlmRequest};
 /// Asset path of the shipped coreference prompt.
 pub const LLM_COREF_PROMPT_PATH: &str = "contradiction_engine/prompts/coref/clusters.json";
 
-/// Coreference prompt templates.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct LlmCorefPrompt {
-    /// System message (literal braces escaped as `{{` / `}}`).
-    pub system_template: String,
-    /// User message with `{mentions_json}` and `{text}` placeholders.
-    pub user_template: String,
+/// A [`ModelError::Load`] for the coreference prompt.
+fn prompt_error(message: impl std::fmt::Display) -> ModelError {
+    ModelError::Load { model: "coref llm prompt".to_owned(), message: message.to_string() }
 }
 
-impl LlmCorefPrompt {
-    /// Parses prompt JSON; `origin` names the source in errors. Both templates are checked for
-    /// unknown placeholders and unbalanced braces.
-    pub fn from_json_str(text: &str, origin: &str) -> Result<Self, ModelError> {
-        let load_error = |message: String| ModelError::Load {
-            model: "coref llm prompt".to_owned(),
-            message: format!("{origin}: {message}"),
-        };
-        let prompt: Self = serde_json::from_str(text).map_err(|e| load_error(e.to_string()))?;
-        fill_template(&prompt.system_template, &[]).map_err(load_error)?;
-        fill_template(&prompt.user_template, &[("mentions_json", ""), ("text", "")])
-            .map_err(load_error)?;
-        Ok(prompt)
-    }
-
-    /// Loads a prompt file resolved with [`ce_config::resolve_asset`] (working directory first,
-    /// then the embedded assets).
-    pub fn load(path: &str) -> Result<Self, ModelError> {
-        let load_error = |message: String| ModelError::Load {
-            model: "coref llm prompt".to_owned(),
-            message: format!("{path}: {message}"),
-        };
-        let asset = ce_config::resolve_asset(path).map_err(|e| load_error(e.to_string()))?;
-        let text = asset.read_to_string().map_err(|e| load_error(e.to_string()))?;
-        Self::from_json_str(&text, &asset.display_path())
-    }
+/// Checks that `prompt` uses only the `{mentions_json}` and `{text}` placeholders (none in the
+/// system template) and balanced braces.
+fn validate_prompt(prompt: &EdPrompt) -> Result<(), ModelError> {
+    fill_template(&prompt.system_template, &[]).map_err(prompt_error)?;
+    fill_template(&prompt.user_template, &[("mentions_json", ""), ("text", "")])
+        .map_err(prompt_error)?;
+    Ok(())
 }
 
 /// Fills Python `str.format` placeholders `{name}` from `values`; `{{` and `}}` are literal
@@ -122,7 +98,7 @@ fn response_schema() -> Value {
 /// Coreference by prompting an [`Llm`] (see the module docs).
 pub struct LlmCoref {
     llm: Arc<dyn Llm>,
-    prompt: LlmCorefPrompt,
+    prompt: EdPrompt,
     schema: Value,
 }
 
@@ -138,12 +114,17 @@ impl LlmCoref {
     /// # Errors
     /// [`ModelError::Load`] when the prompt cannot be read or is malformed.
     pub fn new(llm: Arc<dyn Llm>) -> Result<Self, ModelError> {
-        Ok(Self::with_prompt(llm, LlmCorefPrompt::load(LLM_COREF_PROMPT_PATH)?))
+        let prompt = EdPrompt::load(LLM_COREF_PROMPT_PATH).map_err(prompt_error)?;
+        Self::with_prompt(llm, prompt)
     }
 
     /// A resolver over `llm` with `prompt`.
-    pub fn with_prompt(llm: Arc<dyn Llm>, prompt: LlmCorefPrompt) -> Self {
-        Self { llm, prompt, schema: response_schema() }
+    ///
+    /// # Errors
+    /// [`ModelError::Load`] when a template has an unknown placeholder or unbalanced braces.
+    pub fn with_prompt(llm: Arc<dyn Llm>, prompt: EdPrompt) -> Result<Self, ModelError> {
+        validate_prompt(&prompt)?;
+        Ok(Self { llm, prompt, schema: response_schema() })
     }
 
     /// The system and user messages for `text` and `mentions`.
@@ -165,12 +146,7 @@ impl LlmCoref {
             &self.prompt.user_template,
             &[("mentions_json", &mentions_json), ("text", text)],
         );
-        match (system, user) {
-            (Ok(system), Ok(user)) => Ok((system, user)),
-            (Err(e), _) | (_, Err(e)) => {
-                Err(ModelError::Load { model: "coref llm prompt".to_owned(), message: e })
-            }
-        }
+        Ok((system.map_err(prompt_error)?, user.map_err(prompt_error)?))
     }
 }
 
@@ -231,9 +207,9 @@ impl<'a> DocText<'a> {
         if len == 0 {
             return None;
         }
-        if let Some(start) = hint {
-            if self.slice(start, start + len) == Some(needle) {
-                return Some((start, start + len));
+        if let Some((start, end)) = hint.and_then(|s| Some((s, s.checked_add(len)?))) {
+            if self.slice(start, end) == Some(needle) {
+                return Some((start, end));
             }
         }
         let mut occurrences =
@@ -399,6 +375,19 @@ mod tests {
         assert_eq!(doc.locate("Reed", Some(29)), Some((30, 34)));
         assert_eq!(doc.locate("Zoë", Some(3)), Some((0, 3)));
         assert_eq!(doc.locate("absent", Some(0)), None);
+        // A huge start hint does not overflow; the nearest occurrence wins.
+        assert_eq!(doc.locate("she", Some(usize::MAX)), Some((40, 43)));
+    }
+
+    #[test]
+    fn huge_llm_offsets_are_dropped_or_relocated() {
+        let max = u64::MAX;
+        let answer = format!(
+            r#"{{"clusters": [[{{"mention": 0}}, {{"text": "She", "start": {max}}}, [{max}, {max}]]]}}"#
+        );
+        let (coref, _) = coref(&[&answer]);
+        let clusters = coref.resolve_with_mentions(TEXT, &mentions()).expect("resolves");
+        assert_eq!(clusters, vec![CorefCluster { spans: vec![(0, 10), (21, 24)] }]);
     }
 
     #[test]
@@ -419,11 +408,16 @@ mod tests {
 
     #[test]
     fn prompt_validation() {
-        let bad = r#"{"system_template": "x", "user_template": "{doc}"}"#;
+        let prompt = |system: &str, user: &str| EdPrompt {
+            system_template: system.to_owned(),
+            user_template: user.to_owned(),
+        };
+        let llm = || Arc::new(MockLlm::new()) as Arc<dyn Llm>;
         assert!(matches!(
-            LlmCorefPrompt::from_json_str(bad, "test"),
+            LlmCoref::with_prompt(llm(), prompt("x", "{doc}")),
             Err(ModelError::Load { ref message, .. }) if message.contains("{doc}")
         ));
-        assert!(LlmCorefPrompt::from_json_str(r#"{"system_template": "x"}"#, "test").is_err());
+        assert!(LlmCoref::with_prompt(llm(), prompt("{text}", "{text}")).is_err());
+        assert!(LlmCoref::with_prompt(llm(), prompt("{{x}}", "{mentions_json} {text}")).is_ok());
     }
 }
