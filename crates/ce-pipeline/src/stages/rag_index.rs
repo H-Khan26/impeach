@@ -19,8 +19,8 @@
 //! `<doc_id>:chunk-00000`, `<doc_id>:sent-00000`) and the context gets no embedder.
 //!
 //! Context writes: `document` (with `helix_id`; restored on error as well), `helix_doc_id`,
-//! `doc_id`, `rag_index_result`, `doc_text`, and `embedder` in online mode when the document
-//! has chunks.
+//! `doc_id`, `rag_index_result`, `doc_text`, `index_persisted` (true online, false offline),
+//! and `embedder` in online mode when the document has chunks.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -318,6 +318,7 @@ impl Stage for RagIndexStage {
         if let Some(embedder) = embedder {
             ctx.data.embedder = Some(SharedEmbedder(embedder));
         }
+        ctx.data.index_persisted = !self.offline;
         ctx.data.helix_doc_id = Some(result.document.helix_id.clone());
         ctx.data.doc_id = Some(result.document.doc_id.clone());
         ctx.data.doc_text = result.doc_text.clone();

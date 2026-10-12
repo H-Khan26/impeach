@@ -6,27 +6,27 @@
 //! `eyecite` -> [`CitationDetector`], `regex` -> [`RegexDetector`], `gliner2` ->
 //! [`GlinerDetector`] over the registry's `<pipeline.name>_<model_name_suffix>` NER model.
 //! The GLiNER2 label set is checked when the stage is built; the model is resolved on the
-//! first chunk, and a missing or failing model fails the stage (Python lets the model error
-//! propagate). The model threshold is `models.gliner2.threshold`, or the detector's
+//! first chunk and the resolved detectors are kept for later documents; a missing or failing
+//! model fails the stage (Python lets the model error propagate) and is retried next run. The model threshold is `models.gliner2.threshold`, or the detector's
 //! `min_score` when `models.gliner2` is not configured (an injected model).
 //!
 //! Context writes: `mentions_by_chunk` (chunk graph id -> merged mentions, chunks with at least
 //! one mention), `doc_mentions` (all of them, in chunk order) and `mention_to_span_id`.
 //!
-//! Mention spans: when there are mentions and a `helix_doc_id`, each mention becomes a `Span`
+//! Mention spans: when there are mentions, a `helix_doc_id` and `index_persisted` is set (the
+//! index was written to the store; Python checks for a `helix_client`), each mention becomes a `Span`
 //! node under its chunk (`SpanType` `MENTION`, label = mention type, surface text = name,
 //! metadata `{"ner_source", "confidence", "entity_type", "mention_id"[, "sentence_index"]}`)
 //! written with [`GraphStore::create_spans_batch`]; a failed batch falls back to one write
 //! per span, logging and skipping failures (Python writes one by one and skips failures);
 //! only fatal store errors fail the stage. `mention_to_span_id` maps each written mention id
-//! to its span id. When the config's `RAGIndexStage` runs with `offline: true`, its chunk ids
-//! are fabricated and nothing is in the store, so the stage writes no spans and leaves
-//! `mention_to_span_id` unset.
+//! to its span id. After an offline RAGIndexStage (fabricated ids, nothing in the store) the
+//! stage writes no spans and leaves `mention_to_span_id` unset.
 
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use ce_config::pipeline::{MentionDetector as DetectorConfig, MentionStageConfig};
-use ce_config::{MappingsRegistry, PipelineConfig, StageConfig};
+use ce_config::{MappingsRegistry, StageConfig};
 use ce_core::pyjson::to_python_json_ascii;
 use ce_core::util::saturating_i64;
 use ce_core::{ChunkId, IndexingResult, Mention, MentionId, Metadata, NodeId, SpanId};
@@ -63,9 +63,10 @@ pub struct MentionStage {
     mappings: &'static MappingsRegistry,
     detection: MentionDetection,
     detectors: Vec<DetectorSlot>,
+    /// The detectors with their models, resolved on first use.
+    resolved: OnceLock<Vec<ConfiguredDetector>>,
     registry: Arc<ModelRegistry>,
     store: Arc<dyn GraphStore>,
-    offline_index: bool,
 }
 
 impl MentionStage {
@@ -112,9 +113,9 @@ impl MentionStage {
             mappings,
             detection: MentionDetection::new(mappings, config.normalize_names),
             detectors,
+            resolved: OnceLock::new(),
             registry: Arc::clone(&services.registry),
             store: Arc::clone(&services.store),
-            offline_index: rag_index_offline(pipeline),
         })
     }
 
@@ -137,10 +138,13 @@ impl MentionStage {
         }
     }
 
-    /// Whether mention spans are skipped because RAGIndexStage runs offline.
-    #[must_use]
-    pub fn skips_span_writes(&self) -> bool {
-        self.offline_index
+    /// The resolved detectors, built on the first call; a failed resolution is not kept.
+    fn active_detectors(&self) -> Result<&[ConfiguredDetector]> {
+        if let Some(resolved) = self.resolved.get() {
+            return Ok(resolved);
+        }
+        let built = self.resolve_detectors()?;
+        Ok(self.resolved.get_or_init(|| built))
     }
 
     /// The detectors in config order, resolving GLiNER2 models from the registry.
@@ -175,17 +179,13 @@ impl MentionStage {
     /// # Errors
     /// Model resolution and detector failures.
     pub fn detect(&self, result: &IndexingResult) -> Result<(MentionsByChunk, Vec<Mention>)> {
-        let mut detectors: Option<Vec<ConfiguredDetector>> = None;
         let mut by_chunk = IndexMap::new();
         let mut all = Vec::new();
         for write in &result.chunks {
             if write.helix_id.as_str().is_empty() {
                 continue;
             }
-            if detectors.is_none() {
-                detectors = Some(self.resolve_detectors()?);
-            }
-            let active = detectors.as_deref().unwrap_or_default();
+            let active = self.active_detectors()?;
             let chunk = &write.chunk;
             let chunk_id = ChunkId::from(write.helix_id.as_str());
             let view = ChunkView {
@@ -258,14 +258,6 @@ impl MentionStage {
     }
 }
 
-/// Whether the config's first `RAGIndexStage` is enabled and offline.
-fn rag_index_offline(config: &PipelineConfig) -> bool {
-    config
-        .stages
-        .iter()
-        .any(|stage| matches!(stage, StageConfig::RagIndex(rag) if rag.enabled && rag.offline))
-}
-
 /// The `MENTION` span node of a mention under document `doc_node_id`; `None` without a
 /// `chunk_id`.
 #[must_use]
@@ -311,7 +303,7 @@ impl Stage for MentionStage {
             mentions = all.len(),
             "detected mentions"
         );
-        if !self.offline_index && !all.is_empty() {
+        if ctx.data.index_persisted && !all.is_empty() {
             if let Some(doc_node_id) = ctx.data.helix_doc_id.clone() {
                 let written = self.write_mention_spans(&all, &doc_node_id)?;
                 tracing::info!(

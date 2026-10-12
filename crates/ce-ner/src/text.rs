@@ -1,4 +1,7 @@
-//! Character-offset helpers over UTF-8 text.
+//! Text and value helpers with Python semantics: character offsets over UTF-8 text and JSON
+//! truthiness.
+
+use serde_json::Value;
 
 /// Maps between character offsets (Python `str` indices) and byte offsets of one text.
 #[derive(Debug)]
@@ -36,8 +39,22 @@ impl<'a> CharIndex<'a> {
     }
 }
 
+/// Python truthiness of a JSON value.
+pub(crate) fn is_truthy(value: &Value) -> bool {
+    match value {
+        Value::Null => false,
+        Value::Bool(b) => *b,
+        Value::Number(n) => n.as_f64().is_some_and(|f| f != 0.0),
+        Value::String(s) => !s.is_empty(),
+        Value::Array(a) => !a.is_empty(),
+        Value::Object(o) => !o.is_empty(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
 
     #[test]
@@ -50,5 +67,18 @@ mod tests {
         assert_eq!(index.slice(4, 5), "§");
         assert_eq!(index.slice(6, 99), "12");
         assert_eq!(index.slice(5, 2), "");
+    }
+
+    #[test]
+    fn truthiness_matches_python() {
+        for falsy in
+            [json!(null), json!(false), json!(0), json!(0.0), json!(""), json!([]), json!({})]
+        {
+            assert!(!is_truthy(&falsy), "{falsy}");
+        }
+        for truthy in [json!(true), json!(1), json!(-0.5), json!("x"), json!([0]), json!({"a": 0})]
+        {
+            assert!(is_truthy(&truthy), "{truthy}");
+        }
     }
 }

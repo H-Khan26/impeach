@@ -159,7 +159,6 @@ fn builds_from_the_default_config_without_loading_a_model() {
     let harness = Harness::new(default_config());
     let stage = mention_stage(&harness);
     assert_eq!(stage.name(), "mention_detection");
-    assert!(!stage.skips_span_writes());
 }
 
 #[test]
@@ -197,6 +196,20 @@ fn missing_ner_model_fails_the_stage() {
         .expect_err("unregistered model");
     let text = error.to_string();
     assert!(text.contains("processing_v17_not_registered"), "{text}");
+
+    // The failed resolution is not kept: once the model is registered the same pipeline runs,
+    // and later documents reuse the resolved detectors.
+    harness
+        .services
+        .registry
+        .insert_ner("processing_v17_not_registered", Arc::new(green_valley_ner()));
+    for _ in 0..2 {
+        let mut ctx = pipeline.new_context();
+        let input = PipelineInput::Jsonl(fixture("green_valley_incident_report.jsonl"));
+        pipeline.run(&mut ctx, input).expect("model registered");
+        let mentions = ctx.data.doc_mentions.expect("doc_mentions");
+        assert!(mentions.iter().any(|m| m.source.as_deref() == Some("gliner2")));
+    }
 }
 
 #[test]
@@ -282,8 +295,8 @@ fn offline_rag_index_skips_span_writes() {
         }
     }
     let harness = Harness::new(config);
-    assert!(mention_stage(&harness).skips_span_writes());
     let ctx = run_fixture(&harness, "Mason_intra.jsonl");
+    assert!(!ctx.data.index_persisted);
     let mentions = ctx.data.doc_mentions.as_ref().expect("doc_mentions");
     assert_eq!(mentions.len(), 4);
     assert!(ctx.data.mention_to_span_id.is_none());

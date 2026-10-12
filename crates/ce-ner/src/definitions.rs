@@ -18,6 +18,8 @@ use indexmap::{IndexMap, IndexSet};
 use regex::Regex;
 use serde_json::Value;
 
+use crate::text::{is_truthy, CharIndex};
+
 /// Confidence of a definition taken from mention metadata.
 pub const METADATA_ROLE_CONFIDENCE: f64 = 0.90;
 
@@ -240,12 +242,12 @@ impl DefinitionExtractor {
         let mention_by_name = build_mention_name_index(mentions);
         let mut defined_terms = Vec::new();
 
+        let index = CharIndex::new(text);
         for pattern_def in &self.config.definition_patterns {
-            let mut cursor = CharCursor::new(text);
             for captures in pattern_def.pattern.captures_iter(text) {
                 let whole = captures.get(0).expect("group 0 is always present in a match");
-                let start = cursor.char_offset(whole.start());
-                let end = cursor.char_offset(whole.end());
+                let start = index.char_of_byte(whole.start());
+                let end = index.char_of_byte(whole.end());
 
                 let (Some(entity_group), Some(term_group)) =
                     (captures.name("entity_name"), captures.name("defined_term"))
@@ -445,41 +447,6 @@ fn metadata_role(metadata: &Metadata) -> Option<&Value> {
         .or_else(|| metadata.get("role_in_doc").filter(|value| is_truthy(value)))
 }
 
-/// Python truthiness of a JSON value.
-fn is_truthy(value: &Value) -> bool {
-    match value {
-        Value::Null => false,
-        Value::Bool(flag) => *flag,
-        Value::Number(number) => number.as_f64().is_some_and(|n| n != 0.0),
-        Value::String(text) => !text.is_empty(),
-        Value::Array(items) => !items.is_empty(),
-        Value::Object(map) => !map.is_empty(),
-    }
-}
-
-/// Converts non-decreasing byte offsets of one text into character offsets incrementally.
-struct CharCursor<'a> {
-    text: &'a str,
-    byte: usize,
-    chars: usize,
-}
-
-impl<'a> CharCursor<'a> {
-    fn new(text: &'a str) -> Self {
-        Self { text, byte: 0, chars: 0 }
-    }
-
-    fn char_offset(&mut self, byte: usize) -> usize {
-        if byte < self.byte {
-            self.byte = 0;
-            self.chars = 0;
-        }
-        self.chars += self.text[self.byte..byte].chars().count();
-        self.byte = byte;
-        self.chars
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -490,28 +457,6 @@ mod tests {
         assert!(!roles.is_valid_role_term("Plaintiff"));
         assert!(!roles.is_hybrid_role_name("Defendant Reed"));
         assert_eq!(roles.strip_role_prefix("Defendant Reed"), None);
-    }
-
-    #[test]
-    fn char_cursor_counts_characters() {
-        let text = "\u{e9} (\"Plaintiff\") \u{fc}";
-        let mut cursor = CharCursor::new(text);
-        assert_eq!(cursor.char_offset(0), 0);
-        assert_eq!(cursor.char_offset(2), 1);
-        assert_eq!(cursor.char_offset(text.len()), text.chars().count());
-        assert_eq!(cursor.char_offset(2), 1);
-    }
-
-    #[test]
-    fn truthiness_follows_python() {
-        for falsy in [Value::Null, Value::Bool(false), 0.into(), 0.0.into(), "".into()] {
-            assert!(!is_truthy(&falsy), "{falsy}");
-        }
-        assert!(!is_truthy(&serde_json::json!([])));
-        assert!(!is_truthy(&serde_json::json!({})));
-        for truthy in [Value::Bool(true), 1.into(), (-0.5).into(), "x".into()] {
-            assert!(is_truthy(&truthy), "{truthy}");
-        }
     }
 
     #[test]

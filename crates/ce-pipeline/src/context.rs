@@ -114,6 +114,11 @@ pub struct ContextData {
     /// `embedding_service`). Later stages treat `None` as "no embeddings available" (offline
     /// runs and empty documents).
     pub embedder: Option<SharedEmbedder>,
+    /// RAGIndexStage: `true` once the document, its chunks and spans were written to the graph
+    /// store (online mode); `false` before indexing and for offline runs, whose ids are
+    /// fabricated. The counterpart of Python's `helix_client` being in the context: later
+    /// stages write graph nodes under the indexed chunks only when it is `true`.
+    pub index_persisted: bool,
 
     /// MentionStage (augmented by CoreferenceStage): mentions per chunk graph id.
     pub mentions_by_chunk: Option<IndexMap<ChunkId, Vec<Mention>>>,

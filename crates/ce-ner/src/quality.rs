@@ -10,11 +10,9 @@
 //! registry that fails to load; the Rust registry always loads (or the stage fails to
 //! build), so only the stage's `normalize_names` switch applies here.
 
+use crate::text::{is_truthy, CharIndex};
 use ce_config::mappings::QualityFilters;
 use ce_core::{DetectionSource, Mention, Metadata};
-use serde_json::Value;
-
-use crate::text::CharIndex;
 
 /// Quality rules of one `MentionStage`.
 #[derive(Debug, Clone)]
@@ -183,24 +181,12 @@ pub(crate) fn fill_metadata(into: &mut Metadata, from: &Metadata) {
     }
 }
 
-/// Python truthiness of a JSON value.
-pub(crate) fn is_truthy(value: &Value) -> bool {
-    match value {
-        Value::Null => false,
-        Value::Bool(b) => *b,
-        Value::Number(n) => n.as_f64().is_some_and(|f| f != 0.0),
-        Value::String(s) => !s.is_empty(),
-        Value::Array(a) => !a.is_empty(),
-        Value::Object(o) => !o.is_empty(),
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use ce_config::MappingsRegistry;
     use ce_core::Span;
     use pretty_assertions::assert_eq;
-    use serde_json::json;
+    use serde_json::{json, Value};
 
     use super::*;
 
@@ -366,18 +352,5 @@ mod tests {
         let names: Vec<&str> = healed[0].sources.iter().map(|s| s.name.as_str()).collect();
         assert_eq!(names, ["gliner2", "x", "regex_detector"]);
         assert_eq!(Value::Object(healed[0].metadata.clone()), json!({"k": "v", "z": 1}));
-    }
-
-    #[test]
-    fn truthiness_matches_python() {
-        for falsy in
-            [json!(null), json!(false), json!(0), json!(0.0), json!(""), json!([]), json!({})]
-        {
-            assert!(!is_truthy(&falsy), "{falsy}");
-        }
-        for truthy in [json!(true), json!(1), json!(-0.5), json!("x"), json!([0]), json!({"a": 0})]
-        {
-            assert!(is_truthy(&truthy), "{truthy}");
-        }
     }
 }
