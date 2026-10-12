@@ -22,6 +22,14 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
+      # The Linux runner's disk cannot hold debug builds with full debuginfo of every test
+      # binary; free preinstalled SDKs and keep line tables only.
+      - name: Free disk space
+        if: runner.os == 'Linux'
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          echo "CARGO_PROFILE_DEV_DEBUG=line-tables-only" >> "$GITHUB_ENV"
+          df -h /
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: 1.99.0
