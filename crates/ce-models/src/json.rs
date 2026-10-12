@@ -228,7 +228,9 @@ fn balanced_end(text: &str) -> Option<usize> {
     None
 }
 
-fn excerpt(text: &str, max_chars: usize) -> &str {
+/// The first `max_chars` characters of `text` (for log excerpts).
+#[must_use]
+pub fn excerpt(text: &str, max_chars: usize) -> &str {
     match text.char_indices().nth(max_chars) {
         Some((i, _)) => &text[..i],
         None => text,
@@ -241,6 +243,12 @@ mod tests {
     use serde_json::json;
 
     use super::*;
+
+    #[test]
+    fn excerpt_counts_characters() {
+        assert_eq!(excerpt("héllo world", 5), "héllo");
+        assert_eq!(excerpt("abc", 30), "abc");
+    }
 
     #[test]
     fn strip_code_fences_matches_python() {

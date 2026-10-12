@@ -47,13 +47,14 @@ fn probe(name: &str, fail: bool) -> (Probe, Arc<Mutex<Vec<DocumentPayload>>>) {
     (Probe { name: name.to_owned(), seen: Arc::clone(&seen), fail }, seen)
 }
 
-const BUILTIN_TYPES: [&str; 6] = [
+const BUILTIN_TYPES: [&str; 7] = [
     "RAGIndexStage",
     "MentionStage",
     "DefinitionStage",
     "CoreferenceStage",
     "EDStage",
     "RelationStage",
+    "FactStage",
 ];
 
 #[test]
@@ -73,7 +74,8 @@ fn builtin_registry_builds_ported_stages_and_skips_the_rest() {
             "definition_extraction",
             "coreference",
             "ed_resolution",
-            "relation_extraction"
+            "relation_extraction",
+            "fact_extraction"
         ]
     );
     assert_eq!(StageRegistry::builtin().type_names(), BUILTIN_TYPES);
@@ -84,10 +86,10 @@ fn unregistered_stage_types_error_with_the_known_types() {
     let harness = Harness::new(default_config());
     let error = StageRegistry::builtin()
         .build(harness.services.clone(), UnregisteredStages::Error)
-        .expect_err("FactStage is not ported");
+        .expect_err("ContradictionCheckStage is not ported");
     match error {
         PipelineError::UnknownStage { stage_type, known } => {
-            assert_eq!(stage_type, "FactStage");
+            assert_eq!(stage_type, "ContradictionCheckStage");
             assert_eq!(known, BUILTIN_TYPES);
         }
         other => panic!("unexpected error {other}"),
@@ -135,7 +137,8 @@ fn custom_constructors_follow_config_order() {
             "definition_extraction",
             "coreference",
             "ed_resolution",
-            "relation_extraction"
+            "relation_extraction",
+            "fact_extraction"
         ]
     );
 }

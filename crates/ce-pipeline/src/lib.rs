@@ -16,6 +16,8 @@
 //! - [`MentionStage`], [`DefinitionStage`], [`CoreferenceStage`]: mentions, defined role terms
 //!   and coreference clusters; [`EdStage`]: mentions -> entities (`ce_ed`), role map and
 //!   mention span links; [`RelationStage`]: GLiNER2 relations kept in the context.
+//! - [`FactStage`]: LLM facts per chunk (`ce_facts`), linked to ED entities; committed to the
+//!   store (`commit_facts: true`) or left in `fact_nodes_pending` for the contradiction stage.
 //! - [`run_processing`]: the public entry point over a pre-ingested JSONL file;
 //!   [`run_processing_with`] injects the model registry, graph store and stage registry.
 //!
@@ -50,6 +52,15 @@
 //!   without a Helix client.
 //! - [`RelationStage`] uses [`stages::relation::DEFAULT_RELATION_THRESHOLD`] when the config has
 //!   no `models.gliner2` block (an injected model); Python required the block.
+//! - [`FactStage`] loads its prompt files and `roles.yaml` when it is built and fails the build
+//!   when one is missing (Python logged it and skipped the stage at run time). Its commit path
+//!   (`commit_facts: true`) also writes the `FactInDocument` / `FactAboutEntity` /
+//!   `FactDerivedFromSpan` edges and `metadata.helix_fact_id`, like the contradiction stage's
+//!   commit (Python wrote only nodes and embeddings there). Fact embeddings are computed in
+//!   batches of [`ce_facts::FACT_EMBED_BATCH_SIZE`] with vectors kept aligned with their facts.
+//!   Fact node value / property types are always normalised through the taxonomy. A role term
+//!   that links to no name is looked up in the EDStage `role_map`. Prompt aliases keep
+//!   first-seen order (Python used a set).
 
 pub mod api;
 pub mod context;
@@ -71,5 +82,6 @@ pub use factory::{build_pipeline, StageConstructor, StageRegistry, UnregisteredS
 pub use runner::{Pipeline, PipelineInput, RunReport, StageTiming};
 pub use stage::Stage;
 pub use stages::{
-    CoreferenceStage, DefinitionStage, EdStage, MentionStage, RagIndexStage, RelationStage,
+    CoreferenceStage, DefinitionStage, EdStage, FactStage, MentionStage, RagIndexStage,
+    RelationStage,
 };

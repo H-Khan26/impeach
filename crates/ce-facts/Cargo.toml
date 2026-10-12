@@ -1,0 +1,29 @@
+[package]
+name = "ce-facts"
+description = "LLM fact extraction (single-pass and multi-pass), entity linking and fact indexing"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+ce-core.workspace = true
+ce-config.workspace = true
+ce-text.workspace = true
+ce-store.workspace = true
+ce-models.workspace = true
+ce-ner.workspace = true
+ce-ed.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+regex.workspace = true
+indexmap.workspace = true
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+
+[lints]
+workspace = true

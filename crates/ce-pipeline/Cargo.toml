@@ -25,6 +25,7 @@ ce-models.workspace = true
 ce-ner.workspace = true
 ce-coref.workspace = true
 ce-ed.workspace = true
+ce-facts.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

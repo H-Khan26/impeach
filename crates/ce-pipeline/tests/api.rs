@@ -409,9 +409,12 @@ fn open_store_with_helix_memory_mode() {
             "definition_extraction",
             "coreference",
             "ed_resolution",
-            "relation_extraction"
+            "relation_extraction",
+            "fact_extraction"
         ]
     );
+    // No LLM is registered: the fact stage skips without writing anything.
+    assert!(run.data.extracted_facts.is_none());
     let indexed = run.data.rag_index_result.as_ref().expect("indexed");
     assert_eq!(indexed.chunks.len(), 6);
     assert_eq!(indexed.embeddings.count, 6);

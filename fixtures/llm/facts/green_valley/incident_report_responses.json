@@ -1,0 +1,177 @@
+[
+  {
+    "when": "9TRK220",
+    "response": {
+      "nodes": [
+        {
+          "node_type": "STATED_FACT",
+          "id": "STATED_FACT_0",
+          "text": "Daniel Reed was operating the Green Valley Freightliner box truck at the time of the collision.",
+          "value_type": "TEXT",
+          "property_type": "ATTRIBUTE",
+          "slot_name": "vehicle_operator",
+          "value_raw": "Daniel Reed",
+          "assertion_triple": {"subject": "Daniel Reed", "relationship": "OPERATED", "object": "Freightliner box truck"},
+          "certainty": 0.95,
+          "temporal_context": "current_incident",
+          "is_denial": false,
+          "is_boilerplate": false,
+          "temporal_validity": {"t_valid_from": "2023-03-04", "t_valid_until": "2023-03-04"},
+          "metadata": {}
+        },
+        {
+          "node_type": "STATED_FACT",
+          "id": "STATED_FACT_1",
+          "text": "Daniel Reed was a commercial driver employed by Green Valley Logistics, Inc.",
+          "value_type": "TEXT",
+          "property_type": "RELATIONSHIP",
+          "slot_name": "employer",
+          "value_raw": "Green Valley",
+          "assertion_triple": {"subject": "Daniel Reed", "relationship": "EMPLOYED_BY", "object": "Green Valley Logistics, Inc."},
+          "certainty": 0.9,
+          "temporal_context": "current_incident",
+          "is_denial": false,
+          "is_boilerplate": false,
+          "temporal_validity": {"t_valid_from": null, "t_valid_until": null},
+          "metadata": {}
+        }
+      ]
+    }
+  },
+  {
+    "when": "forty-five (45)",
+    "response": {
+      "nodes": [
+        {
+          "node_type": "STATED_FACT",
+          "id": "STATED_FACT_0",
+          "text": "Lopez was traveling eastbound on Mission Street at 45 to 50 miles per hour.",
+          "value_type": "NUMERIC",
+          "property_type": "QUANTITATIVE",
+          "slot_name": "speed",
+          "value_raw": "between forty-five (45) and fifty (50) miles per hour",
+          "assertion_triple": {"subject": "Lopez", "relationship": "TRAVELED_AT_SPEED", "object": "45-50 miles per hour"},
+          "certainty": "0.85",
+          "temporal_context": "current_incident",
+          "is_denial": false,
+          "is_boilerplate": false,
+          "temporal_validity": {"t_valid_from": "2023-03-04", "t_valid_until": "2023-03-04"},
+          "metadata": {}
+        }
+      ]
+    }
+  },
+  {
+    "when": "solid green",
+    "response": {
+      "nodes": [
+        {
+          "node_type": "STATED_FACT",
+          "id": "STATED_FACT_0",
+          "text": "Reed states the southbound signal on 14th Avenue was solid green when he entered the intersection.",
+          "value_type": "TEXT",
+          "property_type": "STATE",
+          "slot_name": "signal_state",
+          "value_raw": "solid green",
+          "assertion_triple": {"subject": "Reed", "relationship": "OBSERVED_SIGNAL", "object": "solid green"},
+          "certainty": 0.8,
+          "temporal_context": "current_incident",
+          "is_denial": false,
+          "is_boilerplate": false,
+          "temporal_validity": {"t_valid_from": "2023-03-04", "t_valid_until": "2023-03-04"},
+          "metadata": {}
+        }
+      ]
+    }
+  },
+  {
+    "when": "seat belt",
+    "response": {
+      "nodes": [
+        {
+          "node_type": "STATED_FACT",
+          "id": "STATED_FACT_0",
+          "text": "Reed did not observe a seat belt across Lopez when she exited the vehicle.",
+          "value_type": "BOOLEAN",
+          "property_type": "EXISTS",
+          "slot_name": "seat_belt_use",
+          "value_raw": "did not observe any seat belt",
+          "assertion_triple": {"subject": "Reed", "relationship": "DID_NOT_OBSERVE", "object": "seat belt on Lopez"},
+          "certainty": 0.75,
+          "temporal_context": "current_incident",
+          "is_denial": true,
+          "is_boilerplate": false,
+          "temporal_validity": {"t_valid_from": null, "t_valid_until": null},
+          "metadata": {}
+        }
+      ]
+    }
+  },
+  {
+    "when": "dental assistant",
+    "response": {
+      "nodes": [
+        {
+          "node_type": "STATED_FACT",
+          "id": "STATED_FACT_0",
+          "text": "Maria Lopez missed about three days of work as a dental assistant.",
+          "value_type": "NUMERIC",
+          "property_type": "QUANTITATIVE",
+          "slot_name": "missed_work_days",
+          "value_raw": "about three days",
+          "assertion_triple": {"subject": "Maria Lopez", "relationship": "MISSED_WORK", "object": "three days"},
+          "certainty": 0.9,
+          "temporal_context": "current_incident",
+          "is_denial": false,
+          "is_boilerplate": false,
+          "temporal_validity": {"t_valid_from": null, "t_valid_until": null},
+          "metadata": {}
+        }
+      ]
+    }
+  },
+  {
+    "when": "past ten (10) years",
+    "response": {
+      "nodes": [
+        {
+          "node_type": "STATED_FACT",
+          "id": "STATED_FACT_0",
+          "text": "Lopez initially stated she had no motor vehicle accidents in the past ten years.",
+          "value_type": "BOOLEAN",
+          "property_type": "EXISTENCE",
+          "slot_name": "prior_accidents",
+          "value_raw": "had not been involved in any motor vehicle accidents in the past ten (10) years",
+          "assertion_triple": {"subject": "Lopez", "relationship": "DENIED", "object": "prior motor vehicle accidents"},
+          "certainty": 0.85,
+          "temporal_context": "prior_incident",
+          "is_denial": true,
+          "is_boilerplate": false,
+          "temporal_validity": {"t_valid_from": null, "t_valid_until": null},
+          "metadata": {"time_window": {"start": "2013-03-22", "end": "2023-03-22"}}
+        }
+      ]
+    }
+  },
+  {
+    "when": "reserves all rights",
+    "response": {
+      "nodes": [
+        {
+          "node_type": "STATED_FACT",
+          "id": "STATED_FACT_0",
+          "text": "Green Valley reserves all rights to supplement or amend this Incident Report.",
+          "value_type": "TEXT",
+          "property_type": "ATTRIBUTE",
+          "assertion_triple": {"subject": "Green Valley", "relationship": "RESERVES", "object": "all rights"},
+          "certainty": 0.9,
+          "temporal_context": "general_claim",
+          "is_denial": false,
+          "is_boilerplate": true,
+          "temporal_validity": {"t_valid_from": null, "t_valid_until": null},
+          "metadata": {}
+        }
+      ]
+    }
+  }
+]
