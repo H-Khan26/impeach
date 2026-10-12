@@ -190,7 +190,7 @@ fn process_runs_mention_definition_and_rule_coreference_stages() {
 }
 
 #[test]
-fn fastcoref_without_a_sidecar_command_fails_loudly() {
+fn default_fastcoref_backend_falls_back_to_rules_with_a_warning() {
     let dir = tempfile::tempdir().expect("tempdir");
     let config = write_config(
         dir.path(),
@@ -205,7 +205,11 @@ fn fastcoref_without_a_sidecar_command_fails_loudly() {
     );
     let jsonl = fixture("input/green_valley_incident_report.jsonl");
     let output = run(&["process", path_arg(&jsonl), "-c", path_arg(&config)]);
-    assert_eq!(output.status.code(), Some(1));
-    let text = stderr(&output);
-    assert!(text.contains("fastcoref sidecar command not configured"), "{text}");
+    let log = stderr(&output);
+    assert!(output.status.success(), "{log}");
+    assert!(log.contains("stage finished stage=\"coreference\""), "{log}");
+    let warning = "set models.coref.command to a fastcoref sidecar, or set \
+                   models.coref.backend: rule to silence this";
+    assert_eq!(log.matches(warning).count(), 1, "{log}");
+    assert!(log.contains("WARN"), "{log}");
 }

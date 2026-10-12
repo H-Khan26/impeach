@@ -171,23 +171,40 @@ fn rule_backend_clusters_names_and_synthesises_pronouns() {
 }
 
 #[test]
-fn fastcoref_without_command_fails_loudly() {
-    let harness = Harness::new(config(CorefBackend::Fastcoref, |_| {}));
+fn fastcoref_without_command_falls_back_to_rules() {
+    let rule = run(&Harness::new(config(CorefBackend::Rule, |_| {})), true).expect("rule runs");
+    let fallback = run(&Harness::new(config(CorefBackend::Fastcoref, |_| {})), true)
+        .expect("the shipped fastcoref default runs without a sidecar");
+    assert!(fallback.coref_clusters.is_some());
+    assert_eq!(fallback.coref_clusters, rule.coref_clusters);
+    assert_eq!(fallback.synthetic_pronoun_mentions, rule.synthetic_pronoun_mentions);
+}
+
+/// The default config with a fastcoref sidecar command that cannot start.
+fn broken_sidecar(edit: impl FnOnce(&mut CoreferenceStageConfig)) -> PipelineConfig {
+    let mut config = config(CorefBackend::Fastcoref, edit);
+    config.models.coref.command = Some(vec!["ce-pipeline-no-such-coref-sidecar".to_owned()]);
+    config
+}
+
+#[test]
+fn a_sidecar_that_cannot_start_fails_loudly() {
+    let harness = Harness::new(broken_sidecar(|_| {}));
     let err = run(&harness, true).expect_err("coreference must not degrade silently");
     let message = err.to_string();
-    assert!(message.contains("fastcoref sidecar command not configured"), "{message}");
+    assert!(message.contains("ce-pipeline-no-such-coref-sidecar"), "{message}");
     assert!(message.contains("coreference"), "{message}");
 }
 
 #[test]
 fn skips_before_resolving_the_model() {
-    // No mentions: the unconfigured fastcoref backend is never resolved.
-    let harness = Harness::new(config(CorefBackend::Fastcoref, |_| {}));
+    // No mentions: the broken sidecar is never started.
+    let harness = Harness::new(broken_sidecar(|_| {}));
     let data = run(&harness, false).expect("no mentions: skipped");
     assert!(data.coref_clusters.is_none());
 
     // Too long a document.
-    let harness = Harness::new(config(CorefBackend::Fastcoref, |c| c.max_doc_chars = 20));
+    let harness = Harness::new(broken_sidecar(|c| c.max_doc_chars = 20));
     let data = run(&harness, true).expect("long document: skipped");
     assert!(data.coref_clusters.is_none());
     assert_eq!(data.doc_mentions.as_ref().map(Vec::len), Some(4));

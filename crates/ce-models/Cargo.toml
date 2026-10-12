@@ -40,6 +40,7 @@ gliner2 = { workspace = true, optional = true, features = ["candle"] }
 [dev-dependencies]
 pretty_assertions.workspace = true
 tempfile.workspace = true
+tracing-subscriber.workspace = true
 
 [[test]]
 name = "sidecar"

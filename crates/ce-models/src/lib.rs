@@ -58,7 +58,7 @@ pub use mock::{MockCoref, MockEmbedder, MockLlm, MockNer, MockNli};
 pub use ollama::{OllamaLlm, OllamaOptions};
 #[cfg(feature = "ort-nli")]
 pub use ort_nli::{OrtNli, OrtNliOptions};
-pub use registry::{model_key, ModelKind, ModelRegistry};
+pub use registry::{model_key, ModelKind, ModelRegistry, FASTCOREF_FALLBACK_WARNING};
 pub use rule_coref::{RuleCoref, PRONOUN_SENTENCE_WINDOW};
 pub use sidecar::{SidecarCommand, SidecarCoref, SidecarProcess};
 pub use traits::{

@@ -15,9 +15,10 @@
 //!
 //!    A gendered honorific (`mr`, `sir` masculine; `mrs`, `ms`, `miss`, `madam` feminine) is
 //!    kept as a constraint: `Mr. Lopez` and `Mrs. Lopez` are different names, a bare `Lopez`
-//!    beside both is ambiguous, and a bare `Lopez` beside only `Mr. Lopez` is its alias. A name
-//!    that is the alias target of both a masculine and a feminine name (`Carlos Lopez` beside
-//!    `Mr. Lopez` and `Mrs. Lopez`) is ambiguous too: none of those aliases link to it.
+//!    beside both is ambiguous, and a bare `Lopez` beside only `Mr. Lopez` is its alias. Names
+//!    connected through alias relations whose honorifics include both genders (`Carlos Lopez`
+//!    beside `Mr. Lopez` and `Mrs. Lopez`; `Mr. Lopez`, `Maria Lopez` and `Mrs. Maria Lopez`)
+//!    are ambiguous too: none of those alias links are made.
 //! 2. **Pronoun linking**: every pronoun in the text that does not overlap a mention, and every
 //!    mention whose text is a pronoun, links to the nearest preceding compatible mention (or
 //!    already linked pronoun of the same kind) that starts in the same sentence or at most
@@ -35,10 +36,10 @@
 //!    capital initials; a blank line also ends a sentence.
 //!
 //! **Gender**: a cluster never mixes masculine and feminine evidence (gendered honorifics and
-//! pronouns). Name aliases are decided before any linking (see above), so their result does
-//! not depend on mention order; an alias link that would still mix genders through earlier
-//! links is skipped. A pronoun link that would mix them is skipped and the pronoun tries its
-//! next nearest candidate.
+//! pronouns). All alias links and their gender conflicts are decided before any linking (see
+//! above), so name matching does not depend on mention order. Pronouns link afterwards, in
+//! text order: a pronoun link that would mix genders is skipped and the pronoun tries its next
+//! nearest candidate.
 //!
 //! Output clusters hold at least two distinct spans sorted by start, ordered by their first span.
 
@@ -444,17 +445,21 @@ fn cluster_mentions(text: &str, mentions: &[CorefMention<'_>]) -> Vec<CorefClust
             edges.extend(longer.into_iter().map(|h| (g, h)));
         }
     }
-    // Targets receiving aliases of both genders are ambiguous and receive none.
-    let mut received: HashMap<usize, u8> = HashMap::new();
+    // Gender reaches every group of an alias component regardless of edge order; components
+    // reaching both genders are ambiguous and none of their edges link.
+    let mut components = UnionFind::new(&vec![None; groups.len()]);
     for &(g, h) in &edges {
-        if let Some(gender) = groups[g].gender {
-            *received.entry(h).or_default() |= gender.bit();
+        components.union(g, h);
+    }
+    let mut reached: HashMap<usize, u8> = HashMap::new();
+    for (g, group) in groups.iter().enumerate() {
+        if let Some(gender) = group.gender {
+            *reached.entry(components.find(g)).or_default() |= gender.bit();
         }
     }
     let both = Gender::Masculine.bit() | Gender::Feminine.bit();
     for (g, h) in edges {
-        if received.get(&h) != Some(&both) {
-            // Refused when the two sets already carry different genders.
+        if reached.get(&components.find(g)) != Some(&both) {
             forest.union(groups[g].nodes[0], groups[h].nodes[0]);
         }
     }
@@ -639,6 +644,17 @@ mod tests {
             let got = resolve(
                 text,
                 &[("Mrs. Lopez", "PER"), ("Mr. Lopez", "PER"), ("Carlos Lopez", "PER")],
+            );
+            assert!(got.is_empty(), "{text}: {got:?}");
+        }
+        // Gender also travels through ungendered names.
+        for text in [
+            "Mr. Lopez met Maria Lopez. Mrs. Maria Lopez arrived.",
+            "Mrs. Maria Lopez met Maria Lopez. Mr. Lopez arrived.",
+        ] {
+            let got = resolve(
+                text,
+                &[("Mrs. Maria Lopez", "PER"), ("Mr. Lopez", "PER"), ("Maria Lopez", "PER")],
             );
             assert!(got.is_empty(), "{text}: {got:?}");
         }

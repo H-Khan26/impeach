@@ -28,66 +28,112 @@ use crate::traits::{Coref, CorefCluster, CorefMention, Llm, LlmRequest};
 /// Asset path of the shipped coreference prompt.
 pub const LLM_COREF_PROMPT_PATH: &str = "contradiction_engine/prompts/coref/clusters.json";
 
+/// Placeholders the user template must use (and the only ones it may use).
+const USER_PLACEHOLDERS: [&str; 2] = ["mentions_json", "text"];
+
 /// A [`ModelError::Load`] for the coreference prompt.
 fn prompt_error(message: impl std::fmt::Display) -> ModelError {
     ModelError::Load { model: "coref llm prompt".to_owned(), message: message.to_string() }
 }
 
-/// Checks `prompt` (from `origin`, named in errors): the system template has no placeholders,
-/// the user template uses both `{mentions_json}` and `{text}` and no other placeholder, and
-/// braces are balanced.
-fn validate_prompt(prompt: &EdPrompt, origin: &str) -> Result<(), ModelError> {
-    const MENTIONS_MARK: &str = "@@coref-mentions@@";
-    const TEXT_MARK: &str = "@@coref-text@@";
-    let fail = |message: String| prompt_error(format!("{origin}: {message}"));
-    fill_template(&prompt.system_template, &[]).map_err(fail)?;
-    let user = fill_template(
-        &prompt.user_template,
-        &[("mentions_json", MENTIONS_MARK), ("text", TEXT_MARK)],
-    )
-    .map_err(fail)?;
-    for (mark, placeholder) in [(MENTIONS_MARK, "{mentions_json}"), (TEXT_MARK, "{text}")] {
-        if !user.contains(mark) {
-            return Err(fail(format!("user_template must contain {placeholder}")));
-        }
-    }
-    Ok(())
+/// One piece of a parsed `str.format` template.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Piece<'a> {
+    /// Literal text (`{{` / `}}` already unescaped to one brace).
+    Literal(&'a str),
+    /// A `{name}` placeholder.
+    Placeholder(&'a str),
 }
 
-/// Loads and validates the prompt file at `path` (errors name the path).
-fn load_prompt(path: &str) -> Result<EdPrompt, ModelError> {
-    let prompt = EdPrompt::load(path).map_err(|e| prompt_error(format!("{path}: {e}")))?;
-    validate_prompt(&prompt, path)?;
-    Ok(prompt)
-}
-
-/// Fills Python `str.format` placeholders `{name}` from `values`; `{{` and `}}` are literal
-/// braces. An unknown placeholder or a lone brace is an error.
-fn fill_template(template: &str, values: &[(&str, &str)]) -> Result<String, String> {
-    let mut out = String::with_capacity(template.len());
+/// Parses a Python `str.format` template: `{name}` placeholders, `{{` and `}}` literal
+/// braces. An unclosed `{` or a single `}` is an error.
+fn parse_template(template: &str) -> Result<Vec<Piece<'_>>, String> {
+    let mut pieces = Vec::new();
     let mut rest = template;
     while let Some(pos) = rest.find(['{', '}']) {
-        out.push_str(&rest[..pos]);
+        if pos > 0 {
+            pieces.push(Piece::Literal(&rest[..pos]));
+        }
         let tail = &rest[pos..];
         if tail.starts_with("{{") || tail.starts_with("}}") {
-            out.push_str(&tail[..1]);
+            pieces.push(Piece::Literal(&tail[..1]));
             rest = &tail[2..];
         } else if let Some(name) = tail.strip_prefix('{') {
             let end = name.find('}').ok_or_else(|| format!("unclosed `{{` in {template:?}"))?;
-            let key = &name[..end];
-            let value = values
-                .iter()
-                .find(|(k, _)| *k == key)
-                .map(|(_, v)| *v)
-                .ok_or_else(|| format!("unknown placeholder `{{{key}}}`"))?;
-            out.push_str(value);
+            pieces.push(Piece::Placeholder(&name[..end]));
             rest = &name[end + 1..];
         } else {
             return Err(format!("single `}}` in {template:?}"));
         }
     }
-    out.push_str(rest);
+    if !rest.is_empty() {
+        pieces.push(Piece::Literal(rest));
+    }
+    Ok(pieces)
+}
+
+/// The distinct placeholder names of `template`, sorted.
+fn placeholders(template: &str) -> Result<Vec<&str>, String> {
+    let mut names: Vec<&str> = parse_template(template)?
+        .into_iter()
+        .filter_map(|piece| match piece {
+            Piece::Placeholder(name) => Some(name),
+            Piece::Literal(_) => None,
+        })
+        .collect();
+    names.sort_unstable();
+    names.dedup();
+    Ok(names)
+}
+
+/// Fills the placeholders of `template` from `values`; an unknown placeholder is an error.
+fn fill_template(template: &str, values: &[(&str, &str)]) -> Result<String, String> {
+    let mut out = String::with_capacity(template.len());
+    for piece in parse_template(template)? {
+        match piece {
+            Piece::Literal(text) => out.push_str(text),
+            Piece::Placeholder(name) => {
+                let value = values
+                    .iter()
+                    .find(|(k, _)| *k == name)
+                    .map(|(_, v)| *v)
+                    .ok_or_else(|| format!("unknown placeholder `{{{name}}}`"))?;
+                out.push_str(value);
+            }
+        }
+    }
     Ok(out)
+}
+
+/// Checks `prompt`: the system template has no placeholders, the user template has exactly
+/// `{mentions_json}` and `{text}`, and braces are balanced. `origin` (a file path), when
+/// known, prefixes error messages.
+fn validate_prompt(prompt: &EdPrompt, origin: Option<&str>) -> Result<(), ModelError> {
+    let fail = |message: String| match origin {
+        Some(origin) => prompt_error(format!("{origin}: {message}")),
+        None => prompt_error(message),
+    };
+    let system = placeholders(&prompt.system_template).map_err(fail)?;
+    if let Some(name) = system.first() {
+        return Err(fail(format!(
+            "system_template has placeholder `{{{name}}}`; none are allowed"
+        )));
+    }
+    let user = placeholders(&prompt.user_template).map_err(fail)?;
+    if user != USER_PLACEHOLDERS {
+        return Err(fail(format!(
+            "user_template must contain exactly the placeholders {{mentions_json}} and {{text}}, \
+             found {user:?}"
+        )));
+    }
+    Ok(())
+}
+
+/// Loads and validates the prompt file at `path` (load errors name the path already).
+fn load_prompt(path: &str) -> Result<EdPrompt, ModelError> {
+    let prompt = EdPrompt::load(path).map_err(prompt_error)?;
+    validate_prompt(&prompt, Some(path))?;
+    Ok(prompt)
 }
 
 /// JSON schema of the expected answer (structured output).
@@ -131,19 +177,25 @@ impl LlmCoref {
     /// A resolver over `llm` with the shipped prompt ([`LLM_COREF_PROMPT_PATH`]).
     ///
     /// # Errors
-    /// [`ModelError::Load`] when the prompt cannot be read or is malformed.
+    /// [`ModelError::Load`] when the prompt cannot be read or fails the checks of
+    /// [`LlmCoref::with_prompt`].
     pub fn new(llm: Arc<dyn Llm>) -> Result<Self, ModelError> {
-        let prompt = load_prompt(LLM_COREF_PROMPT_PATH)?;
-        Ok(Self { llm, prompt, schema: response_schema() })
+        Ok(Self::build(llm, load_prompt(LLM_COREF_PROMPT_PATH)?))
     }
 
     /// A resolver over `llm` with `prompt`.
     ///
     /// # Errors
-    /// [`ModelError::Load`] when a template has an unknown placeholder or unbalanced braces.
+    /// [`ModelError::Load`] unless `user_template` contains exactly the placeholders
+    /// `{mentions_json}` and `{text}` and `system_template` contains none, with balanced
+    /// braces (`{{` / `}}` for literal ones) in both.
     pub fn with_prompt(llm: Arc<dyn Llm>, prompt: EdPrompt) -> Result<Self, ModelError> {
-        validate_prompt(&prompt, "coref prompt")?;
-        Ok(Self { llm, prompt, schema: response_schema() })
+        validate_prompt(&prompt, None)?;
+        Ok(Self::build(llm, prompt))
+    }
+
+    fn build(llm: Arc<dyn Llm>, prompt: EdPrompt) -> Self {
+        Self { llm, prompt, schema: response_schema() }
     }
 
     /// The system and user messages for `text` and `mentions`.
@@ -160,12 +212,10 @@ impl LlmCoref {
             })
             .collect();
         let mentions_json = Value::Array(listed).to_string();
-        let system = fill_template(&self.prompt.system_template, &[]);
-        let user = fill_template(
-            &self.prompt.user_template,
-            &[("mentions_json", &mentions_json), ("text", text)],
-        );
-        Ok((system.map_err(prompt_error)?, user.map_err(prompt_error)?))
+        let system = fill_template(&self.prompt.system_template, &[]).map_err(prompt_error)?;
+        let values = [(USER_PLACEHOLDERS[0], mentions_json.as_str()), (USER_PLACEHOLDERS[1], text)];
+        let user = fill_template(&self.prompt.user_template, &values).map_err(prompt_error)?;
+        Ok((system, user))
     }
 }
 
@@ -358,6 +408,8 @@ mod tests {
         assert!(fill_template("{missing}", &[]).is_err());
         assert!(fill_template("a } b", &[]).is_err());
         assert!(fill_template("a { b", &[]).is_err());
+        assert_eq!(placeholders("{b} {a} {{c}} {a}").expect("parses"), vec!["a", "b"]);
+        assert!(placeholders("{{").expect("parses").is_empty());
     }
 
     #[test]
@@ -434,11 +486,12 @@ mod tests {
         let llm = || Arc::new(MockLlm::new()) as Arc<dyn Llm>;
         assert!(matches!(
             LlmCoref::with_prompt(llm(), prompt("x", "{doc}")),
-            Err(ModelError::Load { ref message, .. }) if message.contains("{doc}")
+            Err(ModelError::Load { ref message, .. }) if message.contains("found [\"doc\"]")
         ));
         assert!(LlmCoref::with_prompt(llm(), prompt("{text}", "{mentions_json} {text}")).is_err());
         assert!(LlmCoref::with_prompt(llm(), prompt("x", "{mentions_json}")).is_err());
         assert!(LlmCoref::with_prompt(llm(), prompt("x", "{{text}} {mentions_json}")).is_err());
+        assert!(LlmCoref::with_prompt(llm(), prompt("x", "{mentions_json} {text} {x}")).is_err());
         assert!(LlmCoref::with_prompt(llm(), prompt("{{x}}", "{mentions_json} {text}")).is_ok());
 
         // A prompt file without a user template does not load.
@@ -454,6 +507,5 @@ mod tests {
             load_prompt(missing),
             Err(ModelError::Load { ref message, .. }) if message.contains(missing)
         ));
-        assert!(load_prompt(LLM_COREF_PROMPT_PATH).is_ok());
     }
 }

@@ -11,13 +11,16 @@
 //!
 //! | `backend` | Resolver |
 //! | --- | --- |
-//! | `fastcoref` | [`SidecarCoref`] started with `models.coref.command`; without a command, [`ModelError::Unavailable`] ("fastcoref sidecar command not configured") |
+//! | `fastcoref` | [`SidecarCoref`] started with `models.coref.command`; without a command, [`RuleCoref`] with one warning ([`FASTCOREF_FALLBACK_WARNING`]) so the shipped config runs out of the box |
 //! | `rule` | [`RuleCoref`] |
 //! | `llm` | [`LlmCoref`] over the registry's `<pipeline.name>_ollama` LLM |
 //! | `mock` | [`MockCoref`] returning no clusters |
 //!
 //! A sidecar set with [`ModelRegistry::with_coref_sidecar`] replaces the configured coref
-//! backend, whatever it is. A backend whose feature is off yields [`ModelError::Unavailable`].
+//! backend, whatever it is. A backend whose feature is off yields [`ModelError::Unavailable`];
+//! a configured sidecar that cannot start is a [`ModelError::Load`] error.
+//!
+//! Models are built once per key, so the fallback warning is logged once per registry.
 
 use std::collections::HashMap;
 use std::fmt;
@@ -34,6 +37,12 @@ use crate::mock::MockCoref;
 use crate::rule_coref::RuleCoref;
 use crate::sidecar::{SidecarCommand, SidecarCoref};
 use crate::traits::{Coref, Embedder, Llm, NerModel, NliJudge};
+
+/// Warning logged when `models.coref.backend: fastcoref` has no `command` and the registry
+/// falls back to [`RuleCoref`].
+pub const FASTCOREF_FALLBACK_WARNING: &str = "fastcoref sidecar command not configured; using \
+     the rule coreference backend. set models.coref.command to a fastcoref sidecar, or set \
+     models.coref.backend: rule to silence this";
 
 /// Model types of the `models:` config block, in Python registration order.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -367,12 +376,8 @@ impl ModelRegistry {
             CorefBackend::Fastcoref => {
                 let Some((program, args)) = config.command.as_deref().and_then(<[_]>::split_first)
                 else {
-                    return Err(ModelError::Unavailable {
-                        backend: CorefBackend::Fastcoref.as_str().to_owned(),
-                        reason: "fastcoref sidecar command not configured; set \
-                                 models.coref.command or use the rule, llm or mock backend"
-                            .to_owned(),
-                    });
+                    tracing::warn!("{FASTCOREF_FALLBACK_WARNING}");
+                    return Ok(Arc::new(RuleCoref::new()));
                 };
                 let command = SidecarCommand::new(program).args(args);
                 Ok(Arc::new(SidecarCoref::new(command)?))
@@ -508,16 +513,55 @@ mod tests {
     }
 
     #[test]
-    fn fastcoref_without_command_is_unavailable() {
+    fn fastcoref_without_command_falls_back_to_rules_with_one_warning() {
+        use std::io::Write;
+        use std::sync::Mutex;
+
+        use crate::traits::CorefMention;
+
+        /// Appends formatted log lines to a shared buffer.
+        struct Capture(Arc<Mutex<Vec<u8>>>);
+        impl Write for Capture {
+            fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+                lock(&self.0).extend_from_slice(buf);
+                Ok(buf.len())
+            }
+            fn flush(&mut self) -> std::io::Result<()> {
+                Ok(())
+            }
+        }
+
+        let log = Arc::new(Mutex::new(Vec::new()));
+        let writer = Arc::clone(&log);
+        let subscriber = tracing_subscriber::fmt()
+            .with_writer(move || Capture(Arc::clone(&writer)))
+            .with_ansi(false)
+            .with_max_level(tracing::Level::WARN)
+            .finish();
         let registry = ModelRegistry::new("p", models(false));
-        let Err(err) = registry.coref("p_coref") else {
-            panic!("fastcoref without a command resolved");
-        };
+        let mentions = [
+            CorefMention { start: 0, end: 11, text: "Maria Lopez", entity_type: "PER" },
+            CorefMention { start: 17, end: 22, text: "Lopez", entity_type: "PER" },
+        ];
+        tracing::subscriber::with_default(subscriber, || {
+            let first = registry.coref("p_coref").expect("rule fallback");
+            let second = registry.coref("p_coref").expect("cached fallback");
+            assert!(Arc::ptr_eq(&first, &second));
+            let clusters = first
+                .resolve_with_mentions("Maria Lopez said Lopez left.", &mentions)
+                .expect("rule clusters");
+            assert_eq!(clusters, vec![crate::CorefCluster { spans: vec![(0, 11), (17, 22)] }]);
+        });
+        let text = String::from_utf8(lock(&log).clone()).expect("UTF-8 log");
+        assert_eq!(text.matches(FASTCOREF_FALLBACK_WARNING).count(), 1, "{text}");
+        assert!(text.contains("WARN"), "{text}");
         assert!(
-            matches!(err, ModelError::Unavailable { ref backend, .. } if backend == "fastcoref"),
-            "{err:?}"
+            FASTCOREF_FALLBACK_WARNING.contains(
+                "set models.coref.command to a fastcoref sidecar, or set \
+                 models.coref.backend: rule to silence this"
+            ),
+            "{FASTCOREF_FALLBACK_WARNING}"
         );
-        assert!(err.to_string().contains("fastcoref sidecar command not configured"), "{err}");
     }
 
     #[test]

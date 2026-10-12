@@ -8,9 +8,9 @@
 //!    skips.
 //! 3. Resolve the `<pipeline.name>_<model_name_suffix>` coreference model. A key the registry
 //!    does not know skips with a warning (Python: service not registered); any other model
-//!    error (an unavailable backend such as `fastcoref` without a sidecar command, a load or
-//!    inference failure) fails the stage: coreference never degrades silently to "no
-//!    clusters".
+//!    error (a sidecar that cannot start, a load or inference failure) fails the stage:
+//!    coreference never degrades silently to "no clusters". (`fastcoref` without a sidecar
+//!    command resolves to the rule backend with a warning; see [`ce_models::registry`].)
 //! 4. Call [`ce_models::Coref::resolve_with_mentions`] with the mentions of eligible types,
 //!    sorted by start, and post-process the clusters with [`ce_coref::CorefPostProcessor`].
 //!
