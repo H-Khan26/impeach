@@ -408,7 +408,7 @@ fn response_nodes(response: &str) -> Result<Vec<Value>> {
     };
     if let Some(salvage) = salvage_nodes(response) {
         warn!(
-            "Fact extraction output does not parse as a whole (list truncated: {}); salvaged {}              complete nodes, {} unparseable",
+            "Fact extraction output does not parse as a whole (list truncated: {}); salvaged {} complete nodes, {} unparseable",
             salvage.truncated,
             salvage.nodes.len(),
             salvage.unparseable
