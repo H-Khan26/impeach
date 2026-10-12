@@ -1,6 +1,7 @@
 //! `run_processing` (port of `tests/unit/test_api_processing.py`) and the RAG-only flow.
 
 mod common;
+mod ed_common;
 
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -381,11 +382,12 @@ fn open_store_with_helix_memory_mode() {
     let store = ce_pipeline::open_store(&config.helix).expect("store");
     assert_eq!(store.embedding_dim(), config.helix.embedding_dim);
 
-    // The built-in stages against helix memory mode: mock embedder, a NER model that finds
-    // nothing (regex and citation mentions remain) and rule coreference.
+    // The built-in stages against helix memory mode: mock embedder, a gazetteer NER model of
+    // the Green Valley names and rule coreference.
     let registry = ModelRegistry::empty("processing_v17");
     registry.insert_embedder(registry.key(ModelKind::Bge), Arc::new(MockEmbedder::new(DIM)));
-    registry.insert_ner(registry.key(ModelKind::Gliner2), Arc::new(ce_models::MockNer::default()));
+    let ner = ed_common::GazetteerNer::new(ed_common::GREEN_VALLEY_NAMES);
+    registry.insert_ner(registry.key(ModelKind::Gliner2), Arc::new(ner));
     registry.insert_coref(registry.key(ModelKind::Coref), Arc::new(ce_models::RuleCoref::new()));
     let env = ProcessingEnv {
         registry: Some(Arc::new(registry)),
@@ -421,7 +423,7 @@ fn open_store_with_helix_memory_mode() {
     assert!(!span_ids.is_empty());
     assert!(span_ids.len() <= mentions.len());
 
-    // ED against helix: entities created and mention spans linked to them.
+    // ED against helix: mentions resolved to created entities.
     let resolved = run.data.resolved_mentions.as_ref().expect("resolved_mentions");
     assert!(!resolved.is_empty());
     assert!(!run.data.ed_results.as_ref().expect("ed_results").is_empty());
