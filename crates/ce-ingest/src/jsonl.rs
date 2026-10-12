@@ -1,73 +1,16 @@
 //! JSONL output in the byte format of Python `json.dumps(obj, ensure_ascii=False)` and reading
 //! of the first JSONL record.
 
-use std::io::{self, BufRead, Write};
+use std::io::{self, BufRead};
 use std::path::Path;
 
+use ce_core::pyjson::to_python_json;
 use ce_core::{DocId, DocumentPayload, Metadata};
-use serde::Serialize;
-use serde_json::ser::Formatter;
 use serde_json::Value;
 
 use crate::error::{IngestError, Result};
 use crate::loader::stem;
 use crate::py;
-
-/// `serde_json` formatter that writes `", "` and `": "` separators and Python float `repr`.
-#[derive(Debug, Clone, Copy, Default)]
-struct PythonFormatter;
-
-impl Formatter for PythonFormatter {
-    fn begin_array_value<W: ?Sized + Write>(
-        &mut self,
-        writer: &mut W,
-        first: bool,
-    ) -> io::Result<()> {
-        if first {
-            Ok(())
-        } else {
-            writer.write_all(b", ")
-        }
-    }
-
-    fn begin_object_key<W: ?Sized + Write>(
-        &mut self,
-        writer: &mut W,
-        first: bool,
-    ) -> io::Result<()> {
-        if first {
-            Ok(())
-        } else {
-            writer.write_all(b", ")
-        }
-    }
-
-    fn begin_object_value<W: ?Sized + Write>(&mut self, writer: &mut W) -> io::Result<()> {
-        writer.write_all(b": ")
-    }
-
-    fn write_f64<W: ?Sized + Write>(&mut self, writer: &mut W, value: f64) -> io::Result<()> {
-        writer.write_all(py::float_repr(value).as_bytes())
-    }
-
-    fn write_f32<W: ?Sized + Write>(&mut self, writer: &mut W, value: f32) -> io::Result<()> {
-        writer.write_all(py::float_repr(f64::from(value)).as_bytes())
-    }
-}
-
-/// Serialises `value` as Python `json.dumps(value, ensure_ascii=False)` does: `", "` / `": "`
-/// separators, non-ASCII text unescaped, floats as Python `repr`. Field order is the serde
-/// order.
-///
-/// # Errors
-/// The serialisation error of `value`.
-pub fn to_python_json<T: Serialize + ?Sized>(value: &T) -> serde_json::Result<String> {
-    let mut out = Vec::new();
-    let mut serializer = serde_json::Serializer::with_formatter(&mut out, PythonFormatter);
-    value.serialize(&mut serializer)?;
-    // serde_json only writes valid UTF-8.
-    Ok(String::from_utf8_lossy(&out).into_owned())
-}
 
 /// Writes `payload` as the only line of `path` (truncating it), newline-terminated.
 pub(crate) fn write_payload(payload: &DocumentPayload, path: &Path) -> Result<()> {
@@ -207,16 +150,6 @@ mod tests {
     use serde_json::json;
 
     use super::*;
-
-    #[test]
-    fn python_json_format() {
-        let value =
-            json!({"a": [1, 2.5, 1e20, "é\n\u{1}"], "b": {}, "c": [], "d": null, "e": true});
-        assert_eq!(
-            to_python_json(&value).expect("serialize"),
-            "{\"a\": [1, 2.5, 1e+20, \"é\\n\\u0001\"], \"b\": {}, \"c\": [], \"d\": null, \"e\": true}"
-        );
-    }
 
     fn write(dir: &Path, name: &str, content: &str) -> std::path::PathBuf {
         let path = dir.join(name);

@@ -268,9 +268,9 @@ impl SqliteReviewStore {
                 if item.updated_at.is_empty() {
                     item.updated_at.clone_from(&now);
                 }
-                let new_payload = python_json_dumps(&Value::Object(item.new_fact_payload.clone()));
+                let new_payload = python_json_dumps(&item.new_fact_payload);
                 let existing_payload = (!item.existing_fact_payload.is_empty())
-                    .then(|| python_json_dumps(&Value::Object(item.existing_fact_payload.clone())));
+                    .then(|| python_json_dumps(&item.existing_fact_payload));
                 written += statement.execute(params![
                     item.case_id,
                     item.session_id,
@@ -538,83 +538,16 @@ fn python_isoformat(value: NaiveDateTime) -> String {
     }
 }
 
-/// Python `json.dumps(value)`: `", "` and `": "` separators, non-ASCII escaped as `\uXXXX`.
-fn python_json_dumps(value: &Value) -> String {
-    let mut out = String::new();
-    write_python_json(value, &mut out);
-    out
-}
-
-fn write_python_json(value: &Value, out: &mut String) {
-    match value {
-        Value::Null => out.push_str("null"),
-        Value::Bool(flag) => out.push_str(if *flag { "true" } else { "false" }),
-        Value::Number(number) => out.push_str(&number.to_string()),
-        Value::String(text) => write_python_string(text, out),
-        Value::Array(values) => {
-            out.push('[');
-            for (index, item) in values.iter().enumerate() {
-                if index > 0 {
-                    out.push_str(", ");
-                }
-                write_python_json(item, out);
-            }
-            out.push(']');
-        }
-        Value::Object(map) => {
-            out.push('{');
-            for (index, (key, item)) in map.iter().enumerate() {
-                if index > 0 {
-                    out.push_str(", ");
-                }
-                write_python_string(key, out);
-                out.push_str(": ");
-                write_python_json(item, out);
-            }
-            out.push('}');
-        }
-    }
-}
-
-fn write_python_string(text: &str, out: &mut String) {
-    out.push('"');
-    for c in text.chars() {
-        match c {
-            '"' => out.push_str("\\\""),
-            '\\' => out.push_str("\\\\"),
-            '\n' => out.push_str("\\n"),
-            '\r' => out.push_str("\\r"),
-            '\t' => out.push_str("\\t"),
-            '\u{08}' => out.push_str("\\b"),
-            '\u{0c}' => out.push_str("\\f"),
-            c if c.is_ascii() && !c.is_ascii_control() => out.push(c),
-            c => {
-                let mut units = [0_u16; 2];
-                for unit in c.encode_utf16(&mut units) {
-                    let _ = write!(out, "\\u{unit:04x}");
-                }
-            }
-        }
-    }
-    out.push('"');
+/// Python `json.dumps(value)` of a payload object.
+fn python_json_dumps(value: &Metadata) -> String {
+    ce_core::pyjson::to_python_json_ascii(value)
+        .expect("a map of serde_json values always serialises")
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
-    use serde_json::json;
-
-    #[test]
-    fn json_dumps_matches_python_format() {
-        let value = json!({"a": [1, 2.5, null, true], "b": {"c": "Ünïcode \u{1F600} \"q\"\n"}});
-        assert_eq!(
-            python_json_dumps(&value),
-            r#"{"a": [1, 2.5, null, true], "b": {"c": "\u00dcn\u00efcode \ud83d\ude00 \"q\"\n"}}"#
-        );
-        assert_eq!(python_json_dumps(&json!({})), "{}");
-        assert_eq!(python_json_dumps(&json!("\u{1}")), r#""\u0001""#);
-    }
 
     #[test]
     fn isoformat_omits_zero_microseconds() {

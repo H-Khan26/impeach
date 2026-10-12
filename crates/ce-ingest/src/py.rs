@@ -1,5 +1,5 @@
 //! Python `str` and `json` semantics the loaders rely on: text-mode file reading, `splitlines`,
-//! `isdigit` / `isupper`, truthiness, `str()` / `repr()` of JSON values and float `repr`.
+//! `isdigit` / `isupper`, truthiness, `str()` / `repr()` of JSON values.
 
 use std::fmt::Write as _;
 use std::path::Path;
@@ -159,7 +159,7 @@ fn write_repr(out: &mut String, value: &Value) {
         Value::Bool(true) => out.push_str("True"),
         Value::Bool(false) => out.push_str("False"),
         Value::Number(n) => match n.as_f64().filter(|_| n.is_f64()) {
-            Some(f) => out.push_str(&float_repr(f)),
+            Some(f) => out.push_str(&ce_core::pyjson::float_repr(f)),
             None => out.push_str(&n.to_string()),
         },
         Value::String(s) => write_str_repr(out, s),
@@ -218,59 +218,6 @@ fn write_str_repr(out: &mut String, text: &str) {
         }
     }
     out.push(quote);
-}
-
-/// Python `repr()` of a float (also what `json.dumps` writes): the shortest round-trip digits,
-/// positional for decimal exponents in `-4..16`, otherwise scientific with a signed two-digit
-/// exponent (`1e+20`, `1.5e-07`). Non-finite values use the `json.dumps` spellings.
-pub(crate) fn float_repr(value: f64) -> String {
-    if value.is_nan() {
-        return "NaN".to_owned();
-    }
-    if value.is_infinite() {
-        return if value > 0.0 { "Infinity" } else { "-Infinity" }.to_owned();
-    }
-    if value == 0.0 {
-        return if value.is_sign_negative() { "-0.0" } else { "0.0" }.to_owned();
-    }
-    let sci = format!("{value:e}");
-    let Some((mantissa, exponent)) = sci.split_once('e') else {
-        return sci;
-    };
-    let Ok(exp) = exponent.parse::<i32>() else {
-        return sci;
-    };
-    let (sign, mantissa) = match mantissa.strip_prefix('-') {
-        Some(rest) => ("-", rest),
-        None => ("", mantissa),
-    };
-    let digits: String = mantissa.chars().filter(|c| *c != '.').collect();
-    let mut out = String::from(sign);
-    if !(-4..16).contains(&exp) {
-        out.push_str(&digits[..1]);
-        if digits.len() > 1 {
-            out.push('.');
-            out.push_str(&digits[1..]);
-        }
-        let exp_sign = if exp < 0 { '-' } else { '+' };
-        // Writing to a String cannot fail.
-        let _ = write!(out, "e{exp_sign}{:02}", exp.unsigned_abs());
-    } else if let Ok(int_len) = usize::try_from(exp).map(|e| e + 1) {
-        if digits.len() <= int_len {
-            out.push_str(&digits);
-            out.extend(std::iter::repeat_n('0', int_len - digits.len()));
-            out.push_str(".0");
-        } else {
-            out.push_str(&digits[..int_len]);
-            out.push('.');
-            out.push_str(&digits[int_len..]);
-        }
-    } else {
-        out.push_str("0.");
-        out.extend(std::iter::repeat_n('0', exp.unsigned_abs() as usize - 1));
-        out.push_str(&digits);
-    }
-    out
 }
 
 #[cfg(test)]
@@ -339,28 +286,5 @@ mod tests {
             r#"["it's", 'say "hi"\n', 'a\xa0b']"#
         );
         assert_eq!(py_str(&json!(["both ' and \""])), r#"['both \' and "']"#);
-    }
-
-    #[test]
-    fn float_repr_matches_python() {
-        let cases = [
-            (1e20, "1e+20"),
-            (1e-7, "1e-07"),
-            (1.5e-7, "1.5e-07"),
-            (1e16, "1e+16"),
-            (1e15, "1000000000000000.0"),
-            (1_234_567_890_123_456.0, "1234567890123456.0"),
-            (0.0001, "0.0001"),
-            (0.1, "0.1"),
-            (1.0, "1.0"),
-            (-2.5, "-2.5"),
-            (123.456, "123.456"),
-            (-0.0, "-0.0"),
-            (1.0e300, "1e+300"),
-            (2.0e-308, "2e-308"),
-        ];
-        for (value, expected) in cases {
-            assert_eq!(float_repr(value), expected, "{value}");
-        }
     }
 }

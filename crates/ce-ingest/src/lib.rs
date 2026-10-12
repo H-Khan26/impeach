@@ -43,9 +43,10 @@ pub mod pdf;
 mod py;
 pub mod transcript;
 
+pub use ce_core::pyjson::to_python_json;
 pub use error::{IngestError, Result};
 pub use ingest::{run_ingestion, IngestOptions, IngestionResult};
-pub use jsonl::{read_first_record, to_python_json};
+pub use jsonl::read_first_record;
 pub use loader::{DocumentLoader, LoadedDocument};
 pub use pdf::{normalize_pdf_linebreaks, PdfCleaning};
 pub use transcript::{flatten_utterances, parse_file, FlattenedTranscript, Utterance};
