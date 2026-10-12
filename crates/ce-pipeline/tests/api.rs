@@ -11,7 +11,8 @@ use ce_ingest::IngestError;
 use ce_models::{MockEmbedder, ModelKind, ModelRegistry};
 use ce_pipeline::{
     load_processing_config, run_processing, run_processing_with, PipelineContext, PipelineError,
-    ProcessingEnv, ProcessingOptions, ProcessingResult, Stage, StageBuildContext, StageRegistry,
+    ProcessingEnv, ProcessingOptions, ProcessingResult, RagIndexStage, Stage, StageBuildContext,
+    StageRegistry,
 };
 use ce_store::{GraphStore, MemoryStore};
 use common::{fixture, DIM};
@@ -129,10 +130,15 @@ fn mock_env() -> (ProcessingEnv, Arc<MemoryStore>) {
     let env = ProcessingEnv {
         registry: Some(Arc::new(registry)),
         store: Some(dyn_store),
-        stages: None,
+        stages: Some(rag_index_only()),
         unregistered: None,
     };
     (env, store)
+}
+
+/// A stage registry with only `RAGIndexStage`; later stage types are skipped.
+fn rag_index_only() -> StageRegistry {
+    StageRegistry::empty().with(RagIndexStage::TYPE_NAME, RagIndexStage::construct)
 }
 
 fn create_test_jsonl(dir: &Path) -> PathBuf {

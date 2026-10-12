@@ -12,7 +12,7 @@ name = "contradiction-engine"
 path = "src/main.rs"
 
 [features]
-default = ["helix", "fastembed", "ort-nli", "ollama"]
+default = ["helix", "fastembed", "ort-nli", "ollama", "gliner2"]
 helix = ["ce-pipeline/helix"]
 fastembed = ["ce-pipeline/fastembed", "ce-eval/fastembed", "ce-models/fastembed"]
 ort-nli = ["ce-pipeline/ort-nli"]

@@ -19,7 +19,7 @@
 //! | `fastembed` | on | `fastembed` | `FastEmbedder`: `BAAI/bge-small-en-v1.5`, `all-MiniLM-L6-v2` through fastembed / ONNX Runtime |
 //! | `ort-nli` | on | `ort_nli` | `OrtNli`: `cross-encoder/nli-deberta-v3-large` ONNX export from the Hugging Face hub, run with ort |
 //! | `ollama` | on | `ollama` | `OllamaLlm`: Ollama HTTP API through ollama-rs |
-//! | `gliner2` | off | `gliner2` | `Gliner2Ner`: GLiNER2 entities and relations through the gliner2 crate (candle) |
+//! | `gliner2` | on | `gliner2` | `Gliner2Ner`: GLiNER2 entities and relations through the gliner2 crate (candle) |
 //!
 //! ONNX Runtime binaries are downloaded at build time (`ort` `download-binaries`). Model files
 //! are downloaded on first use: fastembed models into `.fastembed_cache/` (or

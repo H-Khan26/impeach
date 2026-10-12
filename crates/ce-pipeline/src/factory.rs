@@ -25,7 +25,7 @@ use crate::context::StageBuildContext;
 use crate::error::{PipelineError, Result};
 use crate::runner::Pipeline;
 use crate::stage::Stage;
-use crate::stages::rag_index::RagIndexStage;
+use crate::stages::{CoreferenceStage, DefinitionStage, MentionStage, RagIndexStage};
 
 /// Constructor of one stage type: receives the stage's config block and the shared services.
 pub type StageConstructor =
@@ -60,11 +60,16 @@ impl StageRegistry {
         Self::default()
     }
 
-    /// Every ported stage: `RAGIndexStage`.
+    /// Every ported stage: `RAGIndexStage`, `MentionStage`, `DefinitionStage`,
+    /// `CoreferenceStage`.
     #[must_use]
     pub fn builtin() -> Self {
         let mut registry = Self::empty();
-        registry.register(RagIndexStage::TYPE_NAME, RagIndexStage::construct);
+        registry
+            .register(RagIndexStage::TYPE_NAME, RagIndexStage::construct)
+            .register(MentionStage::TYPE_NAME, MentionStage::construct)
+            .register(DefinitionStage::TYPE_NAME, DefinitionStage::construct)
+            .register(CoreferenceStage::TYPE_NAME, CoreferenceStage::construct);
         registry
     }
 

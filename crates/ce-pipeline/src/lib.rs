@@ -61,4 +61,4 @@ pub use error::{PipelineError, Result};
 pub use factory::{build_pipeline, StageConstructor, StageRegistry, UnregisteredStages};
 pub use runner::{Pipeline, PipelineInput, RunReport, StageTiming};
 pub use stage::Stage;
-pub use stages::RagIndexStage;
+pub use stages::{CoreferenceStage, DefinitionStage, MentionStage, RagIndexStage};
