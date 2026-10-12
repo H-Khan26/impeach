@@ -164,3 +164,48 @@ fn eval_rejects_a_missing_key() {
     assert_eq!(output.status.code(), Some(1));
     assert!(stderr(&output).contains("Input file not found"), "{}", stderr(&output));
 }
+
+#[test]
+fn process_runs_mention_definition_and_rule_coreference_stages() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let config = write_config(
+        dir.path(),
+        &[
+            ("    offline: false", "    offline: true"),
+            (
+                "      - type: \"gliner2\"\n        model_name_suffix: \"gliner2\"\n        min_score: 0.4\n        label_set: \"legal_entities\"\n",
+                "",
+            ),
+            ("backend: \"fastcoref\"", "backend: \"rule\""),
+            ("mode: \"embedded\"", "mode: \"memory\""),
+        ],
+    );
+    let jsonl = fixture("input/green_valley_incident_report.jsonl");
+    let output = run(&["-v", "process", path_arg(&jsonl), "-c", path_arg(&config)]);
+    assert!(output.status.success(), "{}", stderr(&output));
+    let log = stderr(&output);
+    for stage in ["rag_index", "mention_detection", "definition_extraction", "coreference"] {
+        assert!(log.contains(&format!("stage finished stage=\"{stage}\"")), "{stage}: {log}");
+    }
+}
+
+#[test]
+fn fastcoref_without_a_sidecar_command_fails_loudly() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let config = write_config(
+        dir.path(),
+        &[
+            ("    offline: false", "    offline: true"),
+            (
+                "      - type: \"gliner2\"\n        model_name_suffix: \"gliner2\"\n        min_score: 0.4\n        label_set: \"legal_entities\"\n",
+                "",
+            ),
+            ("mode: \"embedded\"", "mode: \"memory\""),
+        ],
+    );
+    let jsonl = fixture("input/green_valley_incident_report.jsonl");
+    let output = run(&["process", path_arg(&jsonl), "-c", path_arg(&config)]);
+    assert_eq!(output.status.code(), Some(1));
+    let text = stderr(&output);
+    assert!(text.contains("fastcoref sidecar command not configured"), "{text}");
+}
