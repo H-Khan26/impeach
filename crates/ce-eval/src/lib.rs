@@ -33,8 +33,8 @@ pub mod similarity;
 pub use assignment::{assign_one_to_one, AssignmentMethod};
 pub use error::{EvalError, Result};
 pub use evaluate::{
-    default_report_path, evaluate, evaluate_body, run_evaluation, score_pairs, EvalBody,
-    EvalOptions, PairScore, DEFAULT_MODEL, DEFAULT_THRESHOLD,
+    default_report_path, evaluate, evaluate_body, run_evaluation, run_evaluation_with_key,
+    score_pairs, EvalBody, EvalOptions, PairScore, DEFAULT_MODEL, DEFAULT_THRESHOLD,
 };
 pub use key::{parse_key, parse_key_file, GroundTruthContradiction, GroundTruthFact, Key};
 pub use pipeline_output::{

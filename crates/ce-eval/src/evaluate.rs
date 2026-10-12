@@ -469,6 +469,22 @@ pub fn run_evaluation(
     options: &EvalOptions,
 ) -> Result<EvalReport> {
     let key = parse_key_file(key_path)?;
+    run_evaluation_with_key(input_path, &key, key_path, report_path, embedder, options)
+}
+
+/// [`run_evaluation`] with a key the caller already parsed from `key_path` (the path is used
+/// for the report and the empty-key error).
+///
+/// # Errors
+/// [`EvalError::EmptyKey`] when the key has no rows, plus the load, embedding and write errors.
+pub fn run_evaluation_with_key(
+    input_path: &Path,
+    key: &Key,
+    key_path: &Path,
+    report_path: Option<&Path>,
+    embedder: &dyn Embedder,
+    options: &EvalOptions,
+) -> Result<EvalReport> {
     if key.is_empty() {
         return Err(EvalError::EmptyKey { path: key_path.to_path_buf() });
     }
@@ -480,7 +496,7 @@ pub fn run_evaluation(
     if options.ground_truth_file.is_empty() {
         options.ground_truth_file = key_path.display().to_string();
     }
-    let report = evaluate(&output, &key, embedder, &options)?;
+    let report = evaluate(&output, key, embedder, &options)?;
     if let Some(path) = report_path {
         let io_error = |source| EvalError::Io { path: path.to_path_buf(), source };
         if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
