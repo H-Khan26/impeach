@@ -636,6 +636,9 @@ impl GraphStore for FailingUpdateStore {
     fn get_entity_facts(&self, entity_id: &EntityId) -> ce_store::Result<Vec<StoredFact>> {
         self.inner.get_entity_facts(entity_id)
     }
+    fn get_fact_entities(&self, fact_id: &FactId) -> ce_store::Result<Vec<EntityId>> {
+        self.inner.get_fact_entities(fact_id)
+    }
     fn find_facts_by_text(&self, keywords: &str, limit: usize) -> ce_store::Result<Vec<FactHit>> {
         self.inner.find_facts_by_text(keywords, limit)
     }

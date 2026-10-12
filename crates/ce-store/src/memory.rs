@@ -142,6 +142,21 @@ impl Graph {
         sources
     }
 
+    /// Distinct targets of `label` edges leaving `from`, in first-edge order (a HelixDB `out`
+    /// step yields each neighbour once).
+    fn targets(&self, label: &str, from: u64) -> Vec<u64> {
+        let from = from.to_string();
+        let mut targets: Vec<u64> = Vec::new();
+        for edge in self.edges.iter().filter(|edge| edge.label == label && edge.from == from) {
+            if let Ok(to) = edge.to.parse() {
+                if !targets.contains(&to) {
+                    targets.push(to);
+                }
+            }
+        }
+        targets
+    }
+
     fn vector_search(&self, label: &str, query: &[f32], limit: usize) -> Vec<(u64, f64)> {
         let query_norm = norm(query);
         let mut scored: Vec<(u64, f64)> = self
@@ -508,6 +523,20 @@ impl GraphStore for MemoryStore {
             .sources(FACT_ABOUT_ENTITY, id)
             .into_iter()
             .filter_map(|fact_id| fact(&graph, fact_id))
+            .collect())
+    }
+
+    fn get_fact_entities(&self, fact_id: &FactId) -> Result<Vec<EntityId>> {
+        let id = parse_node_id("fact_id", fact_id.as_str())?;
+        let graph = self.read();
+        if graph.get(FACT, id).is_none() {
+            return Ok(Vec::new());
+        }
+        Ok(graph
+            .targets(FACT_ABOUT_ENTITY, id)
+            .into_iter()
+            .filter(|entity_id| graph.get(ENTITY, *entity_id).is_some())
+            .map(|entity_id| EntityId::new(entity_id.to_string()))
             .collect())
     }
 

@@ -21,6 +21,7 @@ ce-ner = { path = "crates/ce-ner" }
 ce-coref = { path = "crates/ce-coref" }
 ce-ed = { path = "crates/ce-ed" }
 ce-facts = { path = "crates/ce-facts" }
+ce-contradictions = { path = "crates/ce-contradictions" }
 ce-pipeline = { path = "crates/ce-pipeline", default-features = false }
 ce-eval = { path = "crates/ce-eval", default-features = false }
 

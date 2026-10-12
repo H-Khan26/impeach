@@ -76,6 +76,8 @@ pub mod query_names {
     pub const LINK_FACT_TO_SPAN: &str = "LinkFactToSpan";
     /// `GetEntityFacts`
     pub const GET_ENTITY_FACTS: &str = "GetEntityFacts";
+    /// `GetFactEntities`
+    pub const GET_FACT_ENTITIES: &str = "GetFactEntities";
     /// `FindFactsByText`
     pub const FIND_FACTS_BY_TEXT: &str = "FindFactsByText";
     /// `FindSimilarFacts`

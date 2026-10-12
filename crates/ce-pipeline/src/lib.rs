@@ -64,6 +64,7 @@
 
 pub mod api;
 pub mod context;
+pub mod e2e;
 pub mod error;
 pub mod factory;
 pub mod rag;
@@ -82,6 +83,6 @@ pub use factory::{build_pipeline, StageConstructor, StageRegistry, UnregisteredS
 pub use runner::{Pipeline, PipelineInput, RunReport, StageTiming};
 pub use stage::Stage;
 pub use stages::{
-    CoreferenceStage, DefinitionStage, EdStage, FactStage, MentionStage, RagIndexStage,
-    RelationStage,
+    ContradictionStage, CoreferenceStage, DefinitionStage, EdStage, FactStage, MentionStage,
+    RagIndexStage, RelationStage,
 };

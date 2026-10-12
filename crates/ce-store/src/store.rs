@@ -177,6 +177,13 @@ pub trait GraphStore: Send + Sync + std::fmt::Debug {
     /// `Validation` for a malformed id; database failures.
     fn get_entity_facts(&self, entity_id: &EntityId) -> Result<Vec<StoredFact>>;
 
+    /// `GetFactEntities`: entities the fact is linked to by `FactAboutEntity`, each once, in
+    /// first-edge order (empty when the fact does not exist).
+    ///
+    /// # Errors
+    /// `Validation` for a malformed id; database failures.
+    fn get_fact_entities(&self, fact_id: &FactId) -> Result<Vec<EntityId>>;
+
     /// `FindFactsByText`: BM25 search over `FactText`.
     ///
     /// # Errors
