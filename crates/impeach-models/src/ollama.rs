@@ -4,7 +4,8 @@
 //! The [`Llm`] trait is synchronous, so each [`OllamaLlm`] owns a private current-thread tokio
 //! runtime and blocks on the HTTP call. Do not call it from inside an async task.
 //!
-//! [`OllamaLlm::check_reachable`] (run by the model registry when it resolves the LLM) fails
+//! [`OllamaLlm::check_reachable`] (run once per pipeline build through
+//! [`ModelRegistry::check_llm_reachable`](crate::ModelRegistry::check_llm_reachable)) fails
 //! with [`ModelError::Unavailable`] naming the `base_url` and how to start Ollama or run
 //! without it. A later request that cannot reach the server fails with a short
 //! [`ModelError::Connection`].

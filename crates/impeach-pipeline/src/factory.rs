@@ -176,9 +176,9 @@ impl StageRegistry {
     }
 }
 
-/// Resolves the `<pipeline>_ollama` LLM once when an enabled stage may call it, so an
-/// unreachable server is reported (with how to fix it) before any document is processed. The
-/// stages keep their own handling of an unavailable LLM (skip or run without it).
+/// Checks once that the `<pipeline>_ollama` server answers when an enabled stage may call it, so
+/// an unreachable server is reported (with how to fix it) before any document is processed.
+/// The stages still get a client; their calls fail with a short connection error.
 fn probe_llm(services: &StageBuildContext) {
     let config = &services.config;
     let stage_needs_llm = |stage: &StageConfig| match stage {
@@ -195,7 +195,7 @@ fn probe_llm(services: &StageBuildContext) {
         return;
     }
     let key = format!("{}_ollama", config.name());
-    match services.registry.llm(&key) {
+    match services.registry.check_llm_reachable(&key) {
         Ok(_) | Err(ModelError::UnknownModel { .. }) => {}
         Err(error) => tracing::warn!("{error}"),
     }
