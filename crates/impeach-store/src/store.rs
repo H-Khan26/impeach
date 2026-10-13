@@ -1,18 +1,28 @@
 //! The [`GraphStore`] trait: one method per query of the Python Helix client, plus batch writes
 //! and the chunk cleanup of re-indexed documents.
+//!
+//! The span, edge and fact batch methods are all or nothing: every item is validated and every
+//! endpoint looked up before anything is written, and the writes form one transaction. A
+//! failed batch writes nothing, so a caller may retry its items one by one without creating
+//! duplicates. `create_entity_with_embedding` has a default implementation of two writes
+//! (entity, then vector); the memory and Helix stores override it with one transaction.
 
 use impeach_core::{ChunkId, EntityId, FactId, NodeId, SpanId};
 
 use crate::error::Result;
 use crate::graph::{
-    ChunkNode, DocumentNode, EmbeddingWrite, EntityHit, EntityNode, FactHit, FactNode, SpanNode,
-    StoredChunk, StoredDocument, StoredEntity, StoredFact, StoredSpan, VectorLabel,
+    validate_vector, ChunkNode, DocumentNode, EmbeddingWrite, EntityHit, EntityNode, FactHit,
+    FactLink, FactNode, SpanEntityLink, SpanNode, StoredChunk, StoredDocument, StoredEntity,
+    StoredFact, StoredSpan, VectorLabel,
 };
 
 /// Graph, vector and text storage used by the pipeline.
 ///
-/// Every method is one atomic transaction. Methods take `&self` (backends use interior
-/// mutability) so one store is shared as `Arc<dyn GraphStore>`.
+/// Every method is one atomic transaction, except that `create_chunks_batch` and
+/// `create_embeddings_batch` may split large inputs and the default
+/// `create_entity_with_embedding` writes twice (see the module docs). Methods
+/// take `&self` (backends use interior mutability) so one store is shared as
+/// `Arc<dyn GraphStore>`.
 ///
 /// Errors common to every method: [`crate::StoreError::Validation`] for malformed input
 /// (including ids that are not graph node ids), [`crate::StoreError::NotFound`] when a
@@ -218,8 +228,8 @@ pub trait GraphStore: Send + Sync + std::fmt::Debug {
     /// `Validation` for a malformed id; database failures.
     fn delete_document_chunks(&self, doc_id: &NodeId) -> Result<usize>;
 
-    /// Batch `CreateSpanForChunk`: results in input order; transactions as in
-    /// [`GraphStore::create_chunks_batch`].
+    /// Batch `CreateSpanForChunk`: results in input order. All or nothing: every parent chunk is
+    /// looked up first and the spans are written in one transaction.
     ///
     /// # Errors
     /// `NotFound` when any `chunk_id` is not a chunk.
@@ -235,4 +245,56 @@ pub trait GraphStore: Send + Sync + std::fmt::Debug {
         label: VectorLabel,
         items: &[EmbeddingWrite<'_>],
     ) -> Result<usize>;
+
+    /// `CreateEntity` plus `CreateEntityEmbedding`: the entity is visible to searches with its
+    /// vector at once. The entity and the vector are validated before anything is written.
+    ///
+    /// The default implementation writes the entity, then its vector. When the vector write
+    /// fails (non-fatally) the entity is kept and returned and the missing vector is logged,
+    /// so callers never create the entity a second time.
+    ///
+    /// # Errors
+    /// `Validation` per [`EntityNode::validated`] or for a malformed vector.
+    fn create_entity_with_embedding(
+        &self,
+        entity: &EntityNode,
+        embedding: &[f32],
+    ) -> Result<StoredEntity> {
+        let node = entity.validated()?;
+        validate_vector(embedding, self.embedding_dim())?;
+        let stored = self.create_entity(&node)?;
+        match self.create_entity_embedding(&stored.id, embedding) {
+            Ok(()) => {}
+            Err(error) if error.is_fatal() => return Err(error),
+            Err(error) => tracing::warn!(
+                entity = %stored.id,
+                error = %error,
+                "entity created without its embedding: the vector write failed"
+            ),
+        }
+        Ok(stored)
+    }
+
+    /// Batch `LinkSpanToEntity`, edges in input order; returns the number written. All or
+    /// nothing: every link is validated and every endpoint looked up before the edges are
+    /// written in one transaction.
+    ///
+    /// # Errors
+    /// `Validation` for a malformed id or confidence; `NotFound` for a missing endpoint.
+    fn link_spans_to_entities_batch(&self, links: &[SpanEntityLink<'_>]) -> Result<usize>;
+
+    /// Batch `CreateFact`: results in input order. All or nothing: every fact is validated
+    /// before the facts are written in one transaction.
+    ///
+    /// # Errors
+    /// `Validation` per [`FactNode::validate`].
+    fn create_facts_batch(&self, facts: &[FactNode]) -> Result<Vec<StoredFact>>;
+
+    /// Batch `LinkFactToDocument` / `LinkFactToEntity` / `LinkFactToSpan`, edges in input
+    /// order; returns the number written. All or nothing, as
+    /// [`GraphStore::link_spans_to_entities_batch`].
+    ///
+    /// # Errors
+    /// `Validation` for a malformed id or confidence; `NotFound` for a missing endpoint.
+    fn link_facts_batch(&self, links: &[FactLink<'_>]) -> Result<usize>;
 }

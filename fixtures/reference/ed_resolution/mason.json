@@ -1,0 +1,516 @@
+{
+ "scenario": "mason",
+ "documents": [
+  {
+   "input": "Mason_billy.jsonl",
+   "doc_id": "001",
+   "ed_results": [
+    {
+     "mention_id": "ent_001_0_1",
+     "chosen_entity_id": "14",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_3",
+     "chosen_entity_id": "15",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_4",
+     "chosen_entity_id": "16",
+     "candidates": [
+      {
+       "entity_id": "15",
+       "canonical_name": "Eastvale",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.9433266520500183,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "eastvale"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_6",
+     "chosen_entity_id": "17",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_001_0_2",
+     "chosen_entity_id": "18",
+     "candidates": [
+      {
+       "entity_id": "14",
+       "canonical_name": "Mason",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.9548307061195374,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "mason"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_5",
+     "chosen_entity_id": "19",
+     "candidates": [
+      {
+       "entity_id": "16",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.9219228029251099,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "15",
+       "canonical_name": "Eastvale",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.916591227054596,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "eastvale"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    }
+   ],
+   "resolved_mentions": {
+    "ent_001_0_1": "14",
+    "ent_001_0_3": "15",
+    "ent_001_0_4": "16",
+    "ent_001_0_6": "17",
+    "ent_001_0_2": "18",
+    "ent_001_0_5": "19",
+    "ent_001_0_0": "14",
+    "synth_pronoun_001_cluster_0_68_70": "14",
+    "synth_pronoun_001_cluster_0_98_100": "14",
+    "synth_pronoun_001_cluster_0_207_210": "14"
+   },
+   "role_map": null,
+   "entities_after": [
+    {
+     "id": "14",
+     "name": "Mason",
+     "entity_type": "PER",
+     "aliases": []
+    },
+    {
+     "id": "15",
+     "name": "Eastvale",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "16",
+     "name": "California",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "17",
+     "name": "beer pong",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "18",
+     "name": "Billy",
+     "entity_type": "PER",
+     "aliases": []
+    },
+    {
+     "id": "19",
+     "name": "hospital",
+     "entity_type": "FACILITY",
+     "aliases": []
+    }
+   ]
+  },
+  {
+   "input": "Mason_watson.jsonl",
+   "doc_id": "002",
+   "ed_results": [
+    {
+     "mention_id": "ent_002_0_1",
+     "chosen_entity_id": "14",
+     "candidates": [
+      {
+       "entity_id": "14",
+       "canonical_name": "Mason",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "mason"
+       }
+      },
+      {
+       "entity_id": "18",
+       "canonical_name": "Billy",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.8932726979255676,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "billy"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "hybrid_heuristic"
+    },
+    {
+     "mention_id": "ent_002_0_3",
+     "chosen_entity_id": "33",
+     "candidates": [
+      {
+       "entity_id": "19",
+       "canonical_name": "hospital",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.8961303234100342,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "hospital"
+       }
+      },
+      {
+       "entity_id": "16",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.8876575231552124,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "15",
+       "canonical_name": "Eastvale",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.8769862055778503,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "eastvale"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_002_0_4",
+     "chosen_entity_id": "16",
+     "candidates": [
+      {
+       "entity_id": "16",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "33",
+       "canonical_name": "Stockton",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Stockton, California on July 8, 2022. He was playing cup pong when he was struck in the head by a large clown named Watson. Mason suffered a minor concussion. His hospita",
+       "score": 0.9537787437438965,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "mason_v_billy",
+        "normalized_name": "stockton"
+       }
+      },
+      {
+       "entity_id": "19",
+       "canonical_name": "hospital",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.9128815531730652,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "hospital"
+       }
+      },
+      {
+       "entity_id": "15",
+       "canonical_name": "Eastvale",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.888736367225647,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "eastvale"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "hybrid_heuristic"
+    },
+    {
+     "mention_id": "ent_002_0_6",
+     "chosen_entity_id": "34",
+     "candidates": [
+      {
+       "entity_id": "17",
+       "canonical_name": "beer pong",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "beer pong"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_002_0_2",
+     "chosen_entity_id": "14",
+     "candidates": [
+      {
+       "entity_id": "14",
+       "canonical_name": "Mason",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.8853955864906311,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "mason"
+       }
+      },
+      {
+       "entity_id": "18",
+       "canonical_name": "Billy",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.8735893368721008,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "billy"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.6995454545454546,
+     "strategy_used": "vector_fuzzy"
+    },
+    {
+     "mention_id": "ent_002_0_5",
+     "chosen_entity_id": "19",
+     "candidates": [
+      {
+       "entity_id": "19",
+       "canonical_name": "hospital",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "hospital"
+       }
+      },
+      {
+       "entity_id": "33",
+       "canonical_name": "Stockton",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Stockton, California on July 8, 2022. He was playing cup pong when he was struck in the head by a large clown named Watson. Mason suffered a minor concussion. His hospita",
+       "score": 0.9276139736175537,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "mason_v_billy",
+        "normalized_name": "stockton"
+       }
+      },
+      {
+       "entity_id": "16",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.8783293962478638,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "15",
+       "canonical_name": "Eastvale",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Mason was attending a fair in Eastvale, California on July 8, 2022. He was playing beer pong when he was struck in the head by a large clown named Billy. Mason suffered a severe concussion and brain d",
+       "score": 0.8672382831573486,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "mason_v_billy",
+        "normalized_name": "eastvale"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "llm_skipped_reuse"
+    }
+   ],
+   "resolved_mentions": {
+    "ent_002_0_1": "14",
+    "ent_002_0_3": "33",
+    "ent_002_0_4": "16",
+    "ent_002_0_6": "34",
+    "ent_002_0_2": "14",
+    "ent_002_0_5": "19",
+    "ent_002_0_0": "14",
+    "synth_pronoun_002_cluster_0_68_70": "14",
+    "synth_pronoun_002_cluster_0_97_99": "14",
+    "synth_pronoun_002_cluster_0_189_192": "14"
+   },
+   "role_map": null,
+   "entities_after": [
+    {
+     "id": "14",
+     "name": "Mason",
+     "entity_type": "PER",
+     "aliases": []
+    },
+    {
+     "id": "15",
+     "name": "Eastvale",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "16",
+     "name": "California",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "17",
+     "name": "beer pong",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "18",
+     "name": "Billy",
+     "entity_type": "PER",
+     "aliases": []
+    },
+    {
+     "id": "19",
+     "name": "hospital",
+     "entity_type": "FACILITY",
+     "aliases": []
+    },
+    {
+     "id": "33",
+     "name": "Stockton",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "34",
+     "name": "cup pong",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    }
+   ]
+  }
+ ]
+}

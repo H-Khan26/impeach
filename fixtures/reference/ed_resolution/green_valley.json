@@ -1,0 +1,4409 @@
+{
+ "scenario": "green_valley",
+ "documents": [
+  {
+   "input": "green_valley_incident_report.jsonl",
+   "doc_id": "001",
+   "ed_results": [
+    {
+     "mention_id": "ent_001_0_2",
+     "chosen_entity_id": "128",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_3",
+     "chosen_entity_id": "129",
+     "candidates": [
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8766999840736389,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_13",
+     "chosen_entity_id": "130",
+     "candidates": [
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8773500919342041,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8591588735580444,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_12",
+     "chosen_entity_id": "131",
+     "candidates": [
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.9057656526565552,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8759503960609436,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8599081635475159,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_0",
+     "chosen_entity_id": "132",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_1",
+     "chosen_entity_id": "133",
+     "candidates": [
+      {
+       "entity_id": "132",
+       "canonical_name": "Daniel Reed",
+       "label": "PER",
+       "aliases": [
+        "Reed"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8500521183013916,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daniel reed"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_5",
+     "chosen_entity_id": "134",
+     "candidates": [
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.9168224334716797,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.9134432673454285,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8942627906799316,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8781484961509705,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_4_5",
+     "chosen_entity_id": "135",
+     "candidates": [
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.6253048777580261,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.6217942833900452,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.6194264888763428,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      },
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.6076481938362122,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5885917544364929,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_0_16",
+     "chosen_entity_id": "136",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_001_0_15",
+     "chosen_entity_id": "137",
+     "candidates": [
+      {
+       "entity_id": "136",
+       "canonical_name": "2020 Freightliner box truck",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8300400376319885,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "2020 freightliner box truck"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_001_1_10",
+     "chosen_entity_id": "137",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_1_11",
+     "chosen_entity_id": "137",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_1_13",
+     "chosen_entity_id": "138",
+     "candidates": [
+      {
+       "entity_id": "137",
+       "canonical_name": "Honda Civic",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7408849596977234,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "honda civic"
+       }
+      },
+      {
+       "entity_id": "136",
+       "canonical_name": "2020 Freightliner box truck",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.6623330116271973,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "2020 freightliner box truck"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_001_1_12",
+     "chosen_entity_id": "138",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_1_7",
+     "chosen_entity_id": "139",
+     "candidates": [
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7021816372871399,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7007105946540833,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.6987908482551575,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.6888004541397095,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.678217887878418,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_2_7",
+     "chosen_entity_id": "133",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_2_10",
+     "chosen_entity_id": "128",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_2_8",
+     "chosen_entity_id": "134",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_alias"
+    },
+    {
+     "mention_id": "ent_001_2_17",
+     "chosen_entity_id": "137",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_3_4",
+     "chosen_entity_id": "132",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_3_7",
+     "chosen_entity_id": "128",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_3_10",
+     "chosen_entity_id": "140",
+     "candidates": [
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7862159013748169,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7825921773910522,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7806989550590515,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7621412873268127,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      },
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7589587569236755,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "135",
+       "canonical_name": "insurer",
+       "label": "ORG",
+       "aliases": [],
+       "description": "Mentioned in: As of September 1, 2023, medical bills submitted to and processed by the insurer in connection with Lopez’s claim totaled Fourteen Thousand Two Hundred Fifty Dollars ($14,250.00), consisting primarily",
+       "score": 0.7251944541931152,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "insurer"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_3_21",
+     "chosen_entity_id": "141",
+     "candidates": [
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.8679096698760986,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "132",
+       "canonical_name": "Daniel Reed",
+       "label": "PER",
+       "aliases": [
+        "Reed"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8115151524543762,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daniel reed"
+       }
+      },
+      {
+       "entity_id": "133",
+       "canonical_name": "Maria Lopez",
+       "label": "PER",
+       "aliases": [
+        "Lopez"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7955451607704163,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "maria lopez"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7734392881393433,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7721108794212341,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7654873132705688,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "136",
+       "canonical_name": "2020 Freightliner box truck",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7642395496368408,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "2020 freightliner box truck"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.746496856212616,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      },
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7460289001464844,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "137",
+       "canonical_name": "Honda Civic",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.741468608379364,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "honda civic"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_001_3_20",
+     "chosen_entity_id": "141",
+     "candidates": [
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.9,
+     "strategy_used": "rule_case_name"
+    },
+    {
+     "mention_id": "ent_001_3_11",
+     "chosen_entity_id": "142",
+     "candidates": [
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.8498713374137878,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.8486589193344116,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7755900621414185,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7754503488540649,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.76934415102005,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7525203824043274,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7517598867416382,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_001_4_10",
+     "chosen_entity_id": "137",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_4_9",
+     "chosen_entity_id": "137",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_4_4",
+     "chosen_entity_id": "143",
+     "candidates": [
+      {
+       "entity_id": "133",
+       "canonical_name": "Maria Lopez",
+       "label": "PER",
+       "aliases": [
+        "Lopez"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.6757943034172058,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "maria lopez"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6649012565612793,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_5_7",
+     "chosen_entity_id": "144",
+     "candidates": [
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.8102074861526489,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.788525402545929,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "139",
+       "canonical_name": "scene",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: He maintains that he entered the intersection lawfully on a green light. 8. Reed further reports that as he entered the intersection, the Honda Civic driven by Lopez entered from the west, traveling e",
+       "score": 0.7836242318153381,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "scene"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7773151397705078,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7466557025909424,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7465175986289978,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_5_14",
+     "chosen_entity_id": "141",
+     "candidates": [
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.9,
+     "strategy_used": "rule_case_name"
+    },
+    {
+     "mention_id": "ent_001_5_11",
+     "chosen_entity_id": "137",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_001_6_5",
+     "chosen_entity_id": "145",
+     "candidates": [
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6575939059257507,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6538084149360657,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6409022212028503,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.6124315857887268,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "132",
+       "canonical_name": "Daniel Reed",
+       "label": "PER",
+       "aliases": [
+        "Reed"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5867602229118347,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daniel reed"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5810149312019348,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5714820623397827,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "133",
+       "canonical_name": "Maria Lopez",
+       "label": "PER",
+       "aliases": [
+        "Lopez"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5692541599273682,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "maria lopez"
+       }
+      },
+      {
+       "entity_id": "144",
+       "canonical_name": "Daly City",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Claim database records further reflect that Lopez submitted another bodily injury claim arising from a separate motor vehicle incident in 2019 in Daly City, California, in which she alleged back pain.",
+       "score": 0.5627419352531433,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daly city"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5604701042175293,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_001_6_4",
+     "chosen_entity_id": "141",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_fuzzy"
+    },
+    {
+     "mention_id": "ent_001_6_1",
+     "chosen_entity_id": "146",
+     "candidates": [
+      {
+       "entity_id": "145",
+       "canonical_name": "Incident Report",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.9463405013084412,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "incident report"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6344706416130066,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6283901333808899,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6214936971664429,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5791558623313904,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_6_3",
+     "chosen_entity_id": "147",
+     "candidates": [
+      {
+       "entity_id": "146",
+       "canonical_name": "police reports",
+       "label": "ORG",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.953412652015686,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "police reports"
+       }
+      },
+      {
+       "entity_id": "145",
+       "canonical_name": "Incident Report",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.9532648324966431,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "incident report"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.681664228439331,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.669806718826294,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.642174482345581,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5956025123596191,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "144",
+       "canonical_name": "Daly City",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Claim database records further reflect that Lopez submitted another bodily injury claim arising from a separate motor vehicle incident in 2019 in Daly City, California, in which she alleged back pain.",
+       "score": 0.5685914754867554,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daly city"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5666310787200928,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_001_6_0",
+     "chosen_entity_id": "148",
+     "candidates": [
+      {
+       "entity_id": "145",
+       "canonical_name": "Incident Report",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.9153120517730713,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "incident report"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6306871175765991,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_001_6_7",
+     "chosen_entity_id": "149",
+     "candidates": [
+      {
+       "entity_id": "148",
+       "canonical_name": "witness",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.9221946597099304,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "witness"
+       }
+      },
+      {
+       "entity_id": "145",
+       "canonical_name": "Incident Report",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.9048930406570435,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "incident report"
+       }
+      },
+      {
+       "entity_id": "146",
+       "canonical_name": "police reports",
+       "label": "ORG",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.8995364308357239,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "police reports"
+       }
+      },
+      {
+       "entity_id": "147",
+       "canonical_name": "medical records",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.8867414593696594,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "medical records"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6199595928192139,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6181368231773376,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6071824431419373,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5763265490531921,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "132",
+       "canonical_name": "Daniel Reed",
+       "label": "PER",
+       "aliases": [
+        "Reed"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.5530449748039246,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daniel reed"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    }
+   ],
+   "resolved_mentions": {
+    "ent_001_0_2": "128",
+    "ent_001_0_3": "129",
+    "ent_001_0_13": "130",
+    "ent_001_0_12": "131",
+    "ent_001_0_0": "132",
+    "ent_001_0_1": "133",
+    "ent_001_0_5": "134",
+    "ent_001_4_5": "135",
+    "ent_001_0_16": "136",
+    "ent_001_0_15": "137",
+    "ent_001_1_10": "137",
+    "ent_001_1_11": "137",
+    "ent_001_1_13": "138",
+    "ent_001_1_12": "138",
+    "ent_001_1_7": "139",
+    "ent_001_2_7": "133",
+    "ent_001_2_10": "128",
+    "ent_001_2_8": "134",
+    "ent_001_2_17": "137",
+    "ent_001_3_4": "132",
+    "ent_001_3_7": "128",
+    "ent_001_3_10": "140",
+    "ent_001_3_21": "141",
+    "ent_001_3_20": "141",
+    "ent_001_3_11": "142",
+    "ent_001_4_10": "137",
+    "ent_001_4_9": "137",
+    "ent_001_4_4": "143",
+    "ent_001_5_7": "144",
+    "ent_001_5_14": "141",
+    "ent_001_5_11": "137",
+    "ent_001_6_5": "145",
+    "ent_001_6_4": "141",
+    "ent_001_6_1": "146",
+    "ent_001_6_3": "147",
+    "ent_001_6_0": "148",
+    "ent_001_6_7": "149",
+    "ent_001_2_12": "128",
+    "ent_001_6_2": "128",
+    "ent_001_1_6": "128",
+    "ent_001_2_14": "128",
+    "ent_001_2_13": "128",
+    "ent_001_3_6": "128",
+    "ent_001_3_8": "128",
+    "ent_001_5_5": "128",
+    "ent_001_5_6": "128",
+    "ent_001_1_5": "128",
+    "ent_001_2_11": "128",
+    "ent_001_2_9": "128",
+    "ent_001_4_7": "129",
+    "ent_001_5_8": "129",
+    "ent_001_3_9": "129",
+    "ent_001_0_4": "129",
+    "ent_001_0_8": "130",
+    "ent_001_1_9": "130",
+    "ent_001_0_11": "130",
+    "ent_001_0_6": "130",
+    "ent_001_5_9": "130",
+    "ent_001_0_7": "131",
+    "ent_001_5_10": "131",
+    "ent_001_0_9": "131",
+    "ent_001_0_10": "131",
+    "ent_001_5_4": "132",
+    "ent_001_3_5": "132",
+    "ent_001_2_5": "132",
+    "ent_001_2_2": "132",
+    "ent_001_2_1": "132",
+    "ent_001_2_0": "132",
+    "ent_001_2_3": "132",
+    "ent_001_2_4": "132",
+    "ent_001_5_3": "133",
+    "ent_001_4_0": "133",
+    "ent_001_5_0": "133",
+    "ent_001_2_6": "133",
+    "ent_001_1_0": "133",
+    "ent_001_3_2": "133",
+    "ent_001_3_0": "133",
+    "ent_001_5_1": "133",
+    "ent_001_4_1": "133",
+    "ent_001_3_1": "133",
+    "ent_001_1_3": "133",
+    "ent_001_1_2": "133",
+    "ent_001_3_3": "133",
+    "ent_001_1_4": "133",
+    "ent_001_5_2": "133",
+    "ent_001_4_3": "133",
+    "ent_001_4_2": "133",
+    "ent_001_1_1": "133",
+    "ent_001_2_16": "134",
+    "ent_001_4_8": "134",
+    "ent_001_4_6": "135",
+    "synth_pronoun_001_cluster_8_1230_1232": "132",
+    "synth_pronoun_001_cluster_8_1373_1375": "132",
+    "synth_pronoun_001_cluster_8_1391_1393": "132",
+    "synth_pronoun_001_cluster_8_1478_1480": "132",
+    "synth_pronoun_001_cluster_8_1752_1755": "132",
+    "synth_pronoun_001_cluster_8_2183_2186": "132",
+    "synth_pronoun_001_cluster_8_2219_2221": "132",
+    "synth_pronoun_001_cluster_8_2336_2338": "132",
+    "synth_pronoun_001_cluster_8_3589_3592": "132",
+    "synth_pronoun_001_cluster_8_3703_3705": "132",
+    "synth_pronoun_001_cluster_8_3971_3974": "132",
+    "synth_pronoun_001_cluster_8_4053_4055": "132",
+    "synth_pronoun_001_cluster_8_4223_4225": "132",
+    "synth_pronoun_001_cluster_8_7466_7468": "132",
+    "synth_pronoun_001_cluster_9_2418_2421": "133",
+    "synth_pronoun_001_cluster_9_2508_2511": "133",
+    "synth_pronoun_001_cluster_9_2544_2547": "133",
+    "synth_pronoun_001_cluster_9_2661_2664": "133",
+    "synth_pronoun_001_cluster_9_2685_2688": "133",
+    "synth_pronoun_001_cluster_9_3277_3280": "133",
+    "synth_pronoun_001_cluster_9_3335_3338": "133",
+    "synth_pronoun_001_cluster_9_3359_3362": "133",
+    "synth_pronoun_001_cluster_9_4394_4397": "133",
+    "synth_pronoun_001_cluster_9_4570_4573": "133",
+    "synth_pronoun_001_cluster_9_4648_4651": "133",
+    "synth_pronoun_001_cluster_9_4835_4838": "133",
+    "synth_pronoun_001_cluster_9_4992_4995": "133",
+    "synth_pronoun_001_cluster_9_5050_5053": "133",
+    "synth_pronoun_001_cluster_9_5093_5096": "133",
+    "synth_pronoun_001_cluster_9_5895_5898": "133",
+    "synth_pronoun_001_cluster_9_5940_5943": "133",
+    "synth_pronoun_001_cluster_9_6200_6203": "133",
+    "synth_pronoun_001_cluster_9_6362_6365": "133",
+    "synth_pronoun_001_cluster_9_6490_6493": "133",
+    "synth_pronoun_001_cluster_9_6536_6539": "133",
+    "synth_pronoun_001_cluster_9_6748_6751": "133",
+    "synth_pronoun_001_cluster_9_7678_7681": "133",
+    "synth_pronoun_001_cluster_9_7753_7756": "133",
+    "synth_pronoun_001_cluster_9_7787_7790": "133"
+   },
+   "role_map": null,
+   "entities_after": [
+    {
+     "id": "128",
+     "name": "Green Valley Logistics, Inc.",
+     "entity_type": "ORG",
+     "aliases": [
+      "Green Valley"
+     ]
+    },
+    {
+     "id": "129",
+     "name": "California",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "130",
+     "name": "Mission Street",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "131",
+     "name": "14th Avenue",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "132",
+     "name": "Daniel Reed",
+     "entity_type": "PER",
+     "aliases": [
+      "Reed"
+     ]
+    },
+    {
+     "id": "133",
+     "name": "Maria Lopez",
+     "entity_type": "PER",
+     "aliases": [
+      "Lopez"
+     ]
+    },
+    {
+     "id": "134",
+     "name": "San Francisco",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "135",
+     "name": "insurer",
+     "entity_type": "ORG",
+     "aliases": []
+    },
+    {
+     "id": "136",
+     "name": "2020 Freightliner box truck",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "137",
+     "name": "Honda Civic",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "138",
+     "name": "ambulance",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "139",
+     "name": "scene",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "140",
+     "name": "Oakland",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "141",
+     "name": "CLAIM AND MEDICAL INFORMATION",
+     "entity_type": "CASE",
+     "aliases": []
+    },
+    {
+     "id": "142",
+     "name": "urgent care clinic",
+     "entity_type": "FACILITY",
+     "aliases": []
+    },
+    {
+     "id": "143",
+     "name": "adult friend",
+     "entity_type": "PER",
+     "aliases": []
+    },
+    {
+     "id": "144",
+     "name": "Daly City",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "145",
+     "name": "Incident Report",
+     "entity_type": "CASE",
+     "aliases": []
+    },
+    {
+     "id": "146",
+     "name": "police reports",
+     "entity_type": "ORG",
+     "aliases": []
+    },
+    {
+     "id": "147",
+     "name": "medical records",
+     "entity_type": "FACILITY",
+     "aliases": []
+    },
+    {
+     "id": "148",
+     "name": "witness",
+     "entity_type": "PER",
+     "aliases": []
+    },
+    {
+     "id": "149",
+     "name": "expert opinions",
+     "entity_type": "CASE",
+     "aliases": []
+    }
+   ]
+  },
+  {
+   "input": "lopez_v_green_valley_complaint.jsonl",
+   "doc_id": "002",
+   "ed_results": [
+    {
+     "mention_id": "ent_002_0_16",
+     "chosen_entity_id": "129",
+     "candidates": [
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7937783002853394,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7696125507354736,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7677470445632935,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.761279821395874,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.759371817111969,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "hybrid_heuristic"
+    },
+    {
+     "mention_id": "ent_002_0_5",
+     "chosen_entity_id": "128",
+     "candidates": [
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7892173528671265,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7649379372596741,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7600390911102295,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7571022510528564,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7543624043464661,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "hybrid_heuristic"
+    },
+    {
+     "mention_id": "ent_002_0_15",
+     "chosen_entity_id": "134",
+     "candidates": [
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7910337448120117,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7714954614639282,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7647496461868286,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7587495446205139,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7555356025695801,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "hybrid_heuristic"
+    },
+    {
+     "mention_id": "ent_002_0_4",
+     "chosen_entity_id": "132",
+     "candidates": [
+      {
+       "entity_id": "132",
+       "canonical_name": "Daniel Reed",
+       "label": "PER",
+       "aliases": [
+        "Reed"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daniel reed"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.77923184633255,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "133",
+       "canonical_name": "Maria Lopez",
+       "label": "PER",
+       "aliases": [
+        "Lopez"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7487083077430725,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "maria lopez"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "hybrid_heuristic"
+    },
+    {
+     "mention_id": "ent_002_5_0",
+     "chosen_entity_id": "133",
+     "candidates": [
+      {
+       "entity_id": "133",
+       "canonical_name": "Maria Lopez",
+       "label": "PER",
+       "aliases": [
+        "Lopez"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "maria lopez"
+       }
+      },
+      {
+       "entity_id": "143",
+       "canonical_name": "adult friend",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: As of September 1, 2023, medical bills submitted to and processed by the insurer in connection with Lopez’s claim totaled Fourteen Thousand Two Hundred Fifty Dollars ($14,250.00), consisting primarily",
+       "score": 0.7607919573783875,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "adult friend"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.6116907596588135,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "148",
+       "canonical_name": "witness",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.6085237264633179,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "witness"
+       }
+      },
+      {
+       "entity_id": "149",
+       "canonical_name": "expert opinions",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.5933716297149658,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "expert opinions"
+       }
+      },
+      {
+       "entity_id": "145",
+       "canonical_name": "Incident Report",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Green Valley reserves all rights to supplement or amend this Incident Report and preliminary liability assessment as additional information becomes available, including police reports, medical records",
+       "score": 0.5920402407646179,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "incident report"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "hybrid_heuristic"
+    },
+    {
+     "mention_id": "ent_002_0_19",
+     "chosen_entity_id": "130",
+     "candidates": [
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.793085515499115,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7905694842338562,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7892783284187317,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7891764640808105,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7720057368278503,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "hybrid_heuristic"
+    },
+    {
+     "mention_id": "ent_002_0_20",
+     "chosen_entity_id": "131",
+     "candidates": [
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7982786297798157,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7847516536712646,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7809702754020691,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7790911197662354,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7640159726142883,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "hybrid_heuristic"
+    },
+    {
+     "mention_id": "ent_002_0_18",
+     "chosen_entity_id": "272",
+     "candidates": [
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7898649573326111,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7573153376579285,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7526532411575317,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7503827810287476,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7495192289352417,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7472858428955078,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7239542603492737,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_002_0_26",
+     "chosen_entity_id": "273",
+     "candidates": [
+      {
+       "entity_id": "272",
+       "canonical_name": "Alameda County",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.8835859298706055,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "alameda county"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.8055797815322876,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "132",
+       "canonical_name": "Daniel Reed",
+       "label": "PER",
+       "aliases": [
+        "Reed"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7966185212135315,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daniel reed"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7756202816963196,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.77015221118927,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7688196897506714,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7592960596084595,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7581837773323059,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "133",
+       "canonical_name": "Maria Lopez",
+       "label": "PER",
+       "aliases": [
+        "Lopez"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.757036566734314,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "maria lopez"
+       }
+      },
+      {
+       "entity_id": "137",
+       "canonical_name": "Honda Civic",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7568221092224121,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "honda civic"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_002_0_25",
+     "chosen_entity_id": "273",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_002_0_24",
+     "chosen_entity_id": "274",
+     "candidates": [
+      {
+       "entity_id": "273",
+       "canonical_name": "Complaint",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.9254674911499023,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "complaint"
+       }
+      },
+      {
+       "entity_id": "272",
+       "canonical_name": "Alameda County",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.8880060911178589,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "alameda county"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7937692999839783,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "132",
+       "canonical_name": "Daniel Reed",
+       "label": "PER",
+       "aliases": [
+        "Reed"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.788414716720581,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daniel reed"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.762570321559906,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7610706090927124,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7579416036605835,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "137",
+       "canonical_name": "Honda Civic",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7560606598854065,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "honda civic"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7549012899398804,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7533817887306213,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_002_0_21",
+     "chosen_entity_id": "275",
+     "candidates": [
+      {
+       "entity_id": "137",
+       "canonical_name": "Honda Civic",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "honda civic"
+       }
+      },
+      {
+       "entity_id": "273",
+       "canonical_name": "Complaint",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.8741682767868042,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "complaint"
+       }
+      },
+      {
+       "entity_id": "274",
+       "canonical_name": "this Court",
+       "label": "COURT",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.8653652667999268,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "this court"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_002_1_23",
+     "chosen_entity_id": "136",
+     "candidates": [
+      {
+       "entity_id": "136",
+       "canonical_name": "2020 Freightliner box truck",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "2020 freightliner box truck"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "llm_skipped_reuse"
+    },
+    {
+     "mention_id": "ent_002_1_8",
+     "chosen_entity_id": "276",
+     "candidates": [
+      {
+       "entity_id": "132",
+       "canonical_name": "Daniel Reed",
+       "label": "PER",
+       "aliases": [
+        "Reed"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8191452622413635,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daniel reed"
+       }
+      },
+      {
+       "entity_id": "133",
+       "canonical_name": "Maria Lopez",
+       "label": "PER",
+       "aliases": [
+        "Lopez"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7787013053894043,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "maria lopez"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_002_1_15",
+     "chosen_entity_id": "277",
+     "candidates": [
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.806891918182373,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7966042757034302,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7945544719696045,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7890844345092773,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7874189019203186,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7867436408996582,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_002_1_6",
+     "chosen_entity_id": "132",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_002_1_22",
+     "chosen_entity_id": "275",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_fuzzy"
+    },
+    {
+     "mention_id": "ent_002_1_25",
+     "chosen_entity_id": "278",
+     "candidates": [
+      {
+       "entity_id": "277",
+       "canonical_name": "roadway",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: At the same time and place, Defendant Reed was operating a 2020 white Freightliner box truck, California license plate 9TRK220, owned by Defendant Green Valley, traveling northbound on 14th Avenue tow",
+       "score": 0.8951154947280884,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "roadway"
+       }
+      },
+      {
+       "entity_id": "276",
+       "canonical_name": "pedestrians",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: At the same time and place, Defendant Reed was operating a 2020 white Freightliner box truck, California license plate 9TRK220, owned by Defendant Green Valley, traveling northbound on 14th Avenue tow",
+       "score": 0.8891685605049133,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "pedestrians"
+       }
+      },
+      {
+       "entity_id": "132",
+       "canonical_name": "Daniel Reed",
+       "label": "PER",
+       "aliases": [
+        "Reed"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8220171332359314,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daniel reed"
+       }
+      },
+      {
+       "entity_id": "136",
+       "canonical_name": "2020 Freightliner box truck",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.816962480545044,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "2020 freightliner box truck"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.8065674304962158,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8015273809432983,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      },
+      {
+       "entity_id": "128",
+       "canonical_name": "Green Valley Logistics, Inc.",
+       "label": "ORG",
+       "aliases": [
+        "Green Valley"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8005833625793457,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "green valley logistics inc"
+       }
+      },
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7966329455375671,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7957350611686707,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7948651313781738,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_002_1_9",
+     "chosen_entity_id": "279",
+     "candidates": [
+      {
+       "entity_id": "278",
+       "canonical_name": "collision",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: At the same time and place, Defendant Reed was operating a 2020 white Freightliner box truck, California license plate 9TRK220, owned by Defendant Green Valley, traveling northbound on 14th Avenue tow",
+       "score": 0.8880809545516968,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "collision"
+       }
+      },
+      {
+       "entity_id": "276",
+       "canonical_name": "pedestrians",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: At the same time and place, Defendant Reed was operating a 2020 white Freightliner box truck, California license plate 9TRK220, owned by Defendant Green Valley, traveling northbound on 14th Avenue tow",
+       "score": 0.8746809363365173,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "pedestrians"
+       }
+      },
+      {
+       "entity_id": "132",
+       "canonical_name": "Daniel Reed",
+       "label": "PER",
+       "aliases": [
+        "Reed"
+       ],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.8034465909004211,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daniel reed"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_002_1_21",
+     "chosen_entity_id": "280",
+     "candidates": [
+      {
+       "entity_id": "278",
+       "canonical_name": "collision",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: At the same time and place, Defendant Reed was operating a 2020 white Freightliner box truck, California license plate 9TRK220, owned by Defendant Green Valley, traveling northbound on 14th Avenue tow",
+       "score": 0.8917845487594604,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "collision"
+       }
+      },
+      {
+       "entity_id": "136",
+       "canonical_name": "2020 Freightliner box truck",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7906061410903931,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "2020 freightliner box truck"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_002_1_26",
+     "chosen_entity_id": "278",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_002_1_20",
+     "chosen_entity_id": "277",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_002_2_6",
+     "chosen_entity_id": "281",
+     "candidates": [
+      {
+       "entity_id": "144",
+       "canonical_name": "Daly City",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Claim database records further reflect that Lopez submitted another bodily injury claim arising from a separate motor vehicle incident in 2019 in Daly City, California, in which she alleged back pain.",
+       "score": 0.7253076434135437,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daly city"
+       }
+      },
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.723206102848053,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "134",
+       "canonical_name": "San Francisco",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7182361483573914,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "san francisco"
+       }
+      },
+      {
+       "entity_id": "131",
+       "canonical_name": "14th Avenue",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7102773189544678,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "14th avenue"
+       }
+      },
+      {
+       "entity_id": "129",
+       "canonical_name": "California",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.7060928344726562,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "california"
+       }
+      },
+      {
+       "entity_id": "273",
+       "canonical_name": "Complaint",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.7003085613250732,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "complaint"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_002_2_9",
+     "chosen_entity_id": "138",
+     "candidates": [
+      {
+       "entity_id": "138",
+       "canonical_name": "ambulance",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: He maintains that he entered the intersection lawfully on a green light. 8. Reed further reports that as he entered the intersection, the Honda Civic driven by Lopez entered from the west, traveling e",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "ambulance"
+       }
+      },
+      {
+       "entity_id": "137",
+       "canonical_name": "Honda Civic",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 0.708493709564209,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "honda civic"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "llm_skipped_reuse"
+    },
+    {
+     "mention_id": "ent_002_2_8",
+     "chosen_entity_id": "134",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_alias"
+    },
+    {
+     "mention_id": "ent_002_3_14",
+     "chosen_entity_id": "282",
+     "candidates": [
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7248665690422058,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "273",
+       "canonical_name": "Complaint",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.7167251110076904,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "complaint"
+       }
+      },
+      {
+       "entity_id": "278",
+       "canonical_name": "collision",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: At the same time and place, Defendant Reed was operating a 2020 white Freightliner box truck, California license plate 9TRK220, owned by Defendant Green Valley, traveling northbound on 14th Avenue tow",
+       "score": 0.7121908664703369,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "collision"
+       }
+      },
+      {
+       "entity_id": "280",
+       "canonical_name": "lap seat belt",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: At the same time and place, Defendant Reed was operating a 2020 white Freightliner box truck, California license plate 9TRK220, owned by Defendant Green Valley, traveling northbound on 14th Avenue tow",
+       "score": 0.7108339071273804,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "lap seat belt"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_002_3_12",
+     "chosen_entity_id": "282",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_002_3_11",
+     "chosen_entity_id": "282",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_002_3_10",
+     "chosen_entity_id": "282",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_002_3_9",
+     "chosen_entity_id": "282",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_fuzzy"
+    },
+    {
+     "mention_id": "ent_002_3_8",
+     "chosen_entity_id": "283",
+     "candidates": [
+      {
+       "entity_id": "130",
+       "canonical_name": "Mission Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. On March 4, 2023, at approximately 9:20 p.m., a collision occurred at the intersection of Mission Street and 14th Avenue in San Francisco, California, involving a Green Valley Logistics, Inc. (“Gre",
+       "score": 1.0,
+       "source": "exact",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "mission street"
+       }
+      },
+      {
+       "entity_id": "144",
+       "canonical_name": "Daly City",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Claim database records further reflect that Lopez submitted another bodily injury claim arising from a separate motor vehicle incident in 2019 in Daly City, California, in which she alleged back pain.",
+       "score": 0.7431167364120483,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daly city"
+       }
+      },
+      {
+       "entity_id": "281",
+       "canonical_name": "Emergency medical services",
+       "label": "ORG",
+       "aliases": [],
+       "description": "Mentioned in: At the time of the collision, the weather was clear, the roadway was dry, and visibility was good. 14. The force of the impact caused Plaintiff’s vehicle to spin clockwise and come to rest facing sout",
+       "score": 0.7207006216049194,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "emergency medical services"
+       }
+      },
+      {
+       "entity_id": "273",
+       "canonical_name": "Complaint",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.719139814376831,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "complaint"
+       }
+      },
+      {
+       "entity_id": "135",
+       "canonical_name": "insurer",
+       "label": "ORG",
+       "aliases": [],
+       "description": "Mentioned in: As of September 1, 2023, medical bills submitted to and processed by the insurer in connection with Lopez’s claim totaled Fourteen Thousand Two Hundred Fifty Dollars ($14,250.00), consisting primarily",
+       "score": 0.7168118357658386,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "insurer"
+       }
+      },
+      {
+       "entity_id": "278",
+       "canonical_name": "collision",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: At the same time and place, Defendant Reed was operating a 2020 white Freightliner box truck, California license plate 9TRK220, owned by Defendant Green Valley, traveling northbound on 14th Avenue tow",
+       "score": 0.7058102488517761,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "collision"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7009847164154053,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    },
+    {
+     "mention_id": "ent_002_3_21",
+     "chosen_entity_id": "284",
+     "candidates": [
+      {
+       "entity_id": "282",
+       "canonical_name": "vehicle",
+       "label": "PRODUCT",
+       "aliases": [],
+       "description": "Mentioned in: Plaintiff has incurred medical expenses to date in an amount believed to exceed Twenty-Eight Thousand Dollars ($28,000.00) and continues to incur medical expenses for further evaluation and treatment.",
+       "score": 0.8088170886039734,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "vehicle"
+       }
+      },
+      {
+       "entity_id": "283",
+       "canonical_name": "Cesar Chavez Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Plaintiff has incurred medical expenses to date in an amount believed to exceed Twenty-Eight Thousand Dollars ($28,000.00) and continues to incur medical expenses for further evaluation and treatment.",
+       "score": 0.7664119601249695,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "cesar chavez street"
+       }
+      },
+      {
+       "entity_id": "281",
+       "canonical_name": "Emergency medical services",
+       "label": "ORG",
+       "aliases": [],
+       "description": "Mentioned in: At the time of the collision, the weather was clear, the roadway was dry, and visibility was good. 14. The force of the impact caused Plaintiff’s vehicle to spin clockwise and come to rest facing sout",
+       "score": 0.7450097799301147,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "emergency medical services"
+       }
+      },
+      {
+       "entity_id": "144",
+       "canonical_name": "Daly City",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Claim database records further reflect that Lopez submitted another bodily injury claim arising from a separate motor vehicle incident in 2019 in Daly City, California, in which she alleged back pain.",
+       "score": 0.7402351498603821,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daly city"
+       }
+      },
+      {
+       "entity_id": "141",
+       "canonical_name": "CLAIM AND MEDICAL INFORMATION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7334326505661011,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "claim and medical information"
+       }
+      },
+      {
+       "entity_id": "140",
+       "canonical_name": "Oakland",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7295697331428528,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "oakland"
+       }
+      },
+      {
+       "entity_id": "142",
+       "canonical_name": "urgent care clinic",
+       "label": "FACILITY",
+       "aliases": [],
+       "description": "Mentioned in: Company records reflect that Reed had no prior preventable motor vehicle collisions during his employment with Green Valley. 20. A later audit of Reed’s file confirmed that he had been involved in a p",
+       "score": 0.7174586653709412,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "urgent care clinic"
+       }
+      },
+      {
+       "entity_id": "273",
+       "canonical_name": "Complaint",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.7146319150924683,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "complaint"
+       }
+      },
+      {
+       "entity_id": "143",
+       "canonical_name": "adult friend",
+       "label": "PER",
+       "aliases": [],
+       "description": "Mentioned in: As of September 1, 2023, medical bills submitted to and processed by the insurer in connection with Lopez’s claim totaled Fourteen Thousand Two Hundred Fifty Dollars ($14,250.00), consisting primarily",
+       "score": 0.7067468166351318,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "adult friend"
+       }
+      },
+      {
+       "entity_id": "278",
+       "canonical_name": "collision",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: At the same time and place, Defendant Reed was operating a 2020 white Freightliner box truck, California license plate 9TRK220, owned by Defendant Green Valley, traveling northbound on 14th Avenue tow",
+       "score": 0.7047802805900574,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "collision"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "llm_skipped_create"
+    },
+    {
+     "mention_id": "ent_002_4_11",
+     "chosen_entity_id": "284",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_exact"
+    },
+    {
+     "mention_id": "ent_002_4_8",
+     "chosen_entity_id": "136",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_fuzzy"
+    },
+    {
+     "mention_id": "ent_002_5_8",
+     "chosen_entity_id": "274",
+     "candidates": [],
+     "resolved_by_llm": false,
+     "confidence": 0.85,
+     "strategy_used": "intra_doc_fuzzy"
+    },
+    {
+     "mention_id": "ent_002_5_1",
+     "chosen_entity_id": "285",
+     "candidates": [
+      {
+       "entity_id": "283",
+       "canonical_name": "Cesar Chavez Street",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Plaintiff has incurred medical expenses to date in an amount believed to exceed Twenty-Eight Thousand Dollars ($28,000.00) and continues to incur medical expenses for further evaluation and treatment.",
+       "score": 0.7505502700805664,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "cesar chavez street"
+       }
+      },
+      {
+       "entity_id": "135",
+       "canonical_name": "insurer",
+       "label": "ORG",
+       "aliases": [],
+       "description": "Mentioned in: As of September 1, 2023, medical bills submitted to and processed by the insurer in connection with Lopez’s claim totaled Fourteen Thousand Two Hundred Fifty Dollars ($14,250.00), consisting primarily",
+       "score": 0.7292079925537109,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "insurer"
+       }
+      },
+      {
+       "entity_id": "284",
+       "canonical_name": "FIRST CAUSE OF ACTION",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: Plaintiff has incurred medical expenses to date in an amount believed to exceed Twenty-Eight Thousand Dollars ($28,000.00) and continues to incur medical expenses for further evaluation and treatment.",
+       "score": 0.7259684801101685,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "first cause of action"
+       }
+      },
+      {
+       "entity_id": "274",
+       "canonical_name": "this Court",
+       "label": "COURT",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.7115451097488403,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "this court"
+       }
+      },
+      {
+       "entity_id": "273",
+       "canonical_name": "Complaint",
+       "label": "CASE",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.70647132396698,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "complaint"
+       }
+      },
+      {
+       "entity_id": "144",
+       "canonical_name": "Daly City",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: Claim database records further reflect that Lopez submitted another bodily injury claim arising from a separate motor vehicle incident in 2019 in Daly City, California, in which she alleged back pain.",
+       "score": 0.6929399371147156,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "001",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "daly city"
+       }
+      },
+      {
+       "entity_id": "272",
+       "canonical_name": "Alameda County",
+       "label": "LOC",
+       "aliases": [],
+       "description": "Mentioned in: 1. Plaintiff is, and at all relevant times was, a resident of the City and County of San Francisco, State of California. 2. Defendant Green Valley is, and at all relevant times was, a California corpo",
+       "score": 0.6554427146911621,
+       "source": "embedding",
+       "metadata": {
+        "source_doc_id": "002",
+        "case_id": "lopez_v_green_valley",
+        "normalized_name": "alameda county"
+       }
+      }
+     ],
+     "resolved_by_llm": false,
+     "confidence": 0.7,
+     "strategy_used": "hybrid_unresolved_create"
+    }
+   ],
+   "resolved_mentions": {
+    "ent_002_0_16": "129",
+    "ent_002_0_5": "128",
+    "ent_002_0_15": "134",
+    "ent_002_0_4": "132",
+    "ent_002_5_0": "133",
+    "ent_002_0_19": "130",
+    "ent_002_0_20": "131",
+    "ent_002_0_18": "272",
+    "ent_002_0_26": "273",
+    "ent_002_0_25": "273",
+    "ent_002_0_24": "274",
+    "ent_002_0_21": "275",
+    "ent_002_1_23": "136",
+    "ent_002_1_8": "276",
+    "ent_002_1_15": "277",
+    "ent_002_1_6": "132",
+    "ent_002_1_22": "275",
+    "ent_002_1_25": "278",
+    "ent_002_1_9": "279",
+    "ent_002_1_21": "280",
+    "ent_002_1_26": "278",
+    "ent_002_1_20": "277",
+    "ent_002_2_6": "281",
+    "ent_002_2_9": "138",
+    "ent_002_2_8": "134",
+    "ent_002_3_14": "282",
+    "ent_002_3_12": "282",
+    "ent_002_3_11": "282",
+    "ent_002_3_10": "282",
+    "ent_002_3_9": "282",
+    "ent_002_3_8": "283",
+    "ent_002_3_21": "284",
+    "ent_002_4_11": "284",
+    "ent_002_4_8": "136",
+    "ent_002_5_8": "274",
+    "ent_002_5_1": "285",
+    "ent_002_0_14": "129",
+    "ent_002_0_12": "129",
+    "ent_002_3_7": "129",
+    "ent_002_0_7": "129",
+    "ent_002_0_10": "129",
+    "ent_002_0_8": "129",
+    "ent_002_0_13": "129",
+    "ent_002_1_18": "129",
+    "ent_002_0_6": "128",
+    "ent_002_1_12": "128",
+    "ent_002_1_10": "128",
+    "ent_002_1_11": "128",
+    "ent_002_0_9": "134",
+    "ent_002_0_11": "134",
+    "ent_002_0_17": "134",
+    "ent_002_1_7": "132",
+    "ent_002_0_3": "133",
+    "ent_002_1_2": "133",
+    "ent_002_0_2": "133",
+    "ent_002_2_4": "133",
+    "ent_002_3_0": "133",
+    "ent_002_3_5": "133",
+    "ent_002_2_0": "133",
+    "ent_002_4_1": "133",
+    "ent_002_3_6": "133",
+    "ent_002_0_1": "133",
+    "ent_002_4_7": "133",
+    "ent_002_3_1": "133",
+    "ent_002_4_4": "133",
+    "ent_002_2_3": "133",
+    "ent_002_4_3": "133",
+    "ent_002_4_6": "133",
+    "ent_002_0_0": "133",
+    "ent_002_2_2": "133",
+    "ent_002_3_4": "133",
+    "ent_002_3_3": "133",
+    "ent_002_4_2": "133",
+    "ent_002_2_1": "133",
+    "ent_002_1_4": "133",
+    "ent_002_4_5": "133",
+    "ent_002_3_2": "133",
+    "ent_002_1_0": "133",
+    "ent_002_1_3": "133",
+    "ent_002_4_0": "133",
+    "ent_002_2_5": "133",
+    "ent_002_1_5": "133",
+    "ent_002_1_1": "133",
+    "ent_002_2_7": "130",
+    "ent_002_1_14": "130",
+    "ent_002_1_13": "130",
+    "ent_002_1_16": "131",
+    "ent_002_1_19": "131",
+    "ent_002_1_17": "131",
+    "synth_pronoun_002_cluster_1_274_277": "128",
+    "synth_pronoun_002_cluster_3_519_522": "132",
+    "synth_pronoun_002_cluster_4_1150_1153": "133",
+    "synth_pronoun_002_cluster_4_1751_1754": "133",
+    "synth_pronoun_002_cluster_4_2480_2483": "133",
+    "synth_pronoun_002_cluster_4_2932_2935": "133",
+    "synth_pronoun_002_cluster_4_3391_3394": "133",
+    "synth_pronoun_002_cluster_4_3481_3484": "133",
+    "synth_pronoun_002_cluster_4_3574_3577": "133",
+    "synth_pronoun_002_cluster_4_3849_3852": "133",
+    "synth_pronoun_002_cluster_4_3936_3939": "133",
+    "synth_pronoun_002_cluster_4_4481_4484": "133",
+    "synth_pronoun_002_cluster_4_4847_4850": "133",
+    "synth_pronoun_002_cluster_7_1252_1255": "130",
+    "synth_pronoun_002_cluster_7_1523_1526": "130"
+   },
+   "role_map": null,
+   "entities_after": [
+    {
+     "id": "128",
+     "name": "Green Valley Logistics, Inc.",
+     "entity_type": "ORG",
+     "aliases": [
+      "Green Valley"
+     ]
+    },
+    {
+     "id": "129",
+     "name": "California",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "130",
+     "name": "Mission Street",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "131",
+     "name": "14th Avenue",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "132",
+     "name": "Daniel Reed",
+     "entity_type": "PER",
+     "aliases": [
+      "Reed"
+     ]
+    },
+    {
+     "id": "133",
+     "name": "Maria Lopez",
+     "entity_type": "PER",
+     "aliases": [
+      "Lopez"
+     ]
+    },
+    {
+     "id": "134",
+     "name": "San Francisco",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "135",
+     "name": "insurer",
+     "entity_type": "ORG",
+     "aliases": []
+    },
+    {
+     "id": "136",
+     "name": "2020 Freightliner box truck",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "137",
+     "name": "Honda Civic",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "138",
+     "name": "ambulance",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "139",
+     "name": "scene",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "140",
+     "name": "Oakland",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "141",
+     "name": "CLAIM AND MEDICAL INFORMATION",
+     "entity_type": "CASE",
+     "aliases": []
+    },
+    {
+     "id": "142",
+     "name": "urgent care clinic",
+     "entity_type": "FACILITY",
+     "aliases": []
+    },
+    {
+     "id": "143",
+     "name": "adult friend",
+     "entity_type": "PER",
+     "aliases": []
+    },
+    {
+     "id": "144",
+     "name": "Daly City",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "145",
+     "name": "Incident Report",
+     "entity_type": "CASE",
+     "aliases": []
+    },
+    {
+     "id": "146",
+     "name": "police reports",
+     "entity_type": "ORG",
+     "aliases": []
+    },
+    {
+     "id": "147",
+     "name": "medical records",
+     "entity_type": "FACILITY",
+     "aliases": []
+    },
+    {
+     "id": "148",
+     "name": "witness",
+     "entity_type": "PER",
+     "aliases": []
+    },
+    {
+     "id": "149",
+     "name": "expert opinions",
+     "entity_type": "CASE",
+     "aliases": []
+    },
+    {
+     "id": "272",
+     "name": "Alameda County",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "273",
+     "name": "Complaint",
+     "entity_type": "CASE",
+     "aliases": []
+    },
+    {
+     "id": "274",
+     "name": "this Court",
+     "entity_type": "COURT",
+     "aliases": []
+    },
+    {
+     "id": "275",
+     "name": "2018 blue Honda Civic",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "276",
+     "name": "pedestrians",
+     "entity_type": "PER",
+     "aliases": []
+    },
+    {
+     "id": "277",
+     "name": "roadway",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "278",
+     "name": "collision",
+     "entity_type": "CASE",
+     "aliases": []
+    },
+    {
+     "id": "279",
+     "name": "sole occupant",
+     "entity_type": "PER",
+     "aliases": []
+    },
+    {
+     "id": "280",
+     "name": "lap seat belt",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "281",
+     "name": "Emergency medical services",
+     "entity_type": "ORG",
+     "aliases": []
+    },
+    {
+     "id": "282",
+     "name": "vehicle",
+     "entity_type": "PRODUCT",
+     "aliases": []
+    },
+    {
+     "id": "283",
+     "name": "Cesar Chavez Street",
+     "entity_type": "LOC",
+     "aliases": []
+    },
+    {
+     "id": "284",
+     "name": "FIRST CAUSE OF ACTION",
+     "entity_type": "CASE",
+     "aliases": []
+    },
+    {
+     "id": "285",
+     "name": "LAW OFFICES OF SANCHEZ & HERNANDEZ, LLP",
+     "entity_type": "ORG",
+     "aliases": []
+    }
+   ]
+  }
+ ]
+}

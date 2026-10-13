@@ -2762,6 +2762,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "fs4 1.1.0",
  "impeach-config",
  "impeach-eval",
  "impeach-ingest",
@@ -2918,6 +2919,7 @@ dependencies = [
 name = "impeach-models"
 version = "0.1.0"
 dependencies = [
+ "dirs",
  "fastembed",
  "gliner2",
  "hf-hub",

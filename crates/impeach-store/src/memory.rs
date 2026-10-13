@@ -16,13 +16,11 @@ use serde_json::{json, Map, Value};
 use crate::bm25;
 use crate::error::{Result, StoreError};
 use crate::graph::{
-    clamp_limit, merge_hits, or_default, parse_node_id, validate_confidence, validate_vector,
-    ChunkNode, DocumentNode, EmbeddingWrite, EntityHit, EntityNode, FactHit, FactNode, SearchHit,
+    clamp_limit, merge_hits, parse_node_id, validate_vector, ChunkNode, DocumentNode, EdgeWrite,
+    EmbeddingWrite, EntityHit, EntityNode, FactHit, FactLink, FactNode, SearchHit, SpanEntityLink,
     SpanNode, Stored, StoredChunk, StoredDocument, StoredEntity, StoredFact, StoredSpan,
-    VectorLabel, CHUNK_OF_DOCUMENT, DEFAULT_FACT_ENTITY_ROLE, DEFAULT_FACT_SPAN_ROLE,
-    DEFAULT_SPAN_ENTITY_METHOD, DOCUMENT, DOCUMENT_CHUNK, ENTITY, ENTITY_NAME_SEARCH_K, FACT,
-    FACT_ABOUT_ENTITY, FACT_DERIVED_FROM_SPAN, FACT_IN_DOCUMENT, SPAN, SPAN_OF_CHUNK,
-    SPAN_REFERS_TO_ENTITY,
+    VectorLabel, CHUNK_OF_DOCUMENT, DOCUMENT, DOCUMENT_CHUNK, ENTITY, ENTITY_NAME_SEARCH_K, FACT,
+    FACT_ABOUT_ENTITY, SPAN, SPAN_OF_CHUNK,
 };
 use crate::store::GraphStore;
 
@@ -269,6 +267,27 @@ impl MemoryStore {
         Ok(())
     }
 
+    /// Writes validated edges after checking every endpoint, all or nothing.
+    fn add_edges(&self, edges: &[EdgeWrite<'_>]) -> Result<usize> {
+        let mut graph = self.write();
+        for edge in edges {
+            for end in [&edge.from, &edge.to] {
+                if graph.get(end.label, end.node).is_none() {
+                    return Err(StoreError::not_found(end.label, end.id));
+                }
+            }
+        }
+        for edge in edges {
+            let properties: Map<String, Value> = edge
+                .properties
+                .iter()
+                .map(|(name, value)| ((*name).to_owned(), value.to_json()))
+                .collect();
+            graph.add_edge(edge.label, edge.from.node, edge.to.node, Value::Object(properties));
+        }
+        Ok(edges.len())
+    }
+
     fn update(&self, label: &str, field: &str, id: &str, data: NodeData) -> Result<()> {
         let mut graph = self.write();
         let node_id = graph.require(label, field, id)?;
@@ -435,18 +454,8 @@ impl GraphStore for MemoryStore {
         confidence: f64,
         method: &str,
     ) -> Result<()> {
-        let confidence = validate_confidence(confidence)?;
-        let mut graph = self.write();
-        let from = graph.require(SPAN, "span_id", span_id.as_str())?;
-        let to = graph.require(ENTITY, "entity_id", entity_id.as_str())?;
-        let method = or_default(method, DEFAULT_SPAN_ENTITY_METHOD);
-        graph.add_edge(
-            SPAN_REFERS_TO_ENTITY,
-            from,
-            to,
-            json!({"Confidence": confidence, "Method": method}),
-        );
-        Ok(())
+        let link = SpanEntityLink { span_id, entity_id, confidence, method };
+        self.add_edges(&[link.edge()?]).map(drop)
     }
 
     fn create_fact(&self, fact: &FactNode) -> Result<StoredFact> {
@@ -466,16 +475,8 @@ impl GraphStore for MemoryStore {
         page_number: i64,
         section: &str,
     ) -> Result<()> {
-        let mut graph = self.write();
-        let from = graph.require(FACT, "fact_id", fact_id.as_str())?;
-        let to = graph.require(DOCUMENT, "doc_id", doc_id.as_str())?;
-        graph.add_edge(
-            FACT_IN_DOCUMENT,
-            from,
-            to,
-            json!({"PageNumber": page_number, "Section": section}),
-        );
-        Ok(())
+        let link = FactLink::Document { fact_id, doc_id, page_number, section };
+        self.add_edges(&[link.edge()?]).map(drop)
     }
 
     fn link_fact_to_entity(
@@ -484,12 +485,8 @@ impl GraphStore for MemoryStore {
         entity_id: &EntityId,
         role: &str,
     ) -> Result<()> {
-        let mut graph = self.write();
-        let from = graph.require(FACT, "fact_id", fact_id.as_str())?;
-        let to = graph.require(ENTITY, "entity_id", entity_id.as_str())?;
-        let role = or_default(role, DEFAULT_FACT_ENTITY_ROLE);
-        graph.add_edge(FACT_ABOUT_ENTITY, from, to, json!({"Role": role}));
-        Ok(())
+        let link = FactLink::Entity { fact_id, entity_id, role };
+        self.add_edges(&[link.edge()?]).map(drop)
     }
 
     fn link_fact_to_span(
@@ -499,18 +496,8 @@ impl GraphStore for MemoryStore {
         role: &str,
         confidence: f64,
     ) -> Result<()> {
-        let confidence = validate_confidence(confidence)?;
-        let mut graph = self.write();
-        let from = graph.require(FACT, "fact_id", fact_id.as_str())?;
-        let to = graph.require(SPAN, "span_id", span_id.as_str())?;
-        let role = or_default(role, DEFAULT_FACT_SPAN_ROLE);
-        graph.add_edge(
-            FACT_DERIVED_FROM_SPAN,
-            from,
-            to,
-            json!({"Role": role, "Confidence": confidence}),
-        );
-        Ok(())
+        let link = FactLink::Span { fact_id, span_id, role, confidence };
+        self.add_edges(&[link.edge()?]).map(drop)
     }
 
     fn get_entity_facts(&self, entity_id: &EntityId) -> Result<Vec<StoredFact>> {
@@ -626,12 +613,53 @@ impl GraphStore for MemoryStore {
         }
         Ok(items.len())
     }
+
+    fn create_entity_with_embedding(
+        &self,
+        entity: &EntityNode,
+        embedding: &[f32],
+    ) -> Result<StoredEntity> {
+        let node = entity.validated()?;
+        validate_vector(embedding, self.embedding_dim)?;
+        let mut graph = self.write();
+        let id = graph.insert(NodeData::Entity(node.clone()));
+        if let Some(stored) = graph.nodes.get_mut(&id) {
+            stored.embedding = Some(embedding.to_vec());
+        }
+        Ok(Stored { id: EntityId::new(id.to_string()), node })
+    }
+
+    fn link_spans_to_entities_batch(&self, links: &[SpanEntityLink<'_>]) -> Result<usize> {
+        let edges = links.iter().map(SpanEntityLink::edge).collect::<Result<Vec<_>>>()?;
+        self.add_edges(&edges)
+    }
+
+    fn create_facts_batch(&self, facts: &[FactNode]) -> Result<Vec<StoredFact>> {
+        for fact in facts {
+            fact.validate()?;
+        }
+        let mut graph = self.write();
+        Ok(facts
+            .iter()
+            .map(|fact| {
+                let id = graph.insert(NodeData::Fact(fact.clone()));
+                Stored { id: FactId::new(id.to_string()), node: fact.clone() }
+            })
+            .collect())
+    }
+
+    fn link_facts_batch(&self, links: &[FactLink<'_>]) -> Result<usize> {
+        let edges = links.iter().map(FactLink::edge).collect::<Result<Vec<_>>>()?;
+        self.add_edges(&edges)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
+
+    use crate::graph::{FACT_DERIVED_FROM_SPAN, FACT_IN_DOCUMENT, SPAN_REFERS_TO_ENTITY};
 
     #[test]
     fn merge_keeps_the_best_score_per_node() {

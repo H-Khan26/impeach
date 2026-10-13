@@ -5,6 +5,7 @@ mod cli;
 mod commands;
 mod error;
 mod output;
+mod timings;
 
 use std::io::IsTerminal;
 use std::process::ExitCode;

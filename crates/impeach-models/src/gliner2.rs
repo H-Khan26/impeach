@@ -5,6 +5,7 @@
 //! relation's score is the lower of its head and tail confidences (GLiNER2 scores the two
 //! argument spans, not the relation).
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 
 use ::gliner2::config::{download_model, ModelFiles};
@@ -13,7 +14,7 @@ use ::gliner2::{CandleExtractor, ExtractOptions, ExtractorConfig, SchemaTransfor
 use impeach_config::pipeline::Gliner2ModelConfig;
 use serde_json::Value;
 
-use crate::error::ModelError;
+use crate::error::{missing_model, ModelError};
 use crate::traits::{NerModel, NerSpan, RelationHit};
 
 /// Settings of a [`Gliner2Ner`] model.
@@ -63,11 +64,34 @@ impl Gliner2Ner {
                 tokenizer: dir.join("tokenizer.json"),
                 weights: dir.join("model.safetensors"),
             },
-            None => download_model(&options.model).map_err(|e| ModelError::Download {
-                resource: options.model.clone(),
-                message: format!("{e:#}"),
+            None => download_model(&options.model).map_err(|e| {
+                missing_model(
+                    &options.model,
+                    &crate::error::hf_hub_cache_dir(false),
+                    "copy the repo's files into that Hugging Face cache (the GLiNER2 backend \
+                     does not read HF_HOME) or set models.gliner2.model to a cached repo",
+                    &format!("{e:#}"),
+                )
             })?,
         };
+        if let Some(dir) = &options.model_dir {
+            let missing: Vec<String> =
+                [&files.config, &files.encoder_config, &files.tokenizer, &files.weights]
+                    .into_iter()
+                    .filter(|path| !path.is_file())
+                    .filter_map(|path| path.strip_prefix(dir).ok())
+                    .map(|path| path.display().to_string())
+                    .collect();
+            if !missing.is_empty() {
+                return Err(load_error(format!(
+                    "model directory {} lacks {}; put the files of `{}` there (config.json, \
+                     encoder_config/config.json, tokenizer.json, model.safetensors)",
+                    dir.display(),
+                    missing.join(", "),
+                    options.model
+                )));
+            }
+        }
         let tokenizer = files
             .tokenizer
             .to_str()
@@ -142,6 +166,9 @@ impl NerModel for Gliner2Ner {
 
 /// Spans from formatted output `{"entities": {label: [{text, confidence, start, end}]}}`,
 /// sorted by start offset (stable within equal starts).
+///
+/// The crate reports each name once per label; every other whole-word occurrence of a reported
+/// name is added with the same label and score, as the Python GLiNER2 reports every occurrence.
 fn entities_from_output(output: &Value, text: &str) -> Result<Vec<NerSpan>, ModelError> {
     let Some(entities) = output.get("entities").and_then(Value::as_object) else {
         return Ok(Vec::new());
@@ -154,8 +181,47 @@ fn entities_from_output(output: &Value, text: &str) -> Result<Vec<NerSpan>, Mode
             }
         }
     }
+    add_other_occurrences(&mut spans, text);
     spans.sort_by_key(|s| s.start);
     Ok(spans)
+}
+
+/// Adds every whole-word occurrence of a reported span's text that no span of the same label
+/// overlaps, with the reported label and score.
+fn add_other_occurrences(spans: &mut Vec<NerSpan>, text: &str) {
+    // Character offset of every byte offset that starts a character (and of the end).
+    let mut char_at = vec![0; text.len() + 1];
+    for (chars, (byte, _)) in text.char_indices().enumerate() {
+        char_at[byte] = chars;
+    }
+    let char_len = text.chars().count();
+    char_at[text.len()] = char_len;
+    // Characters covered by a span, per label.
+    let mut covered: HashMap<String, Vec<bool>> = HashMap::new();
+    for span in spans.iter() {
+        let taken = covered.entry(span.label.clone()).or_insert_with(|| vec![false; char_len]);
+        taken[span.start..span.end].fill(true);
+    }
+    let is_word = |c: Option<char>| c.is_some_and(char::is_alphanumeric);
+    for index in 0..spans.len() {
+        let reported = spans[index].clone();
+        let Some(taken) = covered.get_mut(&reported.label) else {
+            continue;
+        };
+        for (byte, found) in text.match_indices(reported.text.as_str()) {
+            let byte_end = byte + found.len();
+            if is_word(text[..byte].chars().next_back()) || is_word(text[byte_end..].chars().next())
+            {
+                continue;
+            }
+            let (start, end) = (char_at[byte], char_at[byte_end]);
+            if taken[start..end].iter().any(|&t| t) {
+                continue;
+            }
+            taken[start..end].fill(true);
+            spans.push(NerSpan { start, end, ..reported.clone() });
+        }
+    }
 }
 
 /// Relations from formatted output
@@ -254,6 +320,18 @@ mod tests {
                 },
             ]
         );
+    }
+
+    #[test]
+    fn reported_names_expand_to_every_whole_word_occurrence() {
+        let text = "Lopez met Lopezville's Lopez and Lopez.";
+        let output = json!({"entities": {
+            "person": [{"text": "Lopez", "confidence": 0.7, "start": 23, "end": 28}]
+        }});
+        let spans = entities_from_output(&output, text).expect("spans");
+        let starts: Vec<(usize, usize)> = spans.iter().map(|s| (s.start, s.end)).collect();
+        assert_eq!(starts, vec![(0, 5), (23, 28), (33, 38)]);
+        assert!(spans.iter().all(|s| s.label == "person" && (s.score - 0.7).abs() < 1e-6));
     }
 
     #[test]

@@ -3,10 +3,17 @@
 //!
 //! The [`Llm`] trait is synchronous, so each [`OllamaLlm`] owns a private current-thread tokio
 //! runtime and blocks on the HTTP call. Do not call it from inside an async task.
+//!
+//! [`OllamaLlm::check_reachable`] (run once per pipeline build through
+//! [`ModelRegistry::check_llm_reachable`](crate::ModelRegistry::check_llm_reachable)) fails
+//! with [`ModelError::Unavailable`] naming the `base_url` and how to start Ollama or run
+//! without it. A later request that cannot reach the server fails with a short
+//! [`ModelError::Connection`].
 
 use std::time::Duration;
 
 use impeach_config::pipeline::OllamaModelConfig;
+use ollama_rs::error::OllamaError;
 use ollama_rs::generation::completion::request::GenerationRequest;
 use ollama_rs::generation::parameters::{FormatType, JsonStructure};
 use ollama_rs::models::ModelOptions;
@@ -16,6 +23,9 @@ use tokio::runtime::Runtime;
 use crate::error::{error_chain, ModelError};
 use crate::json::extract_json;
 use crate::traits::{Llm, LlmRequest};
+
+/// Time [`OllamaLlm::check_reachable`] waits for the server.
+pub const REACHABILITY_TIMEOUT: Duration = Duration::from_secs(5);
 
 /// Settings of an [`OllamaLlm`].
 #[derive(Debug, Clone, PartialEq)]
@@ -78,6 +88,47 @@ impl OllamaLlm {
         &self.options
     }
 
+    /// Asks the server for its local models, waiting at most [`REACHABILITY_TIMEOUT`].
+    ///
+    /// # Errors
+    /// [`ModelError::Unavailable`] when the server cannot be reached; [`ModelError::Inference`]
+    /// for other failures.
+    pub fn check_reachable(&self) -> Result<(), ModelError> {
+        let call = self.client.list_local_models();
+        match self
+            .runtime
+            .block_on(async { tokio::time::timeout(REACHABILITY_TIMEOUT, call).await })
+        {
+            Ok(Ok(_)) => Ok(()),
+            Ok(Err(error)) if is_unreachable(&error) => {
+                Err(unreachable_error(&self.options, &error_chain(&error)))
+            }
+            Ok(Err(error)) => Err(self.request_error(&error)),
+            Err(_) => Err(unreachable_error(
+                &self.options,
+                &format!("no answer within {REACHABILITY_TIMEOUT:?}"),
+            )),
+        }
+    }
+
+    /// The error of a failed request: [`ModelError::Connection`] when the server could not be
+    /// reached, else an inference error.
+    fn request_error(&self, error: &OllamaError) -> ModelError {
+        if is_unreachable(error) {
+            return ModelError::Connection(format!(
+                "Ollama at {} did not respond: {}",
+                self.options.base_url,
+                error_chain(error)
+            ));
+        }
+        ModelError::Inference(format!(
+            "Ollama request to {} (model `{}`) failed: {}",
+            self.options.base_url,
+            self.options.model,
+            error_chain(error)
+        ))
+    }
+
     fn generate(
         &self,
         req: &LlmRequest<'_>,
@@ -103,14 +154,27 @@ impl OllamaLlm {
             }
             None => self.runtime.block_on(call),
         };
-        response.map(|r| r.response).map_err(|e| {
-            ModelError::Inference(format!(
-                "Ollama request to {} (model `{}`) failed: {}",
-                self.options.base_url,
-                self.options.model,
-                error_chain(&e)
-            ))
-        })
+        response.map(|r| r.response).map_err(|e| self.request_error(&e))
+    }
+}
+
+/// Whether `error` means the server could not be reached (connection failure or timeout).
+fn is_unreachable(error: &OllamaError) -> bool {
+    matches!(error, OllamaError::ReqwestError(source) if source.is_connect() || source.is_timeout())
+}
+
+/// [`ModelError::Unavailable`] for an Ollama server that cannot be reached.
+fn unreachable_error(options: &OllamaOptions, cause: &str) -> ModelError {
+    ModelError::Unavailable {
+        backend: "ollama".to_owned(),
+        reason: format!(
+            "Ollama is not reachable at {} ({cause}). Start it with `ollama serve` and pull the \
+             model with `ollama pull {}`, or set models.ollama.base_url to a running server. To \
+             run without an LLM, disable FactStage, set allow_llm: false on EDStage and \
+             judge_model: nli on ContradictionCheckStage, or inject a mock LLM \
+             (impeach_models::MockLlm) into the model registry",
+            options.base_url, options.model
+        ),
     }
 }
 

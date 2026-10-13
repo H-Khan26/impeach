@@ -47,6 +47,7 @@ use crate::api::{
 };
 use crate::error::{PipelineError, Result};
 use crate::factory::StageRegistry;
+use crate::runner::RunReport;
 
 /// Preset scenario names.
 pub const SCENARIO_NAMES: &[&str] = &["green_valley", "mason"];
@@ -165,6 +166,8 @@ pub struct E2eRun {
     pub eval_report: Option<EvalReport>,
     /// Evaluation report path, when written.
     pub eval_report_path: Option<PathBuf>,
+    /// Per-stage timings of every document that was processed successfully, in run order.
+    pub document_reports: Vec<(PathBuf, RunReport)>,
 }
 
 /// Runs `inputs` sequentially (stopping at the first failed document), writes the output
@@ -217,6 +220,7 @@ pub fn run_e2e(
     );
 
     let mut documents: Vec<E2eDocument> = Vec::with_capacity(inputs.len());
+    let mut document_reports: Vec<(PathBuf, RunReport)> = Vec::with_capacity(inputs.len());
     let mut failed = false;
     for (index, path) in inputs.iter().enumerate() {
         let header = read_jsonl_header(path);
@@ -244,6 +248,7 @@ pub fn run_e2e(
                     stage_6_contradiction_check: Some(summarize_contradictions(result)),
                     ..header
                 });
+                document_reports.push((path.clone(), run.report));
             }
             Err(error) => {
                 tracing::error!(document = %path.display(), "FAILED: {error}");
@@ -290,6 +295,7 @@ pub fn run_e2e(
         output_path: options.output.clone(),
         eval_report: None,
         eval_report_path: None,
+        document_reports,
     };
     if let (Some(key), false) = (key, failed) {
         let Some(embedder) = eval_embedder(env.eval_embedder)? else {

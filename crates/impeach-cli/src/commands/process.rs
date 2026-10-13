@@ -8,7 +8,7 @@ use impeach_pipeline::{run_processing_with, ProcessingEnv, ProcessingOptions, Pr
 use serde_json::json;
 
 use crate::cli::{ProcessArgs, ProcessingArgs};
-use crate::output::{print, println};
+use crate::output::{eprintln, print, println};
 
 /// Processes `args.jsonl`.
 ///
@@ -37,7 +37,8 @@ pub fn process_jsonl(jsonl: &Path, processing: &ProcessingArgs) -> anyhow::Resul
     Ok(run_processing_with(jsonl, &options, ProcessingEnv::default())?)
 }
 
-/// Prints the console report for `document` and writes the `-o` summary when requested.
+/// Prints the console report for `document` (and, with `--timings`, the stage timing summary
+/// to stderr) and writes the `-o` summary when requested.
 ///
 /// # Errors
 /// Summary serialisation and write errors.
@@ -47,6 +48,9 @@ pub fn report(
     run: &ProcessingRun,
 ) -> anyhow::Result<()> {
     print(&render_report(document, run));
+    if processing.timings {
+        eprintln(&crate::timings::render_run(&document.display().to_string(), &run.report));
+    }
     if let Some(output) = &processing.output {
         let summary = summary_json(document, processing.config.as_deref(), run)?;
         std::fs::write(output, summary)

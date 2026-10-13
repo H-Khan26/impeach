@@ -17,8 +17,9 @@
 use std::fmt;
 use std::sync::Arc;
 
+use impeach_config::pipeline::{CorefBackend, JudgeModel};
 use impeach_config::{PipelineConfig, StageConfig};
-use impeach_models::ModelRegistry;
+use impeach_models::{ModelError, ModelRegistry};
 use impeach_store::GraphStore;
 use indexmap::IndexMap;
 
@@ -170,7 +171,33 @@ impl StageRegistry {
         unregistered: UnregisteredStages,
     ) -> Result<Pipeline> {
         let stages = self.build_stages(&services, unregistered)?;
+        probe_llm(&services);
         Ok(Pipeline::new(stages, services))
+    }
+}
+
+/// Checks once that the `<pipeline>_ollama` server answers when an enabled stage may call it, so
+/// an unreachable server is reported (with how to fix it) before any document is processed.
+/// The stages still get a client; their calls fail with a short connection error.
+fn probe_llm(services: &StageBuildContext) {
+    let config = &services.config;
+    let stage_needs_llm = |stage: &StageConfig| match stage {
+        StageConfig::Fact(_) => true,
+        StageConfig::Ed(ed) => ed.allow_llm,
+        StageConfig::ContradictionCheck(check) => {
+            check.verification.as_ref().is_some_and(|v| v.judge_model == JudgeModel::Qwen)
+        }
+        _ => false,
+    };
+    let needs_llm = config.stages.iter().any(|stage| stage.enabled() && stage_needs_llm(stage))
+        || config.models.coref.backend == CorefBackend::Llm;
+    if !needs_llm {
+        return;
+    }
+    let key = format!("{}_ollama", config.name());
+    match services.registry.check_llm_reachable(&key) {
+        Ok(_) | Err(ModelError::UnknownModel { .. }) => {}
+        Err(error) => tracing::warn!("{error}"),
     }
 }
 

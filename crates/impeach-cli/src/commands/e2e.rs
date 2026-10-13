@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use impeach_pipeline::e2e::{render_summary, run_e2e, scenario, E2eEnv, E2eOptions, Scenario};
 
 use crate::cli::RunE2eArgs;
-use crate::output::{print, println};
+use crate::output::{eprintln, print, println};
 
 /// Default output directory of `run-e2e`.
 const DEFAULT_OUTPUT_DIR: &str = "data/output";
@@ -63,6 +63,11 @@ pub fn execute(args: &RunE2eArgs) -> anyhow::Result<()> {
     let run = run_e2e(&inputs, args.scenario.as_deref(), &options, E2eEnv::default())?;
 
     print(&render_summary(&run.output));
+    if args.timings {
+        let documents =
+            run.document_reports.iter().map(|(path, report)| (path.display().to_string(), report));
+        eprintln(&crate::timings::render_e2e(documents));
+    }
     println(&format!("Output written to {}", run.output_path.display()));
     if let Some(report) = &run.eval_report {
         let path = run.eval_report_path.as_ref().map(|path| path.display().to_string());

@@ -1,0 +1,17 @@
+{
+ "scenario": "green_valley",
+ "documents": [
+  {
+   "input": "green_valley_incident_report.jsonl",
+   "doc_id": "001",
+   "extracted_relations": [],
+   "relations_by_type": {}
+  },
+  {
+   "input": "lopez_v_green_valley_complaint.jsonl",
+   "doc_id": "002",
+   "extracted_relations": [],
+   "relations_by_type": {}
+  }
+ ]
+}

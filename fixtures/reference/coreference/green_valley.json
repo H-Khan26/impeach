@@ -1,0 +1,4400 @@
+{
+ "scenario": "green_valley",
+ "documents": [
+  {
+   "input": "green_valley_incident_report.jsonl",
+   "doc_id": "001",
+   "raw_coref": [
+    {
+     "clusters": [
+      {
+       "id": "001_cluster_0",
+       "mentions": [
+        {
+         "start_char": 49,
+         "end_char": 60,
+         "text": "a collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 316,
+         "end_char": 328,
+         "text": "the incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 517,
+         "end_char": 529,
+         "text": "the incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2156,
+         "end_char": 2169,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2582,
+         "end_char": 2595,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3321,
+         "end_char": 3333,
+         "text": "the incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3440,
+         "end_char": 3452,
+         "text": "the incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3688,
+         "end_char": 3701,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4446,
+         "end_char": 4472,
+         "text": "the March 4, 2023 incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4625,
+         "end_char": 4638,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4763,
+         "end_char": 4775,
+         "text": "the incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5133,
+         "end_char": 5145,
+         "text": "the incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5808,
+         "end_char": 5820,
+         "text": "the incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6051,
+         "end_char": 6063,
+         "text": "the incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7114,
+         "end_char": 7127,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7552,
+         "end_char": 7564,
+         "text": "the incident",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_1",
+       "mentions": [
+        {
+         "start_char": 164,
+         "end_char": 239,
+         "text": "a Green Valley Logistics, Inc. (“Green Valley”) 2020 Freightliner box truck",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 330,
+         "end_char": 389,
+         "text": "the Green Valley vehicle, California license plate 9TRK220,",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1889,
+         "end_char": 1911,
+         "text": "the Green Valley truck",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2183,
+         "end_char": 2192,
+         "text": "his truck",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2998,
+         "end_char": 3020,
+         "text": "The Green Valley truck",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3718,
+         "end_char": 3740,
+         "text": "the Green Valley truck",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_2",
+       "mentions": [
+        {
+         "start_char": 166,
+         "end_char": 211,
+         "text": "Green Valley Logistics, Inc. (“Green Valley”)",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 334,
+         "end_char": 346,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 466,
+         "end_char": 478,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1893,
+         "end_char": 1905,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2797,
+         "end_char": 2809,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3002,
+         "end_char": 3014,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3487,
+         "end_char": 3499,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3722,
+         "end_char": 3734,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3862,
+         "end_char": 3874,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3991,
+         "end_char": 4003,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4149,
+         "end_char": 4161,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4347,
+         "end_char": 4361,
+         "text": "Green Valley’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7022,
+         "end_char": 7036,
+         "text": "Green Valley’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7570,
+         "end_char": 7584,
+         "text": "Green Valley’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7940,
+         "end_char": 7952,
+         "text": "Green Valley",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_3",
+       "mentions": [
+        {
+         "start_char": 142,
+         "end_char": 152,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 356,
+         "end_char": 366,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4201,
+         "end_char": 4211,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6469,
+         "end_char": 6479,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6727,
+         "end_char": 6737,
+         "text": "California",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_4",
+       "mentions": [
+        {
+         "start_char": 304,
+         "end_char": 328,
+         "text": "the time of the incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 505,
+         "end_char": 529,
+         "text": "the time of the incident",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_5",
+       "mentions": [
+        {
+         "start_char": 73,
+         "end_char": 123,
+         "text": "the intersection of Mission Street and 14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 664,
+         "end_char": 714,
+         "text": "The intersection of Mission Street and 14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1189,
+         "end_char": 1205,
+         "text": "the intersection",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1244,
+         "end_char": 1260,
+         "text": "the intersection",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1402,
+         "end_char": 1418,
+         "text": "the intersection",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1489,
+         "end_char": 1505,
+         "text": "the intersection",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1718,
+         "end_char": 1734,
+         "text": "the intersection",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1990,
+         "end_char": 2006,
+         "text": "the intersection",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7199,
+         "end_char": 7249,
+         "text": "the intersection of Mission Street and 14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7361,
+         "end_char": 7377,
+         "text": "the intersection",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_6",
+       "mentions": [
+        {
+         "start_char": 93,
+         "end_char": 107,
+         "text": "Mission Street",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 684,
+         "end_char": 698,
+         "text": "Mission Street",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 814,
+         "end_char": 828,
+         "text": "Mission Street",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 910,
+         "end_char": 924,
+         "text": "Mission Street",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1585,
+         "end_char": 1599,
+         "text": "Mission Street",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7219,
+         "end_char": 7233,
+         "text": "Mission Street",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_7",
+       "mentions": [
+        {
+         "start_char": 112,
+         "end_char": 123,
+         "text": "14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 703,
+         "end_char": 714,
+         "text": "14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1089,
+         "end_char": 1100,
+         "text": "14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1310,
+         "end_char": 1321,
+         "text": "14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7238,
+         "end_char": 7249,
+         "text": "14th Avenue",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_8",
+       "mentions": [
+        {
+         "start_char": 412,
+         "end_char": 478,
+         "text": "Daniel Reed (“Reed”), a commercial driver employed by Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 846,
+         "end_char": 850,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1056,
+         "end_char": 1060,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1210,
+         "end_char": 1214,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1230,
+         "end_char": 1232,
+         "text": "he",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 1373,
+         "end_char": 1375,
+         "text": "He",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 1391,
+         "end_char": 1393,
+         "text": "he",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 1449,
+         "end_char": 1453,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1478,
+         "end_char": 1480,
+         "text": "he",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 1739,
+         "end_char": 1743,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1752,
+         "end_char": 1755,
+         "text": "his",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 2012,
+         "end_char": 2016,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2171,
+         "end_char": 2175,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2183,
+         "end_char": 2186,
+         "text": "his",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 2219,
+         "end_char": 2221,
+         "text": "He",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 2336,
+         "end_char": 2338,
+         "text": "He",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 2440,
+         "end_char": 2444,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2601,
+         "end_char": 2605,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2779,
+         "end_char": 2783,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2943,
+         "end_char": 2947,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3240,
+         "end_char": 3244,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3454,
+         "end_char": 3458,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3574,
+         "end_char": 3578,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3589,
+         "end_char": 3592,
+         "text": "his",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 3703,
+         "end_char": 3705,
+         "text": "he",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 3909,
+         "end_char": 3913,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3971,
+         "end_char": 3974,
+         "text": "his",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 4026,
+         "end_char": 4032,
+         "text": "Reed’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4053,
+         "end_char": 4055,
+         "text": "he",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 4223,
+         "end_char": 4225,
+         "text": "he",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 7348,
+         "end_char": 7352,
+         "text": "Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7466,
+         "end_char": 7468,
+         "text": "he",
+         "is_pronoun": true
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_9",
+       "mentions": [
+        {
+         "start_char": 275,
+         "end_char": 296,
+         "text": "Maria Lopez (“Lopez”)",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 877,
+         "end_char": 882,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1533,
+         "end_char": 1538,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2231,
+         "end_char": 2236,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2350,
+         "end_char": 2360,
+         "text": "the driver",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2418,
+         "end_char": 2421,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 2482,
+         "end_char": 2489,
+         "text": "Lopez’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2508,
+         "end_char": 2511,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 2544,
+         "end_char": 2547,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 2619,
+         "end_char": 2624,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2661,
+         "end_char": 2664,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 2685,
+         "end_char": 2688,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 2742,
+         "end_char": 2747,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3226,
+         "end_char": 3231,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3277,
+         "end_char": 3280,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 3335,
+         "end_char": 3338,
+         "text": "She",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 3359,
+         "end_char": 3362,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 4307,
+         "end_char": 4312,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4394,
+         "end_char": 4397,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 4552,
+         "end_char": 4557,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4570,
+         "end_char": 4573,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 4648,
+         "end_char": 4651,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 4781,
+         "end_char": 4786,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4835,
+         "end_char": 4838,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 4992,
+         "end_char": 4995,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 5019,
+         "end_char": 5024,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5050,
+         "end_char": 5053,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 5093,
+         "end_char": 5096,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 5289,
+         "end_char": 5296,
+         "text": "Lopez’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5895,
+         "end_char": 5898,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 5919,
+         "end_char": 5924,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5940,
+         "end_char": 5943,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 6075,
+         "end_char": 6082,
+         "text": "herself",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6172,
+         "end_char": 6177,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6200,
+         "end_char": 6203,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 6338,
+         "end_char": 6343,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6362,
+         "end_char": 6365,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 6490,
+         "end_char": 6493,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 6536,
+         "end_char": 6539,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 6614,
+         "end_char": 6619,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6748,
+         "end_char": 6751,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 7015,
+         "end_char": 7020,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7132,
+         "end_char": 7139,
+         "text": "Lopez’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7650,
+         "end_char": 7655,
+         "text": "Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7678,
+         "end_char": 7681,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 7753,
+         "end_char": 7756,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 7787,
+         "end_char": 7790,
+         "text": "her",
+         "is_pronoun": true
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_10",
+       "mentions": [
+        {
+         "start_char": 244,
+         "end_char": 296,
+         "text": "a blue Honda Civic operated by Maria Lopez (“Lopez”)",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1507,
+         "end_char": 1538,
+         "text": "the Honda Civic driven by Lopez",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1677,
+         "end_char": 1686,
+         "text": "the Civic",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1865,
+         "end_char": 1874,
+         "text": "the Civic",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1963,
+         "end_char": 1972,
+         "text": "the Civic",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2103,
+         "end_char": 2118,
+         "text": "the Honda Civic",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2208,
+         "end_char": 2217,
+         "text": "the Civic",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3130,
+         "end_char": 3145,
+         "text": "The Honda Civic",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5522,
+         "end_char": 5537,
+         "text": "the Honda Civic",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5718,
+         "end_char": 5729,
+         "text": "The vehicle",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5765,
+         "end_char": 5768,
+         "text": "its",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 5972,
+         "end_char": 5987,
+         "text": "the Honda Civic",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6024,
+         "end_char": 6035,
+         "text": "the vehicle",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7525,
+         "end_char": 7536,
+         "text": "the vehicle",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7919,
+         "end_char": 7934,
+         "text": "the Honda Civic",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_11",
+       "mentions": [
+        {
+         "start_char": 2646,
+         "end_char": 2655,
+         "text": "the scene",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2753,
+         "end_char": 2762,
+         "text": "the scene",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2880,
+         "end_char": 2889,
+         "text": "the scene",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3119,
+         "end_char": 3128,
+         "text": "the scene",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_12",
+       "mentions": [
+        {
+         "start_char": 2825,
+         "end_char": 2866,
+         "text": "A San Francisco Police Department officer",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3249,
+         "end_char": 3271,
+         "text": "the responding officer",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_13",
+       "mentions": [
+        {
+         "start_char": 127,
+         "end_char": 152,
+         "text": "San Francisco, California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3516,
+         "end_char": 3529,
+         "text": "San Francisco",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6454,
+         "end_char": 6479,
+         "text": "San Francisco, California",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_14",
+       "mentions": [
+        {
+         "start_char": 6,
+         "end_char": 19,
+         "text": "March 4, 2023",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3559,
+         "end_char": 3572,
+         "text": "March 4, 2023",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4450,
+         "end_char": 4463,
+         "text": "March 4, 2023",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_15",
+       "mentions": [
+        {
+         "start_char": 3428,
+         "end_char": 3452,
+         "text": "the time of the incident",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3676,
+         "end_char": 3701,
+         "text": "the time of the collision",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_16",
+       "mentions": [
+        {
+         "start_char": 3568,
+         "end_char": 3572,
+         "text": "2023",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4301,
+         "end_char": 4305,
+         "text": "2023",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4546,
+         "end_char": 4550,
+         "text": "2023",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5208,
+         "end_char": 5212,
+         "text": "2023",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_17",
+       "mentions": [
+        {
+         "start_char": 4347,
+         "end_char": 4379,
+         "text": "Green Valley’s insurance carrier",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4521,
+         "end_char": 4532,
+         "text": "the insurer",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5033,
+         "end_char": 5044,
+         "text": "the insurer",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5258,
+         "end_char": 5269,
+         "text": "the insurer",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5479,
+         "end_char": 5492,
+         "text": "The insurer’s",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_18",
+       "mentions": [
+        {
+         "start_char": 4481,
+         "end_char": 4550,
+         "text": "a recorded telephone statement taken by the insurer on March 22, 2023",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4807,
+         "end_char": 4829,
+         "text": "the recorded statement",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_19",
+       "mentions": [
+        {
+         "start_char": 2254,
+         "end_char": 2276,
+         "text": "the driver’s side door",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5570,
+         "end_char": 5615,
+         "text": "the driver’s side front fender, driver’s door",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5602,
+         "end_char": 5615,
+         "text": "driver’s door",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_20",
+       "mentions": [
+        {
+         "start_char": 6671,
+         "end_char": 6769,
+         "text": "a separate motor vehicle incident in 2019 in Daly City, California, in which she alleged back pain",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6789,
+         "end_char": 6806,
+         "text": "the 2019 incident",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_21",
+       "mentions": [
+        {
+         "start_char": 6708,
+         "end_char": 6712,
+         "text": "2019",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6793,
+         "end_char": 6797,
+         "text": "2019",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_22",
+       "mentions": [
+        {
+         "start_char": 5895,
+         "end_char": 5917,
+         "text": "her recorded statement",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6989,
+         "end_char": 7020,
+         "text": "the recorded statement of Lopez",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_23",
+       "mentions": [
+        {
+         "start_char": 7022,
+         "end_char": 7063,
+         "text": "Green Valley’s Risk Management Department",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7310,
+         "end_char": 7324,
+         "text": "The Department",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_24",
+       "mentions": [
+        {
+         "start_char": 6834,
+         "end_char": 6882,
+         "text": "CONCLUSIONS AND PRELIMINARY LIABILITY ASSESSMENT",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7996,
+         "end_char": 8053,
+         "text": "this Incident Report and preliminary liability assessment",
+         "is_pronoun": false
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "coref_clusters": [
+    {
+     "id": "001_cluster_2",
+     "member_mention_ids": [
+      "ent_001_2_12",
+      "ent_001_6_2",
+      "ent_001_1_6",
+      "ent_001_0_2",
+      "ent_001_2_14",
+      "ent_001_2_13",
+      "ent_001_3_6",
+      "ent_001_3_8",
+      "ent_001_5_5",
+      "ent_001_5_6",
+      "ent_001_1_5",
+      "ent_001_2_11",
+      "ent_001_2_9"
+     ],
+     "pronoun_spans": []
+    },
+    {
+     "id": "001_cluster_3",
+     "member_mention_ids": [
+      "ent_001_0_3",
+      "ent_001_4_7",
+      "ent_001_5_8",
+      "ent_001_3_9",
+      "ent_001_0_4"
+     ],
+     "pronoun_spans": []
+    },
+    {
+     "id": "001_cluster_6",
+     "member_mention_ids": [
+      "ent_001_0_8",
+      "ent_001_1_9",
+      "ent_001_0_11",
+      "ent_001_0_6",
+      "ent_001_0_13",
+      "ent_001_5_9"
+     ],
+     "pronoun_spans": []
+    },
+    {
+     "id": "001_cluster_7",
+     "member_mention_ids": [
+      "ent_001_0_7",
+      "ent_001_0_12",
+      "ent_001_5_10",
+      "ent_001_0_9",
+      "ent_001_0_10"
+     ],
+     "pronoun_spans": []
+    },
+    {
+     "id": "001_cluster_8",
+     "member_mention_ids": [
+      "ent_001_5_4",
+      "ent_001_3_5",
+      "ent_001_0_0",
+      "ent_001_2_5",
+      "ent_001_2_2",
+      "ent_001_2_1",
+      "ent_001_2_0",
+      "ent_001_2_3",
+      "ent_001_2_4"
+     ],
+     "pronoun_spans": [
+      {
+       "start": 1230,
+       "end": 1232
+      },
+      {
+       "start": 1373,
+       "end": 1375
+      },
+      {
+       "start": 1391,
+       "end": 1393
+      },
+      {
+       "start": 1478,
+       "end": 1480
+      },
+      {
+       "start": 1752,
+       "end": 1755
+      },
+      {
+       "start": 2183,
+       "end": 2186
+      },
+      {
+       "start": 2219,
+       "end": 2221
+      },
+      {
+       "start": 2336,
+       "end": 2338
+      },
+      {
+       "start": 3589,
+       "end": 3592
+      },
+      {
+       "start": 3703,
+       "end": 3705
+      },
+      {
+       "start": 3971,
+       "end": 3974
+      },
+      {
+       "start": 4053,
+       "end": 4055
+      },
+      {
+       "start": 4223,
+       "end": 4225
+      },
+      {
+       "start": 7466,
+       "end": 7468
+      }
+     ]
+    },
+    {
+     "id": "001_cluster_9",
+     "member_mention_ids": [
+      "ent_001_5_3",
+      "ent_001_4_0",
+      "ent_001_5_0",
+      "ent_001_2_6",
+      "ent_001_1_0",
+      "ent_001_3_2",
+      "ent_001_0_1",
+      "ent_001_3_0",
+      "ent_001_5_1",
+      "ent_001_4_1",
+      "ent_001_3_1",
+      "ent_001_1_3",
+      "ent_001_1_2",
+      "ent_001_3_3",
+      "ent_001_1_4",
+      "ent_001_5_2",
+      "ent_001_4_3",
+      "ent_001_4_2",
+      "ent_001_1_1"
+     ],
+     "pronoun_spans": [
+      {
+       "start": 2418,
+       "end": 2421
+      },
+      {
+       "start": 2508,
+       "end": 2511
+      },
+      {
+       "start": 2544,
+       "end": 2547
+      },
+      {
+       "start": 2661,
+       "end": 2664
+      },
+      {
+       "start": 2685,
+       "end": 2688
+      },
+      {
+       "start": 3277,
+       "end": 3280
+      },
+      {
+       "start": 3335,
+       "end": 3338
+      },
+      {
+       "start": 3359,
+       "end": 3362
+      },
+      {
+       "start": 4394,
+       "end": 4397
+      },
+      {
+       "start": 4570,
+       "end": 4573
+      },
+      {
+       "start": 4648,
+       "end": 4651
+      },
+      {
+       "start": 4835,
+       "end": 4838
+      },
+      {
+       "start": 4992,
+       "end": 4995
+      },
+      {
+       "start": 5050,
+       "end": 5053
+      },
+      {
+       "start": 5093,
+       "end": 5096
+      },
+      {
+       "start": 5895,
+       "end": 5898
+      },
+      {
+       "start": 5940,
+       "end": 5943
+      },
+      {
+       "start": 6200,
+       "end": 6203
+      },
+      {
+       "start": 6362,
+       "end": 6365
+      },
+      {
+       "start": 6490,
+       "end": 6493
+      },
+      {
+       "start": 6536,
+       "end": 6539
+      },
+      {
+       "start": 6748,
+       "end": 6751
+      },
+      {
+       "start": 7678,
+       "end": 7681
+      },
+      {
+       "start": 7753,
+       "end": 7756
+      },
+      {
+       "start": 7787,
+       "end": 7790
+      }
+     ]
+    },
+    {
+     "id": "001_cluster_13",
+     "member_mention_ids": [
+      "ent_001_2_16",
+      "ent_001_0_5",
+      "ent_001_4_8"
+     ],
+     "pronoun_spans": []
+    },
+    {
+     "id": "001_cluster_17",
+     "member_mention_ids": [
+      "ent_001_4_5",
+      "ent_001_4_6"
+     ],
+     "pronoun_spans": []
+    }
+   ],
+   "canonical_mention_for_cluster": {
+    "001_cluster_2": "ent_001_0_2",
+    "001_cluster_3": "ent_001_0_3",
+    "001_cluster_6": "ent_001_0_13",
+    "001_cluster_7": "ent_001_0_12",
+    "001_cluster_8": "ent_001_0_0",
+    "001_cluster_9": "ent_001_0_1",
+    "001_cluster_13": "ent_001_0_5",
+    "001_cluster_17": "ent_001_4_5"
+   },
+   "canonical_text_for_mention": {
+    "ent_001_2_12": "Green Valley Logistics, Inc.",
+    "ent_001_6_2": "Green Valley Logistics, Inc.",
+    "ent_001_1_6": "Green Valley Logistics, Inc.",
+    "ent_001_0_2": "Green Valley Logistics, Inc.",
+    "ent_001_2_14": "Green Valley Logistics, Inc.",
+    "ent_001_2_13": "Green Valley Logistics, Inc.",
+    "ent_001_3_6": "Green Valley Logistics, Inc.",
+    "ent_001_3_8": "Green Valley Logistics, Inc.",
+    "ent_001_5_5": "Green Valley Logistics, Inc.",
+    "ent_001_5_6": "Green Valley Logistics, Inc.",
+    "ent_001_1_5": "Green Valley Logistics, Inc.",
+    "ent_001_2_11": "Green Valley Logistics, Inc.",
+    "ent_001_2_9": "Green Valley Logistics, Inc.",
+    "ent_001_0_3": "California",
+    "ent_001_4_7": "California",
+    "ent_001_5_8": "California",
+    "ent_001_3_9": "California",
+    "ent_001_0_4": "California",
+    "ent_001_0_8": "Mission Street",
+    "ent_001_1_9": "Mission Street",
+    "ent_001_0_11": "Mission Street",
+    "ent_001_0_6": "Mission Street",
+    "ent_001_0_13": "Mission Street",
+    "ent_001_5_9": "Mission Street",
+    "ent_001_0_7": "14th Avenue",
+    "ent_001_0_12": "14th Avenue",
+    "ent_001_5_10": "14th Avenue",
+    "ent_001_0_9": "14th Avenue",
+    "ent_001_0_10": "14th Avenue",
+    "ent_001_5_4": "Daniel Reed",
+    "ent_001_3_5": "Daniel Reed",
+    "ent_001_0_0": "Daniel Reed",
+    "ent_001_2_5": "Daniel Reed",
+    "ent_001_2_2": "Daniel Reed",
+    "ent_001_2_1": "Daniel Reed",
+    "ent_001_2_0": "Daniel Reed",
+    "ent_001_2_3": "Daniel Reed",
+    "ent_001_2_4": "Daniel Reed",
+    "ent_001_5_3": "Maria Lopez",
+    "ent_001_4_0": "Maria Lopez",
+    "ent_001_5_0": "Maria Lopez",
+    "ent_001_2_6": "Maria Lopez",
+    "ent_001_1_0": "Maria Lopez",
+    "ent_001_3_2": "Maria Lopez",
+    "ent_001_0_1": "Maria Lopez",
+    "ent_001_3_0": "Maria Lopez",
+    "ent_001_5_1": "Maria Lopez",
+    "ent_001_4_1": "Maria Lopez",
+    "ent_001_3_1": "Maria Lopez",
+    "ent_001_1_3": "Maria Lopez",
+    "ent_001_1_2": "Maria Lopez",
+    "ent_001_3_3": "Maria Lopez",
+    "ent_001_1_4": "Maria Lopez",
+    "ent_001_5_2": "Maria Lopez",
+    "ent_001_4_3": "Maria Lopez",
+    "ent_001_4_2": "Maria Lopez",
+    "ent_001_1_1": "Maria Lopez",
+    "ent_001_2_16": "San Francisco",
+    "ent_001_0_5": "San Francisco",
+    "ent_001_4_8": "San Francisco",
+    "ent_001_4_5": "insurer",
+    "ent_001_4_6": "insurer",
+    "synth_pronoun_001_cluster_8_1230_1232": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_1373_1375": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_1391_1393": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_1478_1480": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_1752_1755": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_2183_2186": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_2219_2221": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_2336_2338": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_3589_3592": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_3703_3705": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_3971_3974": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_4053_4055": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_4223_4225": "Daniel Reed",
+    "synth_pronoun_001_cluster_8_7466_7468": "Daniel Reed",
+    "synth_pronoun_001_cluster_9_2418_2421": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_2508_2511": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_2544_2547": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_2661_2664": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_2685_2688": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_3277_3280": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_3335_3338": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_3359_3362": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_4394_4397": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_4570_4573": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_4648_4651": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_4835_4838": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_4992_4995": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_5050_5053": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_5093_5096": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_5895_5898": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_5940_5943": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_6200_6203": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_6362_6365": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_6490_6493": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_6536_6539": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_6748_6751": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_7678_7681": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_7753_7756": "Maria Lopez",
+    "synth_pronoun_001_cluster_9_7787_7790": "Maria Lopez"
+   },
+   "synthetic_pronoun_mentions": {
+    "synth_pronoun_001_cluster_8_1230_1232": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_1373_1375": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_1391_1393": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_1478_1480": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_1752_1755": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_2183_2186": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_2219_2221": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_2336_2338": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_3589_3592": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_3703_3705": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_3971_3974": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_4053_4055": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_4223_4225": "ent_001_0_0",
+    "synth_pronoun_001_cluster_8_7466_7468": "ent_001_0_0",
+    "synth_pronoun_001_cluster_9_2418_2421": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_2508_2511": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_2544_2547": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_2661_2664": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_2685_2688": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_3277_3280": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_3335_3338": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_3359_3362": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_4394_4397": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_4570_4573": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_4648_4651": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_4835_4838": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_4992_4995": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_5050_5053": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_5093_5096": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_5895_5898": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_5940_5943": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_6200_6203": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_6362_6365": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_6490_6493": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_6536_6539": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_6748_6751": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_7678_7681": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_7753_7756": "ent_001_0_1",
+    "synth_pronoun_001_cluster_9_7787_7790": "ent_001_0_1"
+   },
+   "doc_mention_count": 151,
+   "added_mentions": [
+    {
+     "id": "synth_pronoun_001_cluster_8_1230_1232",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 1230,
+      "end": 1232
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "he",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_1373_1375",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 1373,
+      "end": 1375
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "He",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_1391_1393",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 1391,
+      "end": 1393
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "he",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_1478_1480",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 1478,
+      "end": 1480
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "he",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_1752_1755",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 1752,
+      "end": 1755
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "his",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_2183_2186",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 2183,
+      "end": 2186
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "his",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_2219_2221",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 2219,
+      "end": 2221
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "He",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_2336_2338",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 2336,
+      "end": 2338
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "He",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_3589_3592",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 3589,
+      "end": 3592
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "his",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_3703_3705",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 3703,
+      "end": 3705
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "he",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_3971_3974",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 3971,
+      "end": 3974
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "his",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_4053_4055",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 4053,
+      "end": 4055
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "he",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_4223_4225",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 4223,
+      "end": 4225
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "he",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_8_7466_7468",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 7466,
+      "end": 7468
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "he",
+      "cluster_id": "001_cluster_8",
+      "canonical_mention_id": "ent_001_0_0",
+      "canonical_name": "Daniel Reed"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_5",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_2418_2421",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 2418,
+      "end": 2421
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_2508_2511",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 2508,
+      "end": 2511
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_2544_2547",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 2544,
+      "end": 2547
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_2661_2664",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 2661,
+      "end": 2664
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_2685_2688",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 2685,
+      "end": 2688
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_3277_3280",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 3277,
+      "end": 3280
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_3335_3338",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 3335,
+      "end": 3338
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "She",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_3359_3362",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 3359,
+      "end": 3362
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_4394_4397",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 4394,
+      "end": 4397
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_4570_4573",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 4570,
+      "end": 4573
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_4648_4651",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 4648,
+      "end": 4651
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_4835_4838",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 4835,
+      "end": 4838
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_4992_4995",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 4992,
+      "end": 4995
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_5050_5053",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 5050,
+      "end": 5053
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_5093_5096",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 5093,
+      "end": 5096
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_5895_5898",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 5895,
+      "end": 5898
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_4",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_5940_5943",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 5940,
+      "end": 5943
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_4",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_6200_6203",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 6200,
+      "end": 6203
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_4",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_6362_6365",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 6362,
+      "end": 6365
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_4",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_6490_6493",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 6490,
+      "end": 6493
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_4",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_6536_6539",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 6536,
+      "end": 6539
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_4",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_6748_6751",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 6748,
+      "end": 6751
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_5",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_7678_7681",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 7678,
+      "end": 7681
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_5",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_7753_7756",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 7753,
+      "end": 7756
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_5",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_9_7787_7790",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 7787,
+      "end": 7790
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "001_cluster_9",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Maria Lopez"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_5",
+     "sentence_index": null
+    }
+   ],
+   "mentions_by_chunk": {
+    "2": [
+     "span-3c921c14",
+     "ent_001_0_18",
+     "ent_001_0_13",
+     "ent_001_0_12",
+     "ent_001_0_5",
+     "ent_001_0_3",
+     "ent_001_0_2",
+     "ent_001_0_16",
+     "ent_001_0_15",
+     "ent_001_0_1",
+     "ent_001_0_4",
+     "ent_001_0_0",
+     "ent_001_0_11",
+     "ent_001_0_10",
+     "ent_001_0_8",
+     "ent_001_0_6",
+     "ent_001_0_7",
+     "ent_001_0_9",
+     "synth_pronoun_001_cluster_8_1230_1232",
+     "synth_pronoun_001_cluster_8_1373_1375",
+     "synth_pronoun_001_cluster_8_1391_1393"
+    ],
+    "3": [
+     "ent_001_1_10",
+     "ent_001_1_2",
+     "ent_001_1_9",
+     "ent_001_1_6",
+     "ent_001_1_11",
+     "ent_001_1_1",
+     "ent_001_1_4",
+     "ent_001_1_0",
+     "ent_001_1_13",
+     "ent_001_1_12",
+     "ent_001_1_3",
+     "ent_001_1_7",
+     "ent_001_1_5",
+     "synth_pronoun_001_cluster_8_1478_1480",
+     "synth_pronoun_001_cluster_8_1752_1755",
+     "synth_pronoun_001_cluster_8_2183_2186",
+     "synth_pronoun_001_cluster_8_2219_2221",
+     "synth_pronoun_001_cluster_8_2336_2338",
+     "synth_pronoun_001_cluster_9_2418_2421",
+     "synth_pronoun_001_cluster_9_2508_2511",
+     "synth_pronoun_001_cluster_9_2544_2547",
+     "synth_pronoun_001_cluster_9_2661_2664",
+     "synth_pronoun_001_cluster_9_2685_2688"
+    ],
+    "4": [
+     "ent_001_2_7",
+     "ent_001_2_5",
+     "ent_001_2_10",
+     "ent_001_2_8",
+     "ent_001_2_3",
+     "ent_001_2_12",
+     "ent_001_2_17",
+     "ent_001_2_6",
+     "ent_001_2_4",
+     "ent_001_2_2",
+     "ent_001_2_9",
+     "ent_001_2_16",
+     "span-d824fc47",
+     "ent_001_2_0",
+     "ent_001_2_21",
+     "ent_001_2_14",
+     "ent_001_2_13",
+     "ent_001_2_1",
+     "ent_001_2_11",
+     "synth_pronoun_001_cluster_8_3589_3592",
+     "synth_pronoun_001_cluster_8_3703_3705",
+     "synth_pronoun_001_cluster_8_3971_3974",
+     "synth_pronoun_001_cluster_9_3277_3280",
+     "synth_pronoun_001_cluster_9_3335_3338",
+     "synth_pronoun_001_cluster_9_3359_3362"
+    ],
+    "5": [
+     "ent_001_3_4",
+     "ent_001_3_7",
+     "ent_001_3_5",
+     "ent_001_3_6",
+     "span-2037f94d",
+     "ent_001_3_10",
+     "ent_001_3_9",
+     "ent_001_3_21",
+     "span-ba315288",
+     "ent_001_3_2",
+     "ent_001_3_20",
+     "ent_001_3_8",
+     "span-de5139f9",
+     "span-0ee8c4ba",
+     "ent_001_3_3",
+     "ent_001_3_11",
+     "span-570325d1",
+     "ent_001_3_19",
+     "ent_001_3_0",
+     "ent_001_3_18",
+     "ent_001_3_1",
+     "synth_pronoun_001_cluster_8_4053_4055",
+     "synth_pronoun_001_cluster_8_4223_4225",
+     "synth_pronoun_001_cluster_9_4394_4397",
+     "synth_pronoun_001_cluster_9_4570_4573",
+     "synth_pronoun_001_cluster_9_4648_4651",
+     "synth_pronoun_001_cluster_9_4835_4838",
+     "synth_pronoun_001_cluster_9_4992_4995",
+     "synth_pronoun_001_cluster_9_5050_5053",
+     "synth_pronoun_001_cluster_9_5093_5096"
+    ],
+    "6": [
+     "span-77cd2f22",
+     "ent_001_4_5",
+     "ent_001_4_3",
+     "ent_001_4_15",
+     "span-de676095",
+     "ent_001_4_6",
+     "ent_001_4_10",
+     "ent_001_4_12",
+     "span-9f1696d0",
+     "ent_001_4_11",
+     "span-ade10466",
+     "ent_001_4_2",
+     "ent_001_4_9",
+     "ent_001_4_4",
+     "ent_001_4_1",
+     "ent_001_4_0",
+     "span-43060b26",
+     "ent_001_4_8",
+     "ent_001_4_7",
+     "synth_pronoun_001_cluster_9_5895_5898",
+     "synth_pronoun_001_cluster_9_5940_5943",
+     "synth_pronoun_001_cluster_9_6200_6203",
+     "synth_pronoun_001_cluster_9_6362_6365",
+     "synth_pronoun_001_cluster_9_6490_6493",
+     "synth_pronoun_001_cluster_9_6536_6539"
+    ],
+    "7": [
+     "ent_001_5_0",
+     "ent_001_5_12",
+     "ent_001_5_7",
+     "ent_001_5_8",
+     "ent_001_5_13",
+     "ent_001_5_14",
+     "ent_001_5_2",
+     "ent_001_5_5",
+     "ent_001_5_3",
+     "ent_001_5_9",
+     "ent_001_5_10",
+     "ent_001_5_4",
+     "ent_001_5_6",
+     "ent_001_5_1",
+     "ent_001_5_11",
+     "synth_pronoun_001_cluster_8_7466_7468",
+     "synth_pronoun_001_cluster_9_6748_6751",
+     "synth_pronoun_001_cluster_9_7678_7681",
+     "synth_pronoun_001_cluster_9_7753_7756",
+     "synth_pronoun_001_cluster_9_7787_7790"
+    ],
+    "8": [
+     "ent_001_6_2",
+     "ent_001_6_5",
+     "ent_001_6_4",
+     "ent_001_6_1",
+     "ent_001_6_3",
+     "ent_001_6_0",
+     "ent_001_6_7"
+    ]
+   }
+  },
+  {
+   "input": "lopez_v_green_valley_complaint.jsonl",
+   "doc_id": "002",
+   "raw_coref": [
+    {
+     "clusters": [
+      {
+       "id": "002_cluster_0",
+       "mentions": [
+        {
+         "start_char": 100,
+         "end_char": 119,
+         "text": "State of California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 184,
+         "end_char": 194,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 324,
+         "end_char": 334,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 419,
+         "end_char": 429,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 987,
+         "end_char": 997,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1177,
+         "end_char": 1187,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1304,
+         "end_char": 1314,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1413,
+         "end_char": 1423,
+         "text": "California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4831,
+         "end_char": 4841,
+         "text": "California",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_1",
+       "mentions": [
+        {
+         "start_char": 124,
+         "end_char": 146,
+         "text": "Defendant Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 274,
+         "end_char": 277,
+         "text": "its",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 472,
+         "end_char": 484,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1456,
+         "end_char": 1478,
+         "text": "Defendant Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2029,
+         "end_char": 2041,
+         "text": "Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2221,
+         "end_char": 2233,
+         "text": "Green Valley",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_2",
+       "mentions": [
+        {
+         "start_char": 62,
+         "end_char": 119,
+         "text": "the City and County of San Francisco, State of California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 309,
+         "end_char": 334,
+         "text": "San Francisco, California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 949,
+         "end_char": 997,
+         "text": "the City and County of San Francisco, California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1289,
+         "end_char": 1314,
+         "text": "San Francisco, California",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4816,
+         "end_char": 4841,
+         "text": "San Francisco, California",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_3",
+       "mentions": [
+        {
+         "start_char": 339,
+         "end_char": 353,
+         "text": "Defendant Reed",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 519,
+         "end_char": 522,
+         "text": "his",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 1347,
+         "end_char": 1361,
+         "text": "Defendant Reed",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_4",
+       "mentions": [
+        {
+         "start_char": 3,
+         "end_char": 12,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 727,
+         "end_char": 792,
+         "text": "Plaintiff, who therefore sues such Defendants by fictitious names",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 794,
+         "end_char": 803,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1117,
+         "end_char": 1126,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1150,
+         "end_char": 1153,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 1727,
+         "end_char": 1736,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1751,
+         "end_char": 1754,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 1930,
+         "end_char": 1939,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2285,
+         "end_char": 2296,
+         "text": "Plaintiff’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2364,
+         "end_char": 2375,
+         "text": "Plaintiff’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2400,
+         "end_char": 2409,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2445,
+         "end_char": 2454,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2480,
+         "end_char": 2483,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 2704,
+         "end_char": 2715,
+         "text": "Plaintiff’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2896,
+         "end_char": 2905,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2932,
+         "end_char": 2935,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 3065,
+         "end_char": 3074,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3246,
+         "end_char": 3255,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3391,
+         "end_char": 3394,
+         "text": "She",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 3481,
+         "end_char": 3484,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 3551,
+         "end_char": 3560,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3574,
+         "end_char": 3577,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 3778,
+         "end_char": 3787,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3849,
+         "end_char": 3852,
+         "text": "her",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 3936,
+         "end_char": 3939,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 3979,
+         "end_char": 3988,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4184,
+         "end_char": 4195,
+         "text": "Plaintiff’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4411,
+         "end_char": 4420,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4481,
+         "end_char": 4484,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 4567,
+         "end_char": 4576,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4700,
+         "end_char": 4709,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4847,
+         "end_char": 4850,
+         "text": "she",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 4904,
+         "end_char": 4913,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5121,
+         "end_char": 5130,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5433,
+         "end_char": 5442,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5561,
+         "end_char": 5570,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5798,
+         "end_char": 5807,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6009,
+         "end_char": 6050,
+         "text": "Plaintiff, who had a green traffic signal",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6112,
+         "end_char": 6121,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6346,
+         "end_char": 6357,
+         "text": "Plaintiff’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6549,
+         "end_char": 6560,
+         "text": "Plaintiff’s",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6596,
+         "end_char": 6605,
+         "text": "Plaintiff",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 7150,
+         "end_char": 7171,
+         "text": "Plaintiff MARIA LOPEZ",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_5",
+       "mentions": [
+        {
+         "start_char": 668,
+         "end_char": 711,
+         "text": "Defendants sued herein as Does 1 through 20",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 757,
+         "end_char": 772,
+         "text": "such Defendants",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 840,
+         "end_char": 845,
+         "text": "their",
+         "is_pronoun": true
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_6",
+       "mentions": [
+        {
+         "start_char": 559,
+         "end_char": 573,
+         "text": "this Complaint",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 815,
+         "end_char": 829,
+         "text": "this Complaint",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 921,
+         "end_char": 932,
+         "text": "this action",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_7",
+       "mentions": [
+        {
+         "start_char": 1224,
+         "end_char": 1238,
+         "text": "Mission Street",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1252,
+         "end_char": 1255,
+         "text": "its",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 1523,
+         "end_char": 1526,
+         "text": "its",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 1545,
+         "end_char": 1559,
+         "text": "Mission Street",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1592,
+         "end_char": 1606,
+         "text": "Mission Street",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2803,
+         "end_char": 2817,
+         "text": "Mission Street",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_8",
+       "mentions": [
+        {
+         "start_char": 1274,
+         "end_char": 1285,
+         "text": "14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1504,
+         "end_char": 1515,
+         "text": "14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1611,
+         "end_char": 1622,
+         "text": "14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2131,
+         "end_char": 2142,
+         "text": "14th Avenue",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_9",
+       "mentions": [
+        {
+         "start_char": 1564,
+         "end_char": 1622,
+         "text": "The subject intersection of Mission Street and 14th Avenue",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 1957,
+         "end_char": 1973,
+         "text": "the intersection",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2158,
+         "end_char": 2174,
+         "text": "the intersection",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2316,
+         "end_char": 2332,
+         "text": "the intersection",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_10",
+       "mentions": [
+        {
+         "start_char": 1376,
+         "end_char": 1478,
+         "text": "a 2020 white Freightliner box truck, California license plate 9TRK220, owned by Defendant Green Valley",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2025,
+         "end_char": 2051,
+         "text": "the Green Valley box truck",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2217,
+         "end_char": 2239,
+         "text": "the Green Valley truck",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5352,
+         "end_char": 5369,
+         "text": "the subject truck",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5663,
+         "end_char": 5680,
+         "text": "the subject truck",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_11",
+       "mentions": [
+        {
+         "start_char": 1751,
+         "end_char": 1762,
+         "text": "her vehicle",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2285,
+         "end_char": 2308,
+         "text": "Plaintiff’s Honda Civic",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2364,
+         "end_char": 2383,
+         "text": "Plaintiff’s vehicle",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2480,
+         "end_char": 2491,
+         "text": "her vehicle",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2704,
+         "end_char": 2723,
+         "text": "Plaintiff’s vehicle",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4184,
+         "end_char": 4203,
+         "text": "Plaintiff’s vehicle",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4255,
+         "end_char": 4266,
+         "text": "the vehicle",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4326,
+         "end_char": 4337,
+         "text": "the vehicle",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_12",
+       "mentions": [
+        {
+         "start_char": 2250,
+         "end_char": 2258,
+         "text": "collided",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2430,
+         "end_char": 2443,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2585,
+         "end_char": 2598,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2686,
+         "end_char": 2696,
+         "text": "the impact",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2881,
+         "end_char": 2894,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3536,
+         "end_char": 3549,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3763,
+         "end_char": 3776,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4286,
+         "end_char": 4299,
+         "text": "the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4396,
+         "end_char": 4409,
+         "text": "the collision",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_13",
+       "mentions": [
+        {
+         "start_char": 2418,
+         "end_char": 2443,
+         "text": "the time of the collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 2573,
+         "end_char": 2598,
+         "text": "the time of the collision",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_14",
+       "mentions": [
+        {
+         "start_char": 3481,
+         "end_char": 3507,
+         "text": "her primary care physician",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3574,
+         "end_char": 3600,
+         "text": "her primary care physician",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_15",
+       "mentions": [
+        {
+         "start_char": 1083,
+         "end_char": 1087,
+         "text": "2023",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3687,
+         "end_char": 3691,
+         "text": "2023",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 3706,
+         "end_char": 3710,
+         "text": "2023",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_16",
+       "mentions": [
+        {
+         "start_char": 4726,
+         "end_char": 4760,
+         "text": "a rear-end motor vehicle collision",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 4884,
+         "end_char": 4897,
+         "text": "that incident",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_17",
+       "mentions": [
+        {
+         "start_char": 5183,
+         "end_char": 5193,
+         "text": "Defendants",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5207,
+         "end_char": 5211,
+         "text": "them",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 5413,
+         "end_char": 5427,
+         "text": "All Defendants",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5545,
+         "end_char": 5555,
+         "text": "Defendants",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5756,
+         "end_char": 5766,
+         "text": "Defendants",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 5776,
+         "end_char": 5781,
+         "text": "their",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 6088,
+         "end_char": 6099,
+         "text": "Defendants’",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6502,
+         "end_char": 6512,
+         "text": "Defendants",
+         "is_pronoun": false
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_18",
+       "mentions": [
+        {
+         "start_char": 6633,
+         "end_char": 6643,
+         "text": "Defendants",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6657,
+         "end_char": 6661,
+         "text": "them",
+         "is_pronoun": true
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_19",
+       "mentions": [
+        {
+         "start_char": 1036,
+         "end_char": 1046,
+         "text": "this Court",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 6993,
+         "end_char": 7002,
+         "text": "the Court",
+         "is_pronoun": false
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "coref_clusters": [
+    {
+     "id": "002_cluster_0",
+     "member_mention_ids": [
+      "ent_002_0_14",
+      "ent_002_0_12",
+      "ent_002_3_7",
+      "ent_002_0_16",
+      "ent_002_0_7",
+      "ent_002_0_10",
+      "ent_002_0_8",
+      "ent_002_0_13",
+      "ent_002_1_18"
+     ],
+     "pronoun_spans": []
+    },
+    {
+     "id": "002_cluster_1",
+     "member_mention_ids": [
+      "ent_002_0_5",
+      "ent_002_0_6",
+      "ent_002_1_12",
+      "ent_002_1_10",
+      "ent_002_1_11"
+     ],
+     "pronoun_spans": [
+      {
+       "start": 274,
+       "end": 277
+      }
+     ]
+    },
+    {
+     "id": "002_cluster_2",
+     "member_mention_ids": [
+      "ent_002_0_9",
+      "ent_002_0_11",
+      "ent_002_0_15",
+      "ent_002_0_17"
+     ],
+     "pronoun_spans": []
+    },
+    {
+     "id": "002_cluster_3",
+     "member_mention_ids": [
+      "ent_002_1_7",
+      "ent_002_0_4"
+     ],
+     "pronoun_spans": [
+      {
+       "start": 519,
+       "end": 522
+      }
+     ]
+    },
+    {
+     "id": "002_cluster_4",
+     "member_mention_ids": [
+      "ent_002_0_3",
+      "ent_002_1_2",
+      "ent_002_0_2",
+      "ent_002_2_4",
+      "ent_002_3_0",
+      "ent_002_3_5",
+      "ent_002_2_0",
+      "ent_002_4_1",
+      "ent_002_3_6",
+      "ent_002_0_1",
+      "ent_002_4_7",
+      "ent_002_3_1",
+      "ent_002_4_4",
+      "ent_002_2_3",
+      "ent_002_4_3",
+      "ent_002_5_0",
+      "ent_002_4_6",
+      "ent_002_0_0",
+      "ent_002_2_2",
+      "ent_002_3_4",
+      "ent_002_3_3",
+      "ent_002_4_2",
+      "ent_002_2_1",
+      "ent_002_1_4",
+      "ent_002_4_5",
+      "ent_002_3_2",
+      "ent_002_1_0",
+      "ent_002_1_3",
+      "ent_002_4_0",
+      "ent_002_2_5",
+      "ent_002_1_5",
+      "ent_002_1_1"
+     ],
+     "pronoun_spans": [
+      {
+       "start": 1150,
+       "end": 1153
+      },
+      {
+       "start": 1751,
+       "end": 1754
+      },
+      {
+       "start": 2480,
+       "end": 2483
+      },
+      {
+       "start": 2932,
+       "end": 2935
+      },
+      {
+       "start": 3391,
+       "end": 3394
+      },
+      {
+       "start": 3481,
+       "end": 3484
+      },
+      {
+       "start": 3574,
+       "end": 3577
+      },
+      {
+       "start": 3849,
+       "end": 3852
+      },
+      {
+       "start": 3936,
+       "end": 3939
+      },
+      {
+       "start": 4481,
+       "end": 4484
+      },
+      {
+       "start": 4847,
+       "end": 4850
+      }
+     ]
+    },
+    {
+     "id": "002_cluster_7",
+     "member_mention_ids": [
+      "ent_002_0_19",
+      "ent_002_2_7",
+      "ent_002_1_14",
+      "ent_002_1_13"
+     ],
+     "pronoun_spans": [
+      {
+       "start": 1252,
+       "end": 1255
+      },
+      {
+       "start": 1523,
+       "end": 1526
+      }
+     ]
+    },
+    {
+     "id": "002_cluster_8",
+     "member_mention_ids": [
+      "ent_002_1_16",
+      "ent_002_1_19",
+      "ent_002_1_17",
+      "ent_002_0_20"
+     ],
+     "pronoun_spans": []
+    }
+   ],
+   "canonical_mention_for_cluster": {
+    "002_cluster_0": "ent_002_0_16",
+    "002_cluster_1": "ent_002_0_5",
+    "002_cluster_2": "ent_002_0_15",
+    "002_cluster_3": "ent_002_0_4",
+    "002_cluster_4": "ent_002_5_0",
+    "002_cluster_7": "ent_002_0_19",
+    "002_cluster_8": "ent_002_0_20"
+   },
+   "canonical_text_for_mention": {
+    "ent_002_0_14": "California",
+    "ent_002_0_12": "California",
+    "ent_002_3_7": "California",
+    "ent_002_0_16": "California",
+    "ent_002_0_7": "California",
+    "ent_002_0_10": "California",
+    "ent_002_0_8": "California",
+    "ent_002_0_13": "California",
+    "ent_002_1_18": "California",
+    "ent_002_0_5": "Green Valley",
+    "ent_002_0_6": "Green Valley",
+    "ent_002_1_12": "Green Valley",
+    "ent_002_1_10": "Green Valley",
+    "ent_002_1_11": "Green Valley",
+    "ent_002_0_9": "San Francisco",
+    "ent_002_0_11": "San Francisco",
+    "ent_002_0_15": "San Francisco",
+    "ent_002_0_17": "San Francisco",
+    "ent_002_1_7": "Reed",
+    "ent_002_0_4": "Reed",
+    "ent_002_0_3": "MARIA LOPEZ",
+    "ent_002_1_2": "MARIA LOPEZ",
+    "ent_002_0_2": "MARIA LOPEZ",
+    "ent_002_2_4": "MARIA LOPEZ",
+    "ent_002_3_0": "MARIA LOPEZ",
+    "ent_002_3_5": "MARIA LOPEZ",
+    "ent_002_2_0": "MARIA LOPEZ",
+    "ent_002_4_1": "MARIA LOPEZ",
+    "ent_002_3_6": "MARIA LOPEZ",
+    "ent_002_0_1": "MARIA LOPEZ",
+    "ent_002_4_7": "MARIA LOPEZ",
+    "ent_002_3_1": "MARIA LOPEZ",
+    "ent_002_4_4": "MARIA LOPEZ",
+    "ent_002_2_3": "MARIA LOPEZ",
+    "ent_002_4_3": "MARIA LOPEZ",
+    "ent_002_5_0": "MARIA LOPEZ",
+    "ent_002_4_6": "MARIA LOPEZ",
+    "ent_002_0_0": "MARIA LOPEZ",
+    "ent_002_2_2": "MARIA LOPEZ",
+    "ent_002_3_4": "MARIA LOPEZ",
+    "ent_002_3_3": "MARIA LOPEZ",
+    "ent_002_4_2": "MARIA LOPEZ",
+    "ent_002_2_1": "MARIA LOPEZ",
+    "ent_002_1_4": "MARIA LOPEZ",
+    "ent_002_4_5": "MARIA LOPEZ",
+    "ent_002_3_2": "MARIA LOPEZ",
+    "ent_002_1_0": "MARIA LOPEZ",
+    "ent_002_1_3": "MARIA LOPEZ",
+    "ent_002_4_0": "MARIA LOPEZ",
+    "ent_002_2_5": "MARIA LOPEZ",
+    "ent_002_1_5": "MARIA LOPEZ",
+    "ent_002_1_1": "MARIA LOPEZ",
+    "ent_002_0_19": "Mission Street",
+    "ent_002_2_7": "Mission Street",
+    "ent_002_1_14": "Mission Street",
+    "ent_002_1_13": "Mission Street",
+    "ent_002_1_16": "14th Avenue",
+    "ent_002_1_19": "14th Avenue",
+    "ent_002_1_17": "14th Avenue",
+    "ent_002_0_20": "14th Avenue",
+    "synth_pronoun_002_cluster_1_274_277": "Green Valley",
+    "synth_pronoun_002_cluster_3_519_522": "Reed",
+    "synth_pronoun_002_cluster_4_1150_1153": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_4_1751_1754": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_4_2480_2483": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_4_2932_2935": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_4_3391_3394": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_4_3481_3484": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_4_3574_3577": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_4_3849_3852": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_4_3936_3939": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_4_4481_4484": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_4_4847_4850": "MARIA LOPEZ",
+    "synth_pronoun_002_cluster_7_1252_1255": "Mission Street",
+    "synth_pronoun_002_cluster_7_1523_1526": "Mission Street"
+   },
+   "synthetic_pronoun_mentions": {
+    "synth_pronoun_002_cluster_1_274_277": "ent_002_0_5",
+    "synth_pronoun_002_cluster_3_519_522": "ent_002_0_4",
+    "synth_pronoun_002_cluster_4_1150_1153": "ent_002_5_0",
+    "synth_pronoun_002_cluster_4_1751_1754": "ent_002_5_0",
+    "synth_pronoun_002_cluster_4_2480_2483": "ent_002_5_0",
+    "synth_pronoun_002_cluster_4_2932_2935": "ent_002_5_0",
+    "synth_pronoun_002_cluster_4_3391_3394": "ent_002_5_0",
+    "synth_pronoun_002_cluster_4_3481_3484": "ent_002_5_0",
+    "synth_pronoun_002_cluster_4_3574_3577": "ent_002_5_0",
+    "synth_pronoun_002_cluster_4_3849_3852": "ent_002_5_0",
+    "synth_pronoun_002_cluster_4_3936_3939": "ent_002_5_0",
+    "synth_pronoun_002_cluster_4_4481_4484": "ent_002_5_0",
+    "synth_pronoun_002_cluster_4_4847_4850": "ent_002_5_0",
+    "synth_pronoun_002_cluster_7_1252_1255": "ent_002_0_19",
+    "synth_pronoun_002_cluster_7_1523_1526": "ent_002_0_19"
+   },
+   "doc_mention_count": 124,
+   "added_mentions": [
+    {
+     "id": "synth_pronoun_002_cluster_1_274_277",
+     "type": "ORG",
+     "name": "Green Valley",
+     "span": {
+      "start": 274,
+      "end": 277
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "its",
+      "cluster_id": "002_cluster_1",
+      "canonical_mention_id": "ent_002_0_5",
+      "canonical_name": "Green Valley"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_3_519_522",
+     "type": "PER",
+     "name": "Reed",
+     "span": {
+      "start": 519,
+      "end": 522
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "his",
+      "cluster_id": "002_cluster_3",
+      "canonical_mention_id": "ent_002_0_4",
+      "canonical_name": "Reed"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_1150_1153",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 1150,
+      "end": 1153
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_1751_1754",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 1751,
+      "end": 1754
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_2480_2483",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 2480,
+      "end": 2483
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_1",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_2932_2935",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 2932,
+      "end": 2935
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_3391_3394",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 3391,
+      "end": 3394
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "She",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_3481_3484",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 3481,
+      "end": 3484
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_3574_3577",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 3574,
+      "end": 3577
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_3849_3852",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 3849,
+      "end": 3852
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "her",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_3936_3939",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 3936,
+      "end": 3939
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_2",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_4481_4484",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 4481,
+      "end": 4484
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_4_4847_4850",
+     "type": "PER",
+     "name": "MARIA LOPEZ",
+     "span": {
+      "start": 4847,
+      "end": 4850
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "she",
+      "cluster_id": "002_cluster_4",
+      "canonical_mention_id": "ent_002_5_0",
+      "canonical_name": "MARIA LOPEZ"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_3",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_7_1252_1255",
+     "type": "LOC",
+     "name": "Mission Street",
+     "span": {
+      "start": 1252,
+      "end": 1255
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "its",
+      "cluster_id": "002_cluster_7",
+      "canonical_mention_id": "ent_002_0_19",
+      "canonical_name": "Mission Street"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_7_1523_1526",
+     "type": "LOC",
+     "name": "Mission Street",
+     "span": {
+      "start": 1523,
+      "end": 1526
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "its",
+      "cluster_id": "002_cluster_7",
+      "canonical_mention_id": "ent_002_0_19",
+      "canonical_name": "Mission Street"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_1",
+     "sentence_index": null
+    }
+   ],
+   "mentions_by_chunk": {
+    "151": [
+     "ent_002_0_1",
+     "ent_002_0_15",
+     "ent_002_0_16",
+     "ent_002_0_5",
+     "ent_002_0_7",
+     "ent_002_0_11",
+     "ent_002_0_14",
+     "ent_002_0_4",
+     "ent_002_0_18",
+     "ent_002_0_13",
+     "ent_002_0_6",
+     "ent_002_0_26",
+     "ent_002_0_3",
+     "ent_002_0_0",
+     "ent_002_0_25",
+     "ent_002_0_17",
+     "ent_002_0_10",
+     "ent_002_0_24",
+     "span-929f2b82",
+     "ent_002_0_23",
+     "ent_002_0_2",
+     "ent_002_0_21",
+     "ent_002_0_8",
+     "ent_002_0_19",
+     "ent_002_0_20",
+     "ent_002_0_9",
+     "ent_002_0_12",
+     "synth_pronoun_002_cluster_1_274_277",
+     "synth_pronoun_002_cluster_3_519_522",
+     "synth_pronoun_002_cluster_4_1150_1153",
+     "synth_pronoun_002_cluster_7_1252_1255"
+    ],
+    "152": [
+     "ent_002_1_7",
+     "ent_002_1_23",
+     "ent_002_1_18",
+     "ent_002_1_10",
+     "ent_002_1_19",
+     "ent_002_1_13",
+     "ent_002_1_14",
+     "ent_002_1_16",
+     "ent_002_1_1",
+     "ent_002_1_24",
+     "ent_002_1_8",
+     "ent_002_1_15",
+     "ent_002_1_0",
+     "ent_002_1_6",
+     "ent_002_1_11",
+     "ent_002_1_17",
+     "ent_002_1_12",
+     "ent_002_1_4",
+     "ent_002_1_22",
+     "ent_002_1_3",
+     "ent_002_1_5",
+     "ent_002_1_25",
+     "ent_002_1_2",
+     "ent_002_1_9",
+     "ent_002_1_21",
+     "ent_002_1_26",
+     "ent_002_1_20",
+     "synth_pronoun_002_cluster_4_1751_1754",
+     "synth_pronoun_002_cluster_4_2480_2483",
+     "synth_pronoun_002_cluster_7_1523_1526"
+    ],
+    "153": [
+     "ent_002_2_5",
+     "ent_002_2_7",
+     "ent_002_2_2",
+     "ent_002_2_6",
+     "ent_002_2_4",
+     "ent_002_2_9",
+     "ent_002_2_8",
+     "ent_002_2_1",
+     "ent_002_2_3",
+     "span-f19db60b",
+     "span-cc8adeee",
+     "ent_002_2_0",
+     "ent_002_2_12",
+     "synth_pronoun_002_cluster_4_2932_2935",
+     "synth_pronoun_002_cluster_4_3391_3394",
+     "synth_pronoun_002_cluster_4_3481_3484",
+     "synth_pronoun_002_cluster_4_3574_3577",
+     "synth_pronoun_002_cluster_4_3849_3852",
+     "synth_pronoun_002_cluster_4_3936_3939"
+    ],
+    "154": [
+     "ent_002_3_6",
+     "ent_002_3_16",
+     "span-3153b2a1",
+     "ent_002_3_5",
+     "ent_002_3_14",
+     "ent_002_3_12",
+     "ent_002_3_11",
+     "ent_002_3_15",
+     "span-161a4c87",
+     "ent_002_3_4",
+     "ent_002_3_3",
+     "ent_002_3_10",
+     "ent_002_3_20",
+     "span-6b7f8136",
+     "ent_002_3_2",
+     "ent_002_3_9",
+     "ent_002_3_8",
+     "ent_002_3_7",
+     "ent_002_3_1",
+     "ent_002_3_0",
+     "ent_002_3_21",
+     "synth_pronoun_002_cluster_4_4481_4484",
+     "synth_pronoun_002_cluster_4_4847_4850"
+    ],
+    "155": [
+     "ent_002_4_11",
+     "ent_002_4_5",
+     "ent_002_4_4",
+     "ent_002_4_8",
+     "ent_002_4_7",
+     "ent_002_4_6",
+     "ent_002_4_2",
+     "ent_002_4_3",
+     "ent_002_4_9",
+     "span-21e40c8a",
+     "ent_002_4_1",
+     "ent_002_4_0"
+    ],
+    "156": [
+     "ent_002_5_3",
+     "ent_002_5_2",
+     "ent_002_5_4",
+     "ent_002_5_6",
+     "ent_002_5_5",
+     "ent_002_5_8",
+     "ent_002_5_7",
+     "ent_002_5_1",
+     "ent_002_5_0"
+    ]
+   }
+  }
+ ]
+}

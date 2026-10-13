@@ -1,0 +1,51 @@
+{
+ "source": "Python prototype",
+ "commit": "e48efe7f8ec3446bf5f2b60f662abe9b361ffd2d",
+ "generated": "2026-10-13T06:40:34.746309+00:00",
+ "invocation": "<venv>/python harvest.py <out_dir> green_valley mason (run from the Python prototype root, HF_HUB_OFFLINE=1); compact.py splits the dumps per stage",
+ "config": {
+  "base": "processing/processing_v17.yaml",
+  "changes": [
+   "FactStage and ContradictionCheckStage disabled",
+   "EDStage allow_llm: false",
+   "helix.mode: memory, namespace p8_<scenario> (one database per scenario)"
+  ]
+ },
+ "models": {
+  "coref": "fastcoref biu-nlp/f-coref (cpu)",
+  "gliner2": "fastino/gliner2-base-v1 (cpu)",
+  "embeddings": "BAAI/bge-small-en-v1.5 via sentence-transformers (cpu); vectors not stored"
+ },
+ "scenarios": {
+  "green_valley": [
+   "green_valley_incident_report.jsonl",
+   "lopez_v_green_valley_complaint.jsonl"
+  ],
+  "mason": [
+   "Mason_billy.jsonl",
+   "Mason_watson.jsonl"
+  ]
+ },
+ "stages": [
+  "rag_index",
+  "mention_detection",
+  "definition_extraction",
+  "coreference",
+  "ed_resolution",
+  "relation_extraction"
+ ],
+ "notes": [
+  "documents of a scenario run in order against one store, so ED reuses entities across documents",
+  "helix_id / chunk_id / entity ids are the Python in-memory store's sequential ids",
+  "detector_raw is each detector's output per chunk (segment_id <doc_id>_<sequence_number>) before stage-level filtering, healing and merging",
+  "raw_coref is the fastcoref output (CorefOutput) the coreference stage post-processed"
+ ],
+ "extra": {
+  "invocation": "<venv>/python harvest_a.py <impeach fixtures dir> <out_dir> (run from the Python prototype root, HF_HUB_OFFLINE=1)",
+  "outputs": {
+   "definition_extraction/documents.json": "RAGIndex + Mention (eyecite, regex, GLiNER2) + Definition stages of processing_v17 over extra documents (transcripts, ingest samples, contradiction_test scenarios)",
+   "definition_extraction/cases.json": "definition extractor with the shipped roles.yaml over hand-written texts and mentions",
+   "mention_detection/detector_cases.json": "raw citation (eyecite) and regex detector output per text"
+  }
+ }
+}

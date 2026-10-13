@@ -1,0 +1,924 @@
+{
+ "scenario": "mason",
+ "documents": [
+  {
+   "input": "Mason_billy.jsonl",
+   "doc_id": "001",
+   "detector_raw": [
+    {
+     "detector": "EyeciteMentionDetector",
+     "segment_id": "001_0",
+     "entities": []
+    },
+    {
+     "detector": "RegexMentionDetector",
+     "segment_id": "001_0",
+     "entities": [
+      {
+       "id": "span-b475db25",
+       "type": "MONEY",
+       "name": "$3200",
+       "span": {
+        "start": 285,
+        "end": 290
+       },
+       "score": 1.0,
+       "source": "regex_detector",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "span-d2e368f8",
+       "type": "DATE",
+       "name": "July 8, 2022",
+       "span": {
+        "start": 54,
+        "end": 66
+       },
+       "score": 1.0,
+       "source": "regex_detector",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      }
+     ]
+    },
+    {
+     "detector": "Gliner2MentionDetector",
+     "segment_id": "001_0",
+     "entities": [
+      {
+       "id": "ent_001_0_1",
+       "type": "PER",
+       "name": "Mason",
+       "span": {
+        "start": 0,
+        "end": 5
+       },
+       "score": 0.9976416826248169,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_001_0_3",
+       "type": "LOC",
+       "name": "Eastvale",
+       "span": {
+        "start": 30,
+        "end": 38
+       },
+       "score": 0.9748741984367371,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_001_0_4",
+       "type": "LOC",
+       "name": "California",
+       "span": {
+        "start": 40,
+        "end": 50
+       },
+       "score": 0.9620155096054077,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_001_0_8",
+       "type": "DATE",
+       "name": "July 8, 2022",
+       "span": {
+        "start": 54,
+        "end": 66
+       },
+       "score": 0.9800788760185242,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_001_0_6",
+       "type": "PRODUCT",
+       "name": "beer pong",
+       "span": {
+        "start": 83,
+        "end": 92
+       },
+       "score": 0.9423599243164062,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_001_0_2",
+       "type": "PER",
+       "name": "Billy",
+       "span": {
+        "start": 147,
+        "end": 152
+       },
+       "score": 0.994495689868927,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_001_0_0",
+       "type": "PER",
+       "name": "Mason",
+       "span": {
+        "start": 154,
+        "end": 159
+       },
+       "score": 0.9987921118736267,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_001_0_5",
+       "type": "FACILITY",
+       "name": "hospital",
+       "span": {
+        "start": 211,
+        "end": 219
+       },
+       "score": 0.9759776592254639,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_001_0_9",
+       "type": "TIME",
+       "name": "several months",
+       "span": {
+        "start": 253,
+        "end": 267
+       },
+       "score": 0.8613778948783875,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_001_0_7",
+       "type": "MONEY",
+       "name": "$3200",
+       "span": {
+        "start": 285,
+        "end": 290
+       },
+       "score": 0.7392081618309021,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      }
+     ]
+    }
+   ],
+   "doc_mentions": [
+    {
+     "id": "ent_001_0_1",
+     "type": "PER",
+     "name": "Mason",
+     "span": {
+      "start": 0,
+      "end": 5
+     },
+     "score": 0.9976416826248169,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9976416826248169
+      }
+     ],
+     "metadata": {},
+     "doc_id": "001",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_001_0_3",
+     "type": "LOC",
+     "name": "Eastvale",
+     "span": {
+      "start": 30,
+      "end": 38
+     },
+     "score": 0.9748741984367371,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.9748741984367371
+      }
+     ],
+     "metadata": {},
+     "doc_id": "001",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_001_0_4",
+     "type": "LOC",
+     "name": "California",
+     "span": {
+      "start": 40,
+      "end": 50
+     },
+     "score": 0.9620155096054077,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.9620155096054077
+      }
+     ],
+     "metadata": {},
+     "doc_id": "001",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-d2e368f8",
+     "type": "DATE",
+     "name": "July 8, 2022",
+     "span": {
+      "start": 54,
+      "end": 66
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "DATE",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9800788760185242
+      }
+     ],
+     "metadata": {},
+     "doc_id": "001",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_001_0_6",
+     "type": "PRODUCT",
+     "name": "beer pong",
+     "span": {
+      "start": 83,
+      "end": 92
+     },
+     "score": 0.9423599243164062,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PRODUCT",
+       "score": 0.9423599243164062
+      }
+     ],
+     "metadata": {},
+     "doc_id": "001",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_001_0_2",
+     "type": "PER",
+     "name": "Billy",
+     "span": {
+      "start": 147,
+      "end": 152
+     },
+     "score": 0.994495689868927,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.994495689868927
+      }
+     ],
+     "metadata": {},
+     "doc_id": "001",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_001_0_0",
+     "type": "PER",
+     "name": "Mason",
+     "span": {
+      "start": 154,
+      "end": 159
+     },
+     "score": 0.9987921118736267,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9987921118736267
+      }
+     ],
+     "metadata": {},
+     "doc_id": "001",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_001_0_5",
+     "type": "FACILITY",
+     "name": "hospital",
+     "span": {
+      "start": 211,
+      "end": 219
+     },
+     "score": 0.9759776592254639,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "FACILITY",
+       "score": 0.9759776592254639
+      }
+     ],
+     "metadata": {},
+     "doc_id": "001",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_001_0_9",
+     "type": "TIME",
+     "name": "several months",
+     "span": {
+      "start": 253,
+      "end": 267
+     },
+     "score": 0.8613778948783875,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "TIME",
+       "score": 0.8613778948783875
+      }
+     ],
+     "metadata": {},
+     "doc_id": "001",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-b475db25",
+     "type": "MONEY",
+     "name": "$3200",
+     "span": {
+      "start": 285,
+      "end": 290
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "MONEY",
+       "score": 1.0
+      }
+     ],
+     "metadata": {},
+     "doc_id": "001",
+     "chunk_id": "2",
+     "sentence_index": 0
+    }
+   ],
+   "mentions_by_chunk": {
+    "2": [
+     "ent_001_0_1",
+     "ent_001_0_3",
+     "ent_001_0_4",
+     "span-d2e368f8",
+     "ent_001_0_6",
+     "ent_001_0_2",
+     "ent_001_0_0",
+     "ent_001_0_5",
+     "ent_001_0_9",
+     "span-b475db25"
+    ]
+   },
+   "mention_span_count": 10
+  },
+  {
+   "input": "Mason_watson.jsonl",
+   "doc_id": "002",
+   "detector_raw": [
+    {
+     "detector": "EyeciteMentionDetector",
+     "segment_id": "002_0",
+     "entities": []
+    },
+    {
+     "detector": "RegexMentionDetector",
+     "segment_id": "002_0",
+     "entities": [
+      {
+       "id": "span-abd22427",
+       "type": "MONEY",
+       "name": "$300",
+       "span": {
+        "start": 261,
+        "end": 265
+       },
+       "score": 1.0,
+       "source": "regex_detector",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "span-ad30d4dd",
+       "type": "DATE",
+       "name": "July 8, 2022",
+       "span": {
+        "start": 54,
+        "end": 66
+       },
+       "score": 1.0,
+       "source": "regex_detector",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      }
+     ]
+    },
+    {
+     "detector": "Gliner2MentionDetector",
+     "segment_id": "002_0",
+     "entities": [
+      {
+       "id": "ent_002_0_1",
+       "type": "PER",
+       "name": "Mason",
+       "span": {
+        "start": 0,
+        "end": 5
+       },
+       "score": 0.9987550973892212,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_002_0_3",
+       "type": "LOC",
+       "name": "Stockton",
+       "span": {
+        "start": 30,
+        "end": 38
+       },
+       "score": 0.9656358361244202,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_002_0_4",
+       "type": "LOC",
+       "name": "California",
+       "span": {
+        "start": 40,
+        "end": 50
+       },
+       "score": 0.9486610889434814,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_002_0_8",
+       "type": "DATE",
+       "name": "July 8, 2022",
+       "span": {
+        "start": 54,
+        "end": 66
+       },
+       "score": 0.9815612435340881,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_002_0_6",
+       "type": "PRODUCT",
+       "name": "cup pong",
+       "span": {
+        "start": 83,
+        "end": 91
+       },
+       "score": 0.9686022400856018,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_002_0_2",
+       "type": "PER",
+       "name": "Watson",
+       "span": {
+        "start": 146,
+        "end": 152
+       },
+       "score": 0.994437575340271,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_002_0_0",
+       "type": "PER",
+       "name": "Mason",
+       "span": {
+        "start": 154,
+        "end": 159
+       },
+       "score": 0.9992115497589111,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_002_0_5",
+       "type": "FACILITY",
+       "name": "hospital",
+       "span": {
+        "start": 193,
+        "end": 201
+       },
+       "score": 0.9806369543075562,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_002_0_9",
+       "type": "TIME",
+       "name": "2 months",
+       "span": {
+        "start": 235,
+        "end": 243
+       },
+       "score": 0.9962624907493591,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      },
+      {
+       "id": "ent_002_0_7",
+       "type": "MONEY",
+       "name": "$300",
+       "span": {
+        "start": 261,
+        "end": 265
+       },
+       "score": 0.827603816986084,
+       "source": "gliner2",
+       "sources": [],
+       "metadata": {},
+       "doc_id": null,
+       "chunk_id": null,
+       "sentence_index": null
+      }
+     ]
+    }
+   ],
+   "doc_mentions": [
+    {
+     "id": "ent_002_0_1",
+     "type": "PER",
+     "name": "Mason",
+     "span": {
+      "start": 0,
+      "end": 5
+     },
+     "score": 0.9987550973892212,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9987550973892212
+      }
+     ],
+     "metadata": {},
+     "doc_id": "002",
+     "chunk_id": "21",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_002_0_3",
+     "type": "LOC",
+     "name": "Stockton",
+     "span": {
+      "start": 30,
+      "end": 38
+     },
+     "score": 0.9656358361244202,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.9656358361244202
+      }
+     ],
+     "metadata": {},
+     "doc_id": "002",
+     "chunk_id": "21",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_002_0_4",
+     "type": "LOC",
+     "name": "California",
+     "span": {
+      "start": 40,
+      "end": 50
+     },
+     "score": 0.9486610889434814,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.9486610889434814
+      }
+     ],
+     "metadata": {},
+     "doc_id": "002",
+     "chunk_id": "21",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-ad30d4dd",
+     "type": "DATE",
+     "name": "July 8, 2022",
+     "span": {
+      "start": 54,
+      "end": 66
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "DATE",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9815612435340881
+      }
+     ],
+     "metadata": {},
+     "doc_id": "002",
+     "chunk_id": "21",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_002_0_6",
+     "type": "PRODUCT",
+     "name": "cup pong",
+     "span": {
+      "start": 83,
+      "end": 91
+     },
+     "score": 0.9686022400856018,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PRODUCT",
+       "score": 0.9686022400856018
+      }
+     ],
+     "metadata": {},
+     "doc_id": "002",
+     "chunk_id": "21",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_002_0_2",
+     "type": "PER",
+     "name": "Watson",
+     "span": {
+      "start": 146,
+      "end": 152
+     },
+     "score": 0.994437575340271,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.994437575340271
+      }
+     ],
+     "metadata": {},
+     "doc_id": "002",
+     "chunk_id": "21",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_002_0_0",
+     "type": "PER",
+     "name": "Mason",
+     "span": {
+      "start": 154,
+      "end": 159
+     },
+     "score": 0.9992115497589111,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9992115497589111
+      }
+     ],
+     "metadata": {},
+     "doc_id": "002",
+     "chunk_id": "21",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_002_0_5",
+     "type": "FACILITY",
+     "name": "hospital",
+     "span": {
+      "start": 193,
+      "end": 201
+     },
+     "score": 0.9806369543075562,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "FACILITY",
+       "score": 0.9806369543075562
+      }
+     ],
+     "metadata": {},
+     "doc_id": "002",
+     "chunk_id": "21",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_002_0_9",
+     "type": "TIME",
+     "name": "2 months",
+     "span": {
+      "start": 235,
+      "end": 243
+     },
+     "score": 0.9962624907493591,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "TIME",
+       "score": 0.9962624907493591
+      }
+     ],
+     "metadata": {},
+     "doc_id": "002",
+     "chunk_id": "21",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-abd22427",
+     "type": "MONEY",
+     "name": "$300",
+     "span": {
+      "start": 261,
+      "end": 265
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "MONEY",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.827603816986084
+      }
+     ],
+     "metadata": {},
+     "doc_id": "002",
+     "chunk_id": "21",
+     "sentence_index": 0
+    }
+   ],
+   "mentions_by_chunk": {
+    "21": [
+     "ent_002_0_1",
+     "ent_002_0_3",
+     "ent_002_0_4",
+     "span-ad30d4dd",
+     "ent_002_0_6",
+     "ent_002_0_2",
+     "ent_002_0_0",
+     "ent_002_0_5",
+     "ent_002_0_9",
+     "span-abd22427"
+    ]
+   },
+   "mention_span_count": 10
+  }
+ ]
+}

@@ -99,6 +99,9 @@ pub struct ProcessingArgs {
     /// Write a JSON summary of the results to this path.
     #[arg(short, long)]
     pub output: Option<PathBuf>,
+    /// Print a per-stage timing summary (ms and share of the total) to stderr.
+    #[arg(long)]
+    pub timings: bool,
 }
 
 /// `eval` arguments.
@@ -144,7 +147,7 @@ pub struct RunE2eArgs {
     /// Output JSON (default: data/output/e2e_<scenario|custom>.json).
     #[arg(short, long)]
     pub output: Option<PathBuf>,
-    /// SQLite review-store path (default: <output>.sqlite3 next to the output).
+    /// SQLite review-store path (default: `<output>.sqlite3` next to the output).
     #[arg(long)]
     pub db_path: Option<PathBuf>,
     /// Keep an existing SQLite file at the review-store path and append to it (default:
@@ -163,6 +166,9 @@ pub struct RunE2eArgs {
     /// Root of the scenario fixtures (`input/`, `keys/`).
     #[arg(long, default_value = "fixtures")]
     pub fixtures_dir: PathBuf,
+    /// Print per-stage timing summaries (per document and totals) to stderr.
+    #[arg(long)]
+    pub timings: bool,
 }
 
 /// `store` subcommands.
@@ -218,6 +224,20 @@ mod tests {
         assert!(!args.append_db && !args.no_eval);
         assert!(args.key.is_none() && args.threshold.is_none());
         assert_eq!(args.fixtures_dir, PathBuf::from("fixtures"));
+        assert!(!args.timings);
+    }
+
+    #[test]
+    fn timings_flag_on_run_process_and_run_e2e() {
+        let cli = Cli::parse_from(["impeach", "process", "a.jsonl", "--timings"]);
+        let Command::Process(args) = cli.command else { panic!("expected process") };
+        assert!(args.processing.timings);
+        let cli = Cli::parse_from(["impeach", "run", "a.txt", "--timings"]);
+        let Command::Run(args) = cli.command else { panic!("expected run") };
+        assert!(args.processing.timings);
+        let cli = Cli::parse_from(["impeach", "run-e2e", "--scenario", "mason", "--timings"]);
+        let Command::RunE2e(args) = cli.command else { panic!("expected run-e2e") };
+        assert!(args.timings);
     }
 
     #[test]

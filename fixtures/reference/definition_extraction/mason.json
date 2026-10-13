@@ -1,0 +1,15 @@
+{
+ "scenario": "mason",
+ "documents": [
+  {
+   "input": "Mason_billy.jsonl",
+   "doc_id": "001",
+   "defined_terms": []
+  },
+  {
+   "input": "Mason_watson.jsonl",
+   "doc_id": "002",
+   "defined_terms": []
+  }
+ ]
+}

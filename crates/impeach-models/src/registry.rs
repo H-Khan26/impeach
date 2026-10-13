@@ -125,6 +125,11 @@ impl<T: ?Sized> Models<T> {
         *lock(&self.slot(key)) = Some(model);
     }
 
+    /// Whether a model was injected or constructed under `key`.
+    fn contains(&self, key: &str) -> bool {
+        lock(&self.slots).get(key).is_some_and(|slot| lock(slot).is_some())
+    }
+
     /// The model under `key`, constructed with `build` when the slot is empty.
     fn get_or_build(
         &self,
@@ -273,6 +278,26 @@ impl ModelRegistry {
             self.require_kind(key, ModelKind::Ollama)?;
             self.build_llm()
         })
+    }
+
+    /// Checks that the Ollama server behind `key` answers, without caching a client. An LLM
+    /// injected or already built under `key` passes without a request.
+    pub fn check_llm_reachable(&self, key: &str) -> Result<(), ModelError> {
+        if self.llms.contains(key) {
+            return Ok(());
+        }
+        self.require_kind(key, ModelKind::Ollama)?;
+        let models = self.configured()?;
+        #[cfg(feature = "ollama")]
+        {
+            let options = crate::ollama::OllamaOptions::from_config(&models.ollama);
+            crate::ollama::OllamaLlm::new(&options)?.check_reachable()
+        }
+        #[cfg(not(feature = "ollama"))]
+        {
+            let _ = models;
+            Err(unavailable("ollama"))
+        }
     }
 
     /// The NER model registered under `key` (the `gliner2` model).
@@ -660,11 +685,31 @@ mod tests {
 
     #[cfg(feature = "ollama")]
     #[test]
-    fn ollama_client_is_built_lazily_once() {
-        let registry = ModelRegistry::new("p", models(false));
-        let first = registry.llm("p_ollama").expect("ollama client");
+    fn unreachable_ollama_fails_the_check_but_resolves() {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind a free port");
+        let port = listener.local_addr().expect("local address").port();
+        drop(listener);
+        let mut config = models(false);
+        config.ollama.base_url = format!("http://127.0.0.1:{port}");
+        let registry = ModelRegistry::new("p", config);
+        let Err(error) = registry.check_llm_reachable("p_ollama") else {
+            panic!("nothing listens");
+        };
+        assert!(
+            matches!(&error, ModelError::Unavailable { backend, .. } if backend == "ollama"),
+            "{error:?}"
+        );
+        assert!(error.to_string().contains("ollama serve"), "{error}");
+        let first = registry.llm("p_ollama").expect("client builds without a server");
         let second = registry.llm("p_ollama").expect("cached client");
         assert!(Arc::ptr_eq(&first, &second));
+    }
+
+    #[test]
+    fn injected_llm_passes_the_reachability_check() {
+        let registry = ModelRegistry::new("p", models(false));
+        registry.insert_llm("p_ollama", Arc::new(MockLlm::new()));
+        assert!(registry.check_llm_reachable("p_ollama").is_ok());
     }
 
     #[cfg(not(feature = "ollama"))]

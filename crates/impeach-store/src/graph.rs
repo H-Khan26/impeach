@@ -552,6 +552,165 @@ pub struct EmbeddingWrite<'a> {
     pub vector: &'a [f32],
 }
 
+/// One `SpanRefersToEntity` edge to write with
+/// [`crate::GraphStore::link_spans_to_entities_batch`] (the arguments of
+/// [`crate::GraphStore::link_span_to_entity`]).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SpanEntityLink<'a> {
+    /// Source span.
+    pub span_id: &'a SpanId,
+    /// Target entity.
+    pub entity_id: &'a EntityId,
+    /// Edge `Confidence` in `[0, 1]`.
+    pub confidence: f64,
+    /// Edge `Method`; empty becomes `NER+ED`.
+    pub method: &'a str,
+}
+
+/// One edge of a fact to write with [`crate::GraphStore::link_facts_batch`] (the arguments of
+/// the matching single `LinkFactTo*` method).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum FactLink<'a> {
+    /// `FactInDocument` ([`crate::GraphStore::link_fact_to_document`]).
+    Document {
+        /// Source fact.
+        fact_id: &'a FactId,
+        /// Target document.
+        doc_id: &'a NodeId,
+        /// Edge `PageNumber`.
+        page_number: i64,
+        /// Edge `Section`.
+        section: &'a str,
+    },
+    /// `FactAboutEntity` ([`crate::GraphStore::link_fact_to_entity`]).
+    Entity {
+        /// Source fact.
+        fact_id: &'a FactId,
+        /// Target entity.
+        entity_id: &'a EntityId,
+        /// Edge `Role`; empty becomes `RELATED`.
+        role: &'a str,
+    },
+    /// `FactDerivedFromSpan` ([`crate::GraphStore::link_fact_to_span`]).
+    Span {
+        /// Source fact.
+        fact_id: &'a FactId,
+        /// Target span.
+        span_id: &'a SpanId,
+        /// Edge `Role`; empty becomes `SOURCE_SPAN`.
+        role: &'a str,
+        /// Edge `Confidence` in `[0, 1]`.
+        confidence: f64,
+    },
+}
+
+/// A property value of an edge write.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) enum EdgeValue<'a> {
+    Int(i64),
+    Float(f64),
+    Text(&'a str),
+}
+
+impl EdgeValue<'_> {
+    pub(crate) fn to_json(self) -> serde_json::Value {
+        match self {
+            Self::Int(value) => value.into(),
+            Self::Float(value) => value.into(),
+            Self::Text(value) => value.into(),
+        }
+    }
+}
+
+/// One end of an edge write: label, parameter name, id as given and parsed.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) struct Endpoint<'a> {
+    pub(crate) label: &'static str,
+    pub(crate) id: &'a str,
+    pub(crate) node: u64,
+}
+
+impl<'a> Endpoint<'a> {
+    fn parse(label: &'static str, field: &str, id: &'a str) -> Result<Self> {
+        Ok(Self { label, id, node: parse_node_id(field, id)? })
+    }
+}
+
+/// A validated edge: endpoints parsed, confidence checked and default properties applied,
+/// with the properties in the order of the single `Link*` method.
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) struct EdgeWrite<'a> {
+    pub(crate) label: &'static str,
+    pub(crate) from: Endpoint<'a>,
+    pub(crate) to: Endpoint<'a>,
+    pub(crate) properties: Vec<(&'static str, EdgeValue<'a>)>,
+}
+
+impl<'a> SpanEntityLink<'a> {
+    /// The validated edge.
+    pub(crate) fn edge(&self) -> Result<EdgeWrite<'a>> {
+        let confidence = validate_confidence(self.confidence)?;
+        Ok(EdgeWrite {
+            label: SPAN_REFERS_TO_ENTITY,
+            from: Endpoint::parse(SPAN, "span_id", self.span_id.as_str())?,
+            to: Endpoint::parse(ENTITY, "entity_id", self.entity_id.as_str())?,
+            properties: vec![
+                ("Confidence", EdgeValue::Float(confidence)),
+                ("Method", EdgeValue::Text(or_default(self.method, DEFAULT_SPAN_ENTITY_METHOD))),
+            ],
+        })
+    }
+}
+
+impl<'a> FactLink<'a> {
+    /// The fact the edge starts at.
+    #[must_use]
+    pub fn fact_id(&self) -> &'a FactId {
+        match *self {
+            Self::Document { fact_id, .. }
+            | Self::Entity { fact_id, .. }
+            | Self::Span { fact_id, .. } => fact_id,
+        }
+    }
+
+    /// The validated edge.
+    pub(crate) fn edge(&self) -> Result<EdgeWrite<'a>> {
+        let from = Endpoint::parse(FACT, "fact_id", self.fact_id().as_str())?;
+        Ok(match *self {
+            Self::Document { doc_id, page_number, section, .. } => EdgeWrite {
+                label: FACT_IN_DOCUMENT,
+                from,
+                to: Endpoint::parse(DOCUMENT, "doc_id", doc_id.as_str())?,
+                properties: vec![
+                    ("PageNumber", EdgeValue::Int(page_number)),
+                    ("Section", EdgeValue::Text(section)),
+                ],
+            },
+            Self::Entity { entity_id, role, .. } => EdgeWrite {
+                label: FACT_ABOUT_ENTITY,
+                from,
+                to: Endpoint::parse(ENTITY, "entity_id", entity_id.as_str())?,
+                properties: vec![(
+                    "Role",
+                    EdgeValue::Text(or_default(role, DEFAULT_FACT_ENTITY_ROLE)),
+                )],
+            },
+            Self::Span { span_id, role, confidence, .. } => {
+                let confidence = validate_confidence(confidence)?;
+                EdgeWrite {
+                    label: FACT_DERIVED_FROM_SPAN,
+                    from,
+                    to: Endpoint::parse(SPAN, "span_id", span_id.as_str())?,
+                    properties: vec![
+                        ("Role", EdgeValue::Text(or_default(role, DEFAULT_FACT_SPAN_ROLE))),
+                        ("Confidence", EdgeValue::Float(confidence)),
+                    ],
+                }
+            }
+        })
+    }
+}
+
 /// Parses a graph node id (`field` names the parameter in errors).
 ///
 /// # Errors
@@ -753,6 +912,38 @@ mod tests {
         assert_eq!(field_of(&parse_node_id("doc_id", "").expect_err("empty")), "doc_id");
         assert!(parse_node_id("doc_id", "-1").is_err());
         assert!(parse_node_id("doc_id", "abc").is_err());
+    }
+
+    #[test]
+    fn link_edges_validate_and_apply_defaults() {
+        let (span, entity, fact, doc) =
+            (SpanId::new("1"), EntityId::new("2"), FactId::new("3"), NodeId::new("4"));
+        let edge =
+            SpanEntityLink { span_id: &span, entity_id: &entity, confidence: 0.5, method: "" }
+                .edge()
+                .expect("valid");
+        assert_eq!((edge.label, edge.from.node, edge.to.node), (SPAN_REFERS_TO_ENTITY, 1, 2));
+        assert_eq!(
+            edge.properties,
+            vec![("Confidence", EdgeValue::Float(0.5)), ("Method", EdgeValue::Text("NER+ED"))]
+        );
+        let bad =
+            SpanEntityLink { span_id: &span, entity_id: &entity, confidence: 2.0, method: "" };
+        assert_eq!(field_of(&bad.edge().expect_err("confidence")), "confidence");
+
+        let link = FactLink::Entity { fact_id: &fact, entity_id: &entity, role: "" };
+        assert_eq!(link.fact_id(), &fact);
+        let edge = link.edge().expect("valid");
+        assert_eq!(edge.properties, vec![("Role", EdgeValue::Text("RELATED"))]);
+        let link = FactLink::Span { fact_id: &fact, span_id: &span, role: "", confidence: 1.0 };
+        let edge = link.edge().expect("valid");
+        assert_eq!(edge.properties[0], ("Role", EdgeValue::Text("SOURCE_SPAN")));
+        let missing = NodeId::new("x");
+        let link =
+            FactLink::Document { fact_id: &fact, doc_id: &missing, page_number: 1, section: "" };
+        assert_eq!(field_of(&link.edge().expect_err("doc id")), "doc_id");
+        let link = FactLink::Document { fact_id: &fact, doc_id: &doc, page_number: 1, section: "" };
+        assert_eq!(link.edge().expect("valid").to.label, DOCUMENT);
     }
 
     #[test]

@@ -13,6 +13,10 @@
 //! - Opening creates the vector and text indexes (idempotent) and waits up to
 //!   [`INDEX_BUILD_TIMEOUT`] for pending builds to activate, then reads or creates the
 //!   `StoreInfo` node holding the store id.
+//! - Chunk and embedding batches put up to `batch_size` items (the `helix.batch_size` config
+//!   value) into one transaction. Span, edge and fact batches are one transaction per call, so
+//!   a failed batch writes nothing and a caller's one-by-one retry cannot duplicate items.
+//!   Validation and endpoint lookups happen before the first write.
 //! - Every request is one transaction. Transaction conflicts (and index backpressure, which
 //!   the SDK marks retryable) are retried up to [`TRANSACTION_CONFLICT_ATTEMPTS`] times with
 //!   capped, jittered exponential backoff. A fenced or closed handle fails with
@@ -22,7 +26,7 @@
 //! which the embedded engine needs in debug builds) and blocks the calling thread on a
 //! channel, so it is safe to call from inside another async runtime as well.
 
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fs::{File, OpenOptions};
 use std::num::NonZeroUsize;
 use std::path::{Path, PathBuf};
@@ -40,13 +44,11 @@ use serde_json::{Map, Value};
 
 use crate::error::{Result, StoreError};
 use crate::graph::{
-    clamp_limit, merge_hits, node_properties, or_default, parse_node_id, query_names,
-    validate_confidence, validate_vector, ChunkNode, DocumentNode, EmbeddingWrite, EntityHit,
-    EntityNode, FactHit, FactNode, SearchHit, SpanNode, Stored, StoredChunk, StoredDocument,
-    StoredEntity, StoredFact, StoredSpan, VectorLabel, CHUNK_OF_DOCUMENT, DEFAULT_FACT_ENTITY_ROLE,
-    DEFAULT_FACT_SPAN_ROLE, DEFAULT_SPAN_ENTITY_METHOD, DOCUMENT, DOCUMENT_CHUNK,
-    EMBEDDING_PROPERTY, ENTITY, ENTITY_NAME_SEARCH_K, FACT, FACT_ABOUT_ENTITY,
-    FACT_DERIVED_FROM_SPAN, FACT_IN_DOCUMENT, SPAN, SPAN_OF_CHUNK, SPAN_REFERS_TO_ENTITY,
+    clamp_limit, merge_hits, node_properties, parse_node_id, query_names, validate_vector,
+    ChunkNode, DocumentNode, EdgeValue, EdgeWrite, EmbeddingWrite, EntityHit, EntityNode, FactHit,
+    FactLink, FactNode, SearchHit, SpanEntityLink, SpanNode, Stored, StoredChunk, StoredDocument,
+    StoredEntity, StoredFact, StoredSpan, VectorLabel, CHUNK_OF_DOCUMENT, DOCUMENT, DOCUMENT_CHUNK,
+    EMBEDDING_PROPERTY, ENTITY, ENTITY_NAME_SEARCH_K, FACT, FACT_ABOUT_ENTITY, SPAN, SPAN_OF_CHUNK,
     STORE_ID_PROPERTY, STORE_INFO, TEXT_INDEXES, VECTOR_INDEXED_LABELS,
 };
 use crate::store::GraphStore;
@@ -61,7 +63,7 @@ pub const TRANSACTION_CONFLICT_ATTEMPTS: u32 = 20;
 const CONFLICT_BACKOFF_BASE_S: f64 = 0.005;
 /// Largest conflict backoff, seconds.
 const CONFLICT_BACKOFF_CAP_S: f64 = 0.5;
-/// Items written per transaction by the batch methods.
+/// Default number of items written per transaction by the chunk and embedding batch methods.
 pub const BATCH_WRITE_SIZE: usize = 100;
 /// Stack size of the runtime's worker threads.
 const WORKER_STACK_BYTES: usize = 16 * 1024 * 1024;
@@ -115,6 +117,9 @@ pub struct HelixOptions {
     pub api_key: Option<String>,
     /// Dimension of the vector indexes.
     pub embedding_dim: usize,
+    /// Items per transaction of the chunk and embedding batch writes (at least 1). A database
+    /// already open in this process keeps the batch size it was opened with.
+    pub batch_size: usize,
 }
 
 impl HelixOptions {
@@ -127,6 +132,7 @@ impl HelixOptions {
             namespace: namespace.into(),
             api_key: None,
             embedding_dim,
+            batch_size: BATCH_WRITE_SIZE,
         }
     }
 
@@ -168,6 +174,7 @@ impl HelixOptions {
             namespace: config.namespace.clone(),
             api_key: Some(config.api_key.clone()).filter(|key| !key.is_empty()),
             embedding_dim: config.embedding_dim,
+            batch_size: config.batch_size.max(1),
         }
     }
 
@@ -217,6 +224,7 @@ static REGISTRY: LazyLock<Mutex<HashMap<RegistryKey, Weak<HelixStore>>>> =
 pub struct HelixStore {
     key: RegistryKey,
     embedding_dim: usize,
+    batch_size: usize,
     client: Client,
     runtime: Option<tokio::runtime::Runtime>,
     /// Set once the handle is closed or fenced; every later request fails with it.
@@ -227,6 +235,12 @@ pub struct HelixStore {
     warned_indexes: Mutex<BTreeSet<String>>,
     store_id: RwLock<String>,
     file_lock: Mutex<Option<File>>,
+    /// Test hook: write requests that still succeed before every later one fails.
+    #[cfg(test)]
+    writes_before_failure: std::sync::atomic::AtomicUsize,
+    /// Test hook: write requests sent.
+    #[cfg(test)]
+    writes_sent: std::sync::atomic::AtomicUsize,
 }
 
 impl std::fmt::Debug for HelixStore {
@@ -236,6 +250,7 @@ impl std::fmt::Debug for HelixStore {
             .field("location", &self.key.1)
             .field("namespace", &self.key.2)
             .field("embedding_dim", &self.embedding_dim)
+            .field("batch_size", &self.batch_size)
             .finish_non_exhaustive()
     }
 }
@@ -300,6 +315,7 @@ impl HelixStore {
         let store = Self {
             key,
             embedding_dim: dim.get(),
+            batch_size: options.batch_size.max(1),
             client,
             runtime: Some(runtime),
             lost: OnceLock::new(),
@@ -307,6 +323,10 @@ impl HelixStore {
             warned_indexes: Mutex::new(BTreeSet::new()),
             store_id: RwLock::new(String::new()),
             file_lock: Mutex::new(file_lock),
+            #[cfg(test)]
+            writes_before_failure: std::sync::atomic::AtomicUsize::new(usize::MAX),
+            #[cfg(test)]
+            writes_sent: std::sync::atomic::AtomicUsize::new(0),
         };
         let prepared = store.ensure_indexes(dim).and_then(|()| store.ensure_store_info());
         match prepared {
@@ -456,6 +476,18 @@ impl HelixStore {
     }
 
     fn write(&self, query: &str, batch: WriteBatch) -> Result<Map<String, Value>> {
+        #[cfg(test)]
+        {
+            use std::sync::atomic::Ordering::SeqCst;
+            self.writes_sent.fetch_add(1, SeqCst);
+            if self.writes_before_failure.try_update(SeqCst, SeqCst, |n| n.checked_sub(1)).is_err()
+            {
+                return Err(StoreError::Query {
+                    query: query.to_owned(),
+                    message: "injected write failure".to_owned(),
+                });
+            }
+        }
         object(self.execute(query, &QueryRequest::write(batch))?)
     }
 
@@ -674,36 +706,6 @@ impl HelixStore {
         Ok(())
     }
 
-    #[allow(clippy::too_many_arguments)]
-    fn link(
-        &self,
-        query: &str,
-        (from_label, from_field, from_id): (&'static str, &str, &str),
-        (to_label, to_field, to_id): (&'static str, &str, &str),
-        edge_label: &'static str,
-        edge_properties: Vec<(&'static str, PropertyValue)>,
-    ) -> Result<()> {
-        let from = parse_node_id(from_field, from_id)?;
-        let to = parse_node_id(to_field, to_id)?;
-        let result = self.write(
-            query,
-            write_batch()
-                .var_as("src", g().n(NodeRef::id(from)).has_label(from_label))
-                .var_as("dst", g().n(NodeRef::id(to)).has_label(to_label))
-                .var_as_if(
-                    "edge",
-                    BatchCondition::VarNotEmpty("dst".to_owned()),
-                    g().n(NodeRef::var("src"))
-                        .add_e(edge_label, NodeRef::var("dst"), edge_properties)
-                        .count(),
-                )
-                .returning(["src", "dst", "edge"]),
-        )?;
-        single(&result, "src", from_label, from_id)?;
-        single(&result, "dst", to_label, to_id)?;
-        Ok(())
-    }
-
     fn vector_search<T: DeserializeOwned, I: From<String>>(
         &self,
         query: &str,
@@ -794,6 +796,70 @@ impl HelixStore {
             .collect()
     }
 
+    /// Writes validated edges in one transaction after checking every endpoint.
+    fn add_edges(&self, query: &str, edges: &[EdgeWrite<'_>]) -> Result<usize> {
+        if edges.is_empty() {
+            return Ok(0);
+        }
+        let mut by_label: BTreeMap<&'static str, BTreeSet<u64>> = BTreeMap::new();
+        for edge in edges {
+            for end in [&edge.from, &edge.to] {
+                by_label.entry(end.label).or_default().insert(end.node);
+            }
+        }
+        let mut found: BTreeSet<(&'static str, u64)> = BTreeSet::new();
+        for (label, ids) in by_label {
+            let ids: Vec<u64> = ids.into_iter().collect();
+            found.extend(self.existing(query, label, &ids)?.into_iter().map(|id| (label, id)));
+        }
+        for edge in edges {
+            for end in [&edge.from, &edge.to] {
+                if !found.contains(&(end.label, end.node)) {
+                    return Err(StoreError::not_found(end.label, end.id));
+                }
+            }
+        }
+        let mut batch = write_batch();
+        let mut declared = BTreeSet::new();
+        for edge in edges {
+            for end in [&edge.from, &edge.to] {
+                if declared.insert(end.node) {
+                    batch = batch.var_as(
+                        &format!("n{}", end.node),
+                        g().n(NodeRef::id(end.node)).has_label(end.label),
+                    );
+                }
+            }
+        }
+        let mut names = Vec::with_capacity(edges.len());
+        for (index, edge) in edges.iter().enumerate() {
+            let name = format!("edge{index}");
+            let from = format!("n{}", edge.from.node);
+            let to = format!("n{}", edge.to.node);
+            let properties: Vec<(&'static str, PropertyValue)> =
+                edge.properties.iter().map(|(key, value)| (*key, property(*value))).collect();
+            batch = batch.var_as(
+                &name,
+                g().n(NodeRef::var(from.as_str()))
+                    .add_e(edge.label, NodeRef::var(to.as_str()), properties)
+                    .count(),
+            );
+            names.push(name);
+        }
+        let result = self.write(query, batch.returning(names))?;
+        // The transaction is committed: an edge whose endpoint vanished after the lookup is
+        // logged rather than failing the call, so a caller never rewrites the others.
+        let mut written = 0;
+        for (index, edge) in edges.iter().enumerate() {
+            if result.get(&format!("edge{index}")).and_then(Value::as_u64).unwrap_or(0) == 0 {
+                tracing::warn!(query, from = edge.from.id, to = edge.to.id, "edge not written");
+            } else {
+                written += 1;
+            }
+        }
+        Ok(written)
+    }
+
     fn runtime(&self) -> Result<&tokio::runtime::Runtime> {
         self.runtime.as_ref().ok_or_else(|| {
             StoreError::DatabaseLost(format!("Helix database {} was dropped", self.describe()))
@@ -848,14 +914,23 @@ fn acquire_lock(dir: &Path, namespace: &str) -> Result<File> {
         OpenOptions::new().read(true).write(true).create(true).truncate(false).open(&path)?;
     match fs4::FileExt::try_lock(&file) {
         Ok(()) => Ok(file),
-        Err(fs4::TryLockError::WouldBlock) => Err(StoreError::Connection(format!(
-            "Helix database lock {} is held by another process; an embedded database accepts \
-             one writer process at a time (stop the other process, use a different \
-             data_dir/namespace, or run a Helix server)",
-            path.display()
-        ))),
+        Err(fs4::TryLockError::WouldBlock) => {
+            Err(StoreError::Connection(locked_message(dir, namespace, &path)))
+        }
         Err(fs4::TryLockError::Error(error)) => Err(StoreError::Io(error)),
     }
+}
+
+/// Message of an embedded database whose lock file another process holds.
+fn locked_message(dir: &Path, namespace: &str, lock_path: &Path) -> String {
+    format!(
+        "Helix database `{namespace}` in data directory {} is locked: another impeach process \
+         holds it (lock file {} is held by another process). An embedded database accepts one \
+         writer process at a time: wait for or stop the other process, set helix.data_dir or \
+         helix.namespace to another database, or set helix.mode: server to share a Helix server",
+        dir.display(),
+        lock_path.display()
+    )
 }
 
 fn open_client(
@@ -979,6 +1054,14 @@ fn decode<I: From<String>, T: DeserializeOwned>(row: &Value) -> Result<Stored<I,
     let node = serde_json::from_value(Value::Object(properties))
         .map_err(|error| malformed(format!("cannot decode node {id}: {error}")))?;
     Ok(Stored { id: I::from(id), node })
+}
+
+fn property(value: EdgeValue<'_>) -> PropertyValue {
+    match value {
+        EdgeValue::Int(value) => value.into(),
+        EdgeValue::Float(value) => value.into(),
+        EdgeValue::Text(value) => value.into(),
+    }
 }
 
 fn document_properties(document: &DocumentNode) -> Vec<(&'static str, PropertyValue)> {
@@ -1189,17 +1272,8 @@ impl GraphStore for HelixStore {
         confidence: f64,
         method: &str,
     ) -> Result<()> {
-        let confidence = validate_confidence(confidence)?;
-        self.link(
-            query_names::LINK_SPAN_TO_ENTITY,
-            (SPAN, "span_id", span_id.as_str()),
-            (ENTITY, "entity_id", entity_id.as_str()),
-            SPAN_REFERS_TO_ENTITY,
-            vec![
-                ("Confidence", confidence.into()),
-                ("Method", or_default(method, DEFAULT_SPAN_ENTITY_METHOD).into()),
-            ],
-        )
+        let link = SpanEntityLink { span_id, entity_id, confidence, method };
+        self.add_edges(query_names::LINK_SPAN_TO_ENTITY, &[link.edge()?]).map(drop)
     }
 
     fn create_fact(&self, fact: &FactNode) -> Result<StoredFact> {
@@ -1223,13 +1297,8 @@ impl GraphStore for HelixStore {
         page_number: i64,
         section: &str,
     ) -> Result<()> {
-        self.link(
-            query_names::LINK_FACT_TO_DOCUMENT,
-            (FACT, "fact_id", fact_id.as_str()),
-            (DOCUMENT, "doc_id", doc_id.as_str()),
-            FACT_IN_DOCUMENT,
-            vec![("PageNumber", page_number.into()), ("Section", section.into())],
-        )
+        let link = FactLink::Document { fact_id, doc_id, page_number, section };
+        self.add_edges(query_names::LINK_FACT_TO_DOCUMENT, &[link.edge()?]).map(drop)
     }
 
     fn link_fact_to_entity(
@@ -1238,13 +1307,8 @@ impl GraphStore for HelixStore {
         entity_id: &EntityId,
         role: &str,
     ) -> Result<()> {
-        self.link(
-            query_names::LINK_FACT_TO_ENTITY,
-            (FACT, "fact_id", fact_id.as_str()),
-            (ENTITY, "entity_id", entity_id.as_str()),
-            FACT_ABOUT_ENTITY,
-            vec![("Role", or_default(role, DEFAULT_FACT_ENTITY_ROLE).into())],
-        )
+        let link = FactLink::Entity { fact_id, entity_id, role };
+        self.add_edges(query_names::LINK_FACT_TO_ENTITY, &[link.edge()?]).map(drop)
     }
 
     fn link_fact_to_span(
@@ -1254,17 +1318,8 @@ impl GraphStore for HelixStore {
         role: &str,
         confidence: f64,
     ) -> Result<()> {
-        let confidence = validate_confidence(confidence)?;
-        self.link(
-            query_names::LINK_FACT_TO_SPAN,
-            (FACT, "fact_id", fact_id.as_str()),
-            (SPAN, "span_id", span_id.as_str()),
-            FACT_DERIVED_FROM_SPAN,
-            vec![
-                ("Role", or_default(role, DEFAULT_FACT_SPAN_ROLE).into()),
-                ("Confidence", confidence.into()),
-            ],
-        )
+        let link = FactLink::Span { fact_id, span_id, role, confidence };
+        self.add_edges(query_names::LINK_FACT_TO_SPAN, &[link.edge()?]).map(drop)
     }
 
     fn get_entity_facts(&self, entity_id: &EntityId) -> Result<Vec<StoredFact>> {
@@ -1330,7 +1385,7 @@ impl GraphStore for HelixStore {
     ) -> Result<Vec<StoredChunk>> {
         let parent = parse_node_id("doc_id", doc_id.as_str())?;
         let mut stored = Vec::with_capacity(chunks.len());
-        for group in chunks.chunks(BATCH_WRITE_SIZE) {
+        for group in chunks.chunks(self.batch_size) {
             let mut batch =
                 write_batch().var_as("parent", g().n(NodeRef::id(parent)).has_label(DOCUMENT));
             let mut names = vec!["parent".to_owned()];
@@ -1397,42 +1452,37 @@ impl GraphStore for HelixStore {
         if let Some(missing) = spans.iter().zip(&parents).find(|(_, id)| !found.contains(id)) {
             return Err(StoreError::not_found(DOCUMENT_CHUNK, missing.0.chunk_id.as_str()));
         }
+        if spans.is_empty() {
+            return Ok(Vec::new());
+        }
+        let mut batch = write_batch();
+        let mut names = Vec::new();
+        for parent in &distinct {
+            let var = format!("parent{parent}");
+            batch = batch.var_as(&var, g().n(NodeRef::id(*parent)).has_label(DOCUMENT_CHUNK));
+            names.push(var);
+        }
+        for (index, (span, parent)) in spans.iter().zip(&parents).enumerate() {
+            batch = add_child(
+                batch,
+                &format!("parent{parent}"),
+                index,
+                SPAN,
+                span_properties(span, *parent),
+                SPAN_OF_CHUNK,
+                vec![("SequenceNumber", span.start_char.into())],
+            );
+            names.push(format!("props{index}"));
+        }
+        let result = self.write("CreateSpansBatch", batch.returning(names))?;
         let mut stored = Vec::with_capacity(spans.len());
-        for (group, group_parents) in
-            spans.chunks(BATCH_WRITE_SIZE).zip(parents.chunks(BATCH_WRITE_SIZE))
-        {
-            let mut batch = write_batch();
-            let mut names = Vec::new();
-            let mut declared = BTreeSet::new();
-            for parent in group_parents {
-                if declared.insert(*parent) {
-                    let var = format!("parent{parent}");
-                    batch =
-                        batch.var_as(&var, g().n(NodeRef::id(*parent)).has_label(DOCUMENT_CHUNK));
-                    names.push(var);
-                }
-            }
-            for (index, (span, parent)) in group.iter().zip(group_parents).enumerate() {
-                batch = add_child(
-                    batch,
-                    &format!("parent{parent}"),
-                    index,
-                    SPAN,
-                    span_properties(span, *parent),
-                    SPAN_OF_CHUNK,
-                    vec![("SequenceNumber", span.start_char.into())],
-                );
-                names.push(format!("props{index}"));
-            }
-            let result = self.write("CreateSpansBatch", batch.returning(names))?;
-            for (index, span) in group.iter().enumerate() {
-                stored.push(decode(single(
-                    &result,
-                    &format!("props{index}"),
-                    DOCUMENT_CHUNK,
-                    span.chunk_id.as_str(),
-                )?)?);
-            }
+        for (index, span) in spans.iter().enumerate() {
+            stored.push(decode(single(
+                &result,
+                &format!("props{index}"),
+                DOCUMENT_CHUNK,
+                span.chunk_id.as_str(),
+            )?)?);
         }
         Ok(stored)
     }
@@ -1451,7 +1501,7 @@ impl GraphStore for HelixStore {
         if let Some(missing) = items.iter().zip(&ids).find(|(_, id)| !found.contains(id)) {
             return Err(StoreError::not_found(label.as_str(), missing.0.node_id));
         }
-        for (group, group_ids) in items.chunks(BATCH_WRITE_SIZE).zip(ids.chunks(BATCH_WRITE_SIZE)) {
+        for (group, group_ids) in items.chunks(self.batch_size).zip(ids.chunks(self.batch_size)) {
             let mut batch = write_batch();
             let mut names = Vec::new();
             for (index, (item, id)) in group.iter().zip(group_ids).enumerate() {
@@ -1471,6 +1521,51 @@ impl GraphStore for HelixStore {
             }
         }
         Ok(items.len())
+    }
+
+    fn create_entity_with_embedding(
+        &self,
+        entity: &EntityNode,
+        embedding: &[f32],
+    ) -> Result<StoredEntity> {
+        let entity = entity.validated()?;
+        validate_vector(embedding, self.embedding_dim)?;
+        let mut properties = entity_properties(&entity);
+        properties.push((EMBEDDING_PROPERTY, PropertyValue::from(embedding.to_vec())));
+        self.create_node("CreateEntityWithEmbedding", ENTITY, properties)
+    }
+
+    fn link_spans_to_entities_batch(&self, links: &[SpanEntityLink<'_>]) -> Result<usize> {
+        let edges = links.iter().map(SpanEntityLink::edge).collect::<Result<Vec<_>>>()?;
+        self.add_edges("LinkSpansToEntitiesBatch", &edges)
+    }
+
+    fn create_facts_batch(&self, facts: &[FactNode]) -> Result<Vec<StoredFact>> {
+        for fact in facts {
+            fact.validate()?;
+        }
+        if facts.is_empty() {
+            return Ok(Vec::new());
+        }
+        let mut batch = write_batch();
+        let mut names = Vec::with_capacity(facts.len());
+        for (index, fact) in facts.iter().enumerate() {
+            let name = format!("node{index}");
+            batch = batch.var_as(
+                &name,
+                g().add_n(FACT, fact_properties(fact)).value_map(Some(fields(FACT))),
+            );
+            names.push(name);
+        }
+        let result = self.write("CreateFactsBatch", batch.returning(names))?;
+        (0..facts.len())
+            .map(|index| decode(single(&result, &format!("node{index}"), FACT, "(new)")?))
+            .collect()
+    }
+
+    fn link_facts_batch(&self, links: &[FactLink<'_>]) -> Result<usize> {
+        let edges = links.iter().map(FactLink::edge).collect::<Result<Vec<_>>>()?;
+        self.add_edges("LinkFactsBatch", &edges)
     }
 }
 
@@ -1524,6 +1619,99 @@ mod tests {
         assert_eq!(stored.node.name, "Acme");
         assert_eq!(stored.node.aliases_json, "[]");
         assert!(decode::<EntityId, EntityNode>(&serde_json::json!({"Name": "x"})).is_err());
+    }
+
+    /// Edges of `label` leaving node `from`, counting duplicates.
+    fn out_edges(store: &HelixStore, from: &str, label: &'static str) -> u64 {
+        let id = parse_node_id("from", from).expect("node id");
+        let result = store
+            .read(
+                "CountEdges",
+                read_batch()
+                    .var_as("count", g().n(NodeRef::id(id)).out(Some(label)).count())
+                    .returning(["count"]),
+            )
+            .expect("count edges");
+        result.get("count").and_then(Value::as_u64).expect("edge count")
+    }
+
+    #[test]
+    fn batches_are_one_transaction_and_a_failed_batch_writes_nothing() {
+        use std::sync::atomic::Ordering::SeqCst;
+
+        use crate::graph::{FACT_ABOUT_ENTITY, SPAN_REFERS_TO_ENTITY};
+
+        let namespace = format!("atomic-batches-{}", std::process::id());
+        // Batch size 1: grouped writes would commit every item in its own transaction.
+        let options = HelixOptions { batch_size: 1, ..HelixOptions::memory(namespace, 4) };
+        let store = HelixStore::open(&options).expect("in-memory Helix database opens");
+        let doc = store.create_document(&DocumentNode::default()).expect("document");
+        let chunk = store
+            .create_document_chunk(&doc.id, &ChunkNode { text: "t".into(), ..ChunkNode::default() })
+            .expect("chunk");
+        let entities: Vec<EntityId> = ["One", "Two", "Three"]
+            .iter()
+            .map(|name| store.create_entity(&EntityNode::new(*name, "ORG")).expect("entity").id)
+            .collect();
+        let span_nodes: Vec<SpanNode> = (0..3)
+            .map(|i| SpanNode {
+                doc_id: doc.id.clone(),
+                chunk_id: chunk.id.clone(),
+                start_char: i * 10,
+                ..SpanNode::default()
+            })
+            .collect();
+
+        // A failure injected after the first write request would hit a later group of a split
+        // batch; one transaction per call never reaches it.
+        store.writes_before_failure.store(1, SeqCst);
+        let sent = store.writes_sent.load(SeqCst);
+        let spans = store.create_spans_batch(&span_nodes).expect("spans in one transaction");
+        assert_eq!(store.writes_sent.load(SeqCst) - sent, 1);
+
+        // Every later write fails: the batches write nothing.
+        let facts: Vec<FactNode> =
+            (0..3).map(|i| FactNode::new(format!("zebra fact {i}"), "{}", "{}", 0.9)).collect();
+        assert!(store.create_facts_batch(&facts).is_err());
+        let links: Vec<SpanEntityLink<'_>> = spans
+            .iter()
+            .zip(&entities)
+            .map(|(span, entity)| SpanEntityLink {
+                span_id: &span.id,
+                entity_id: entity,
+                confidence: 0.85,
+                method: "",
+            })
+            .collect();
+        assert!(store.link_spans_to_entities_batch(&links).is_err());
+        assert!(store.find_facts_by_text("zebra", 10).expect("search").is_empty());
+        for span in &spans {
+            assert_eq!(out_edges(&store, span.id.as_str(), SPAN_REFERS_TO_ENTITY), 0);
+        }
+
+        // The callers' one-by-one fallback then writes each item exactly once.
+        store.writes_before_failure.store(usize::MAX, SeqCst);
+        let fact = store.create_fact(&facts[0]).expect("fact");
+        for link in &links {
+            store
+                .link_span_to_entity(link.span_id, link.entity_id, link.confidence, link.method)
+                .expect("link");
+        }
+        for span in &spans {
+            assert_eq!(out_edges(&store, span.id.as_str(), SPAN_REFERS_TO_ENTITY), 1);
+        }
+        let fact_links: Vec<FactLink<'_>> = entities
+            .iter()
+            .map(|entity_id| FactLink::Entity { fact_id: &fact.id, entity_id, role: "" })
+            .collect();
+        store.writes_before_failure.store(0, SeqCst);
+        assert!(store.link_facts_batch(&fact_links).is_err());
+        assert_eq!(out_edges(&store, fact.id.as_str(), FACT_ABOUT_ENTITY), 0);
+        store.writes_before_failure.store(usize::MAX, SeqCst);
+        assert_eq!(store.link_facts_batch(&fact_links).expect("fact links"), 3);
+        assert_eq!(out_edges(&store, fact.id.as_str(), FACT_ABOUT_ENTITY), 3);
+        let hits = store.find_facts_by_text("zebra", 10).expect("search");
+        assert_eq!(hits.len(), 1, "one fact, written once");
     }
 
     #[test]
