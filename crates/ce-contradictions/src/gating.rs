@@ -5,24 +5,23 @@
 //!   then a pair passes when any trigger fires: shared entity anchor (+2.0), semantic
 //!   proximity (embedding cosine >= `semantic_proximity_threshold`, + 1.5 * cosine) or keyword
 //!   overlap (token Jaccard >= `keyword_overlap_threshold`, + overlap). Priority:
-//!   `relevance_score * (1 + triggers)`, sorted stable descending.
+//!   `relevance_score * (1 + triggers)`, sorted stable descending. Fact-text embeddings come
+//!   from the pre-filter (its embedder and cache); without an embedder the semantic trigger
+//!   never fires.
 //!
 //! The shared-entity trigger reads the `candidate_entity_map` built by
 //! [`crate::SimilarFactRetriever::candidate_entity_map`] (Python always passed an empty map, so
 //! the trigger never fired).
 
-use std::collections::{HashMap, HashSet};
-use std::fmt;
-use std::sync::{Arc, Mutex};
+use std::collections::HashSet;
+use std::sync::Arc;
 
 use ce_config::pipeline::{GatingStrategy, VerificationStrategyConfig};
-use ce_core::util::lock;
 use ce_core::{EntityId, ExtractedFact, RetrievedFact, ValueType};
-use ce_models::Embedder;
 use serde_json::Value;
 
 use crate::nli_context::py_truthy;
-use crate::prefilter::{cosine_similarity, CandidateEntityMap, FactPairPreFilter, ScoredCandidate};
+use crate::prefilter::{CandidateEntityMap, FactPairPreFilter, ScoredCandidate};
 
 /// Value types that pair with any other when `allow_text_value_type_mismatch` is set.
 const WILDCARD_VALUE_TYPES: [&str; 2] = ["TEXT", "UNKNOWN"];
@@ -34,34 +33,18 @@ const SHARED_ENTITY_TRIGGER: f64 = 2.0;
 const SEMANTIC_TRIGGER_WEIGHT: f64 = 1.5;
 
 /// Gating over the configured strategy.
+#[derive(Debug)]
 pub struct ContradictionGating {
     config: VerificationStrategyConfig,
-    embedder: Option<Arc<dyn Embedder>>,
     prefilter: Arc<FactPairPreFilter>,
-    /// Fact-text embeddings (`None` caches a failure).
-    embedding_cache: Mutex<HashMap<String, Option<Vec<f32>>>>,
-}
-
-impl fmt::Debug for ContradictionGating {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("ContradictionGating")
-            .field("config", &self.config)
-            .field("embedder", &self.embedder.as_ref().map(|e| e.model_name().to_owned()))
-            .field("prefilter", &self.prefilter)
-            .finish_non_exhaustive()
-    }
 }
 
 impl ContradictionGating {
-    /// Gating with `config`; `embedder` enables the semantic proximity trigger; `prefilter`
-    /// serves the `dual_path` strategy and type normalisation.
+    /// Gating with `config`; `prefilter` serves the `dual_path` strategy, type normalisation
+    /// and fact-text embeddings (its embedder enables the semantic proximity trigger).
     #[must_use]
-    pub fn new(
-        config: VerificationStrategyConfig,
-        embedder: Option<Arc<dyn Embedder>>,
-        prefilter: Arc<FactPairPreFilter>,
-    ) -> Self {
-        Self { config, embedder, prefilter, embedding_cache: Mutex::new(HashMap::new()) }
+    pub fn new(config: VerificationStrategyConfig, prefilter: Arc<FactPairPreFilter>) -> Self {
+        Self { config, prefilter }
     }
 
     /// The verification settings.
@@ -160,8 +143,9 @@ impl ContradictionGating {
         if shares_entity {
             trigger_score += SHARED_ENTITY_TRIGGER;
         }
-        if self.embedder.is_some() {
-            let similarity = self.semantic_similarity(&new_fact.text, &candidate.fact_text);
+        if self.prefilter.embedder().is_some() {
+            let similarity =
+                self.prefilter.text_embedding_similarity(&new_fact.text, &candidate.fact_text);
             if similarity >= self.config.semantic_proximity_threshold {
                 trigger_score += similarity * SEMANTIC_TRIGGER_WEIGHT;
             }
@@ -175,33 +159,5 @@ impl ContradictionGating {
             return 0.0;
         }
         candidate.relevance_score * (1.0 + trigger_score)
-    }
-
-    /// Embedding cosine of two texts; 0.0 for empty texts or failed embeddings.
-    fn semantic_similarity(&self, a: &str, b: &str) -> f64 {
-        if a.is_empty() || b.is_empty() {
-            return 0.0;
-        }
-        match (self.cached_embedding(a), self.cached_embedding(b)) {
-            (Some(ea), Some(eb)) => cosine_similarity(&ea, &eb),
-            _ => 0.0,
-        }
-    }
-
-    /// The embedding of `text`, computed once (failures are cached as `None`).
-    fn cached_embedding(&self, text: &str) -> Option<Vec<f32>> {
-        if let Some(cached) = lock(&self.embedding_cache).get(text) {
-            return cached.clone();
-        }
-        let embedder = self.embedder.as_ref()?;
-        let embedding = match embedder.embed(&[text]) {
-            Ok(vectors) => vectors.into_iter().next(),
-            Err(error) => {
-                tracing::debug!("Failed to compute embedding: {error}");
-                None
-            }
-        };
-        lock(&self.embedding_cache).insert(text.to_owned(), embedding.clone());
-        embedding
     }
 }

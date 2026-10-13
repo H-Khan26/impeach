@@ -10,7 +10,12 @@
 //!
 //! Each source fails on its own: a non-fatal store error or an embedding failure is logged
 //! and that source (or that entity) contributes nothing; fatal store errors propagate.
+//!
+//! Graph lookups (facts of an entity, entities of a fact) go through a [`GraphLookupCache`]
+//! owned by the caller for one contradiction check, during which the graph is not written.
 
+use std::collections::hash_map::Entry;
+use std::collections::HashMap;
 use std::fmt;
 use std::sync::Arc;
 
@@ -56,6 +61,16 @@ impl fmt::Debug for SimilarFactRetriever {
 /// Candidates by fact id in insertion order.
 type Candidates = IndexMap<FactId, RetrievedFact>;
 
+/// Graph lookups memoised for the duration of one contradiction check. Only successful
+/// lookups are kept; a recovered store failure is retried on the next lookup.
+#[derive(Debug, Default)]
+pub struct GraphLookupCache {
+    /// Facts linked to an entity, as retrieved facts without sources.
+    entity_facts: HashMap<EntityId, Vec<RetrievedFact>>,
+    /// Entities a fact is linked to.
+    fact_entities: HashMap<FactId, Vec<EntityId>>,
+}
+
 impl SimilarFactRetriever {
     /// A retriever over `store`, embedding queries with `embedder`.
     #[must_use]
@@ -73,8 +88,9 @@ impl SimilarFactRetriever {
         &self.config
     }
 
-    /// Candidates for `new_fact`: graph hits for each of `entity_ids`, then BM25 / vector hits
-    /// for its text, minus `exclude_fact_ids`, ranked and capped (module docs).
+    /// Candidates for `new_fact`: graph hits for each of `entity_ids` (memoised in `cache`),
+    /// then BM25 / vector hits for its text, minus `exclude_fact_ids`, ranked and capped
+    /// (module docs).
     ///
     /// # Errors
     /// [`crate::ContradictionError::Store`] for a fatal store error; other store and embedding
@@ -84,24 +100,19 @@ impl SimilarFactRetriever {
         new_fact: &ExtractedFact,
         entity_ids: &[EntityId],
         exclude_fact_ids: &[FactId],
+        cache: &mut GraphLookupCache,
     ) -> Result<Vec<RetrievedFact>> {
         let mut candidates = Candidates::new();
-        let mut add = |facts: Vec<StoredFact>, source: &str| {
-            for stored in &facts {
-                let Some(fact) = retrieved_fact_from_node(stored) else { continue };
-                if exclude_fact_ids.contains(&fact.fact_id) {
-                    continue;
+        let mut add = |facts: &[RetrievedFact], source: &str| {
+            for fact in facts {
+                if !exclude_fact_ids.contains(&fact.fact_id) {
+                    add_candidate(&mut candidates, fact, source);
                 }
-                add_candidate(&mut candidates, fact, source);
             }
         };
 
         for entity_id in entity_ids {
-            let facts = recover(
-                self.store.get_entity_facts(entity_id),
-                &format!("Failed to get facts for entity {entity_id}"),
-            )?;
-            add(facts, SOURCE_GRAPH);
+            add(self.entity_facts(entity_id, cache)?, SOURCE_GRAPH);
         }
 
         let strategy = self.config.fact_retrieval_strategy;
@@ -110,7 +121,7 @@ impl SimilarFactRetriever {
                 self.store.find_facts_by_text(&new_fact.text, self.config.bm25_limit),
                 "BM25 search failed",
             )?;
-            add(hits.into_iter().map(|hit| hit.node).collect(), SOURCE_BM25);
+            add(&nodes_to_facts(hits.iter().map(|hit| &hit.node)), SOURCE_BM25);
         }
 
         if matches!(strategy, FactRetrievalStrategy::Vector | FactRetrievalStrategy::Both) {
@@ -119,7 +130,7 @@ impl SimilarFactRetriever {
                     self.store.find_similar_facts(&vector, self.config.vector_limit),
                     "Vector search failed",
                 )?;
-                add(hits.into_iter().map(|hit| hit.node).collect(), SOURCE_VECTOR);
+                add(&nodes_to_facts(hits.iter().map(|hit| &hit.node)), SOURCE_VECTOR);
             }
         }
 
@@ -127,25 +138,56 @@ impl SimilarFactRetriever {
     }
 
     /// Entity ids each candidate is linked to by `FactAboutEntity` edges
-    /// ([`GraphStore::get_fact_entities`]), keyed by candidate fact id in candidate order.
-    /// Candidates without links are omitted. This is the `candidate_entity_map` the gating
-    /// receives (Python always passed an empty map).
+    /// ([`GraphStore::get_fact_entities`], memoised in `cache`), keyed by candidate fact id in
+    /// candidate order. Candidates without links are omitted. This is the
+    /// `candidate_entity_map` the gating receives (Python always passed an empty map).
     ///
     /// # Errors
     /// [`crate::ContradictionError::Store`] for a fatal store error; other failures are
     /// logged and leave that candidate out.
-    pub fn candidate_entity_map(&self, candidates: &[RetrievedFact]) -> Result<CandidateEntityMap> {
+    pub fn candidate_entity_map(
+        &self,
+        candidates: &[RetrievedFact],
+        cache: &mut GraphLookupCache,
+    ) -> Result<CandidateEntityMap> {
         let mut map = CandidateEntityMap::new();
         for candidate in candidates {
-            let entities = recover(
-                self.store.get_fact_entities(&candidate.fact_id),
-                &format!("Failed to get entities for fact {}", candidate.fact_id),
-            )?;
+            let entities = match cache.fact_entities.entry(candidate.fact_id.clone()) {
+                Entry::Occupied(entry) => entry.into_mut(),
+                Entry::Vacant(entry) => match self.store.get_fact_entities(&candidate.fact_id) {
+                    Ok(entities) => entry.insert(entities),
+                    Err(error) => {
+                        let context =
+                            format!("Failed to get entities for fact {}", candidate.fact_id);
+                        skip_error(error, &context)?;
+                        continue;
+                    }
+                },
+            };
             if !entities.is_empty() {
-                map.insert(candidate.fact_id.clone(), entities);
+                map.insert(candidate.fact_id.clone(), entities.clone());
             }
         }
         Ok(map)
+    }
+
+    /// The facts linked to `entity_id`, fetched once per `cache`; empty (logged, not cached)
+    /// for a non-fatal store error.
+    fn entity_facts<'c>(
+        &self,
+        entity_id: &EntityId,
+        cache: &'c mut GraphLookupCache,
+    ) -> Result<&'c [RetrievedFact]> {
+        match cache.entity_facts.entry(entity_id.clone()) {
+            Entry::Occupied(entry) => Ok(entry.into_mut()),
+            Entry::Vacant(entry) => match self.store.get_entity_facts(entity_id) {
+                Ok(stored) => Ok(entry.insert(nodes_to_facts(stored.iter()))),
+                Err(error) => {
+                    skip_error(error, &format!("Failed to get facts for entity {entity_id}"))?;
+                    Ok(&[])
+                }
+            },
+        }
     }
 
     /// The query embedding of `text`; `None` (logged) when embedding fails or returns nothing.
@@ -184,27 +226,35 @@ impl SimilarFactRetriever {
 }
 
 /// Inserts `fact` found by `source`, or records `source` on the existing candidate.
-fn add_candidate(candidates: &mut Candidates, mut fact: RetrievedFact, source: &str) {
+fn add_candidate(candidates: &mut Candidates, fact: &RetrievedFact, source: &str) {
     if let Some(existing) = candidates.get_mut(&fact.fact_id) {
         if !existing.sources.iter().any(|s| s == source) {
             existing.sources.push(source.to_owned());
         }
         return;
     }
+    let mut fact = fact.clone();
     fact.sources = vec![source.to_owned()];
     candidates.insert(fact.fact_id.clone(), fact);
 }
 
+/// Stored fact nodes as retrieved facts, skipping nodes without text.
+fn nodes_to_facts<'a>(nodes: impl Iterator<Item = &'a StoredFact>) -> Vec<RetrievedFact> {
+    nodes.filter_map(retrieved_fact_from_node).collect()
+}
+
 /// The store result, or an empty list (logged) for a non-fatal store error.
 fn recover<T>(result: std::result::Result<Vec<T>, StoreError>, context: &str) -> Result<Vec<T>> {
-    match result {
-        Ok(items) => Ok(items),
-        Err(error) if error.is_fatal() => Err(error.into()),
-        Err(error) => {
-            tracing::warn!("{context}: {error}");
-            Ok(Vec::new())
-        }
+    result.or_else(|error| skip_error(error, context).map(|()| Vec::new()))
+}
+
+/// Propagates a fatal store error; logs any other.
+fn skip_error(error: StoreError, context: &str) -> Result<()> {
+    if error.is_fatal() {
+        return Err(error.into());
     }
+    tracing::warn!("{context}: {error}");
+    Ok(())
 }
 
 /// A stored fact node as a [`RetrievedFact`] with no sources and score 0.0: the parsed

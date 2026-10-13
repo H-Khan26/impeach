@@ -28,7 +28,9 @@
 //! Judge calls are batched: all passing pairs of one fact (cross-document) and all passing
 //! pairs of the document (intra-document) go to the judge in one
 //! [`ContradictionJudge::judge_batch`] call each; results keep pair order. Facts are keyed by
-//! their position in the input, so facts sharing an extraction id stay distinct.
+//! their position in the input, so facts sharing an extraction id stay distinct. Graph
+//! lookups of the cross-document phase (facts of an entity, entities of a candidate) are
+//! memoised for the check in a [`GraphLookupCache`].
 //!
 //! [`ContradictionCheckService::check_facts_excluding`] additionally excludes graph facts of
 //! this document that are already in the store (written by a fact stage that commits): they
@@ -59,7 +61,7 @@ use crate::intra_doc::{IntraDocFilter, IntraDocOutcome};
 use crate::judge::{ContradictionJudge, JudgeVerdict};
 use crate::nli_context::NliContextBuilder;
 use crate::prefilter::{FactPairPreFilter, ScoredCandidate};
-use crate::retrieval::SimilarFactRetriever;
+use crate::retrieval::{GraphLookupCache, SimilarFactRetriever};
 
 /// Retrieval source and contradiction source name of intra-document pairs.
 const INTRA_DOCUMENT: &str = "intra_document";
@@ -177,11 +179,7 @@ impl ContradictionCheckService {
             mappings,
         ));
         let gating = verification.as_ref().map(|verification| {
-            ContradictionGating::new(
-                verification.clone(),
-                Some(Arc::clone(&embedder)),
-                Arc::clone(&prefilter),
-            )
+            ContradictionGating::new(verification.clone(), Arc::clone(&prefilter))
         });
         let intra_filter = IntraDocFilter::new(config.intra_doc_filter.clone());
         let indexer = FactIndexer::new(Arc::clone(&store), Arc::clone(&embedder));
@@ -276,12 +274,15 @@ impl ContradictionCheckService {
         };
 
         // Phase 2: cross-document.
+        // The graph is not written before phase 3, so its lookups are memoised across facts.
+        let mut lookups = GraphLookupCache::default();
         let mut clean_after_cross: Vec<usize> = Vec::with_capacity(clean_after_intra.len());
         for &index in &clean_after_intra {
             let result = self.check_single_fact_cross_doc(
                 &facts[index],
                 entity_ids,
                 exclude_fact_ids,
+                &mut lookups,
                 &mut report.debug_trace,
             )?;
             report.total_candidates_retrieved += stat(&result, "total_candidates");
@@ -501,13 +502,12 @@ impl ContradictionCheckService {
             {
                 continue;
             }
-            let (lower, higher) =
-                if facts[second].id < facts[first].id { (second, first) } else { (first, second) };
+            // Candidate pairs already put the lower fact id first.
             let mut pair = ContradictionPair::new(
-                facts[lower].text.clone(),
-                facts[lower].id.clone(),
-                facts[higher].id.clone(),
-                facts[higher].text.clone(),
+                facts[first].text.clone(),
+                facts[first].id.clone(),
+                facts[second].id.clone(),
+                facts[second].text.clone(),
                 verdict.label,
                 verdict.confidence,
             );
@@ -582,6 +582,7 @@ impl ContradictionCheckService {
         fact: &ExtractedFact,
         document_entity_ids: &[EntityId],
         exclude_fact_ids: &[FactId],
+        lookups: &mut GraphLookupCache,
         debug_trace: &mut Vec<Metadata>,
     ) -> Result<FactContradictionResult> {
         let mut per_fact: Vec<EntityId> = Vec::with_capacity(2);
@@ -597,7 +598,7 @@ impl ContradictionCheckService {
             if per_fact.is_empty() { document_entity_ids } else { &per_fact };
 
         let candidates =
-            self.retriever.retrieve_similar_facts(fact, entity_ids, exclude_fact_ids)?;
+            self.retriever.retrieve_similar_facts(fact, entity_ids, exclude_fact_ids, lookups)?;
         let mut stats =
             CrossDocStats { total_candidates: candidates.len(), ..CrossDocStats::default() };
         if candidates.is_empty() {
@@ -605,7 +606,7 @@ impl ContradictionCheckService {
             return Ok(stats.result(fact.clone(), ContradictionStatus::Clean, Vec::new()));
         }
 
-        let candidate_entity_map = self.retriever.candidate_entity_map(&candidates)?;
+        let candidate_entity_map = self.retriever.candidate_entity_map(&candidates, lookups)?;
         let filtered: Vec<ScoredCandidate<'_>> = match &self.gating {
             Some(gating) => {
                 gating.filter_pairs(fact, &candidates, entity_ids, &candidate_entity_map)

@@ -157,7 +157,7 @@ impl ContradictionStage {
         }
         let resolved = match (self.verification(), &self.judge_prompt) {
             (Some(verification), Some(prompt)) if verification.judge_model == JudgeModel::Qwen => {
-                self.llm_judge(registry, prompt, verification.qwen_batch_size).or_else(|| {
+                self.llm_judge(registry, prompt).or_else(|| {
                     tracing::warn!(
                         "ContradictionCheckStage: Qwen judge requested but Ollama service not \
                          available. Falling back to NLI."
@@ -190,7 +190,6 @@ impl ContradictionStage {
         &self,
         registry: &ModelRegistry,
         prompt: &JudgePrompt,
-        batch_size: usize,
     ) -> Option<Arc<dyn ContradictionJudge>> {
         let key = format!("{}_ollama", self.pipeline_name);
         let llm = registry.llm(&key).or_else(|error| {
@@ -202,9 +201,8 @@ impl ContradictionStage {
                 );
             })
         });
-        llm.ok().map(|llm| {
-            Arc::new(LlmJudge::new(llm, prompt.clone(), batch_size)) as Arc<dyn ContradictionJudge>
-        })
+        llm.ok()
+            .map(|llm| Arc::new(LlmJudge::new(llm, prompt.clone())) as Arc<dyn ContradictionJudge>)
     }
 
     /// Writes review rows for the report's pairs (module docs).

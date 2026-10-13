@@ -73,7 +73,7 @@ struct ShortNli;
 
 impl NliJudge for ShortNli {
     fn score_pairs(&self, _pairs: &[(&str, &str)]) -> Result<Vec<NliScores>, ModelError> {
-        Ok(vec![NliScores { contradiction: 1.0, entailment: 0.0, neutral: 0.0 }])
+        Ok(Vec::new())
     }
 }
 
@@ -84,7 +84,30 @@ fn nli_failures_score_every_pair_neutral() {
     {
         let verdicts = judge.judge_batch(&[("a", "b"), ("c", "d")]);
         assert_eq!(verdicts, vec![JudgeVerdict::neutral(), JudgeVerdict::neutral()]);
+        assert_eq!(judge.judge("a", "b"), JudgeVerdict::neutral());
     }
+}
+
+/// Fails any call that contains the premise `bad`.
+struct FailsOnBadPremise;
+
+impl NliJudge for FailsOnBadPremise {
+    fn score_pairs(&self, pairs: &[(&str, &str)]) -> Result<Vec<NliScores>, ModelError> {
+        if pairs.iter().any(|(premise, _)| *premise == "bad") {
+            return Err(ModelError::Inference("bad premise".to_owned()));
+        }
+        Ok(pairs.iter().map(|_| scores(0.9, 0.05, 0.05)).collect())
+    }
+}
+
+#[test]
+fn nli_batch_failure_falls_back_to_per_pair_scoring() {
+    let judge = NliJudgeAdapter::new(Arc::new(FailsOnBadPremise));
+    let verdicts = judge.judge_batch(&[("a", "b"), ("bad", "d"), ("e", "f")]);
+    assert_eq!(verdicts.len(), 3);
+    assert_verdict(&verdicts[0], NliLabel::Contradiction, f64::from(0.9_f32));
+    assert_eq!(verdicts[1], JudgeVerdict::neutral());
+    assert_verdict(&verdicts[2], NliLabel::Contradiction, f64::from(0.9_f32));
 }
 
 fn default_prompt() -> JudgePrompt {
@@ -94,7 +117,7 @@ fn default_prompt() -> JudgePrompt {
 #[test]
 fn prompt_follows_the_python_format() {
     let prompt = default_prompt();
-    let judge = LlmJudge::new(Arc::new(MockLlm::new()), prompt.clone(), 5);
+    let judge = LlmJudge::new(Arc::new(MockLlm::new()), prompt.clone());
     let built = judge.build_prompt("Speed was 35 mph", "Speed was {45} mph");
     let user = "Analyze these two facts and determine if they contradict:\n\n\
                 Fact A: Speed was 35 mph\n\nFact B: Speed was {45} mph\n\n\
@@ -113,7 +136,7 @@ fn custom_templates_keep_unknown_fields() {
         output_format: None,
         notes: Vec::new(),
     };
-    let judge = LlmJudge::new(Arc::new(MockLlm::new()), prompt, 0);
+    let judge = LlmJudge::new(Arc::new(MockLlm::new()), prompt);
     assert_eq!(
         judge.build_prompt("A", "B"),
         "System: S\n\nUser: B vs A ({context}) {x}\n\nAssistant:"
@@ -123,16 +146,16 @@ fn custom_templates_keep_unknown_fields() {
 #[test]
 fn load_resolves_the_default_prompt_and_rejects_bad_files() {
     let llm = Arc::new(MockLlm::new());
-    let judge = LlmJudge::load(llm.clone(), DEFAULT_JUDGE_PROMPT, 5).expect("default prompt loads");
+    let judge = LlmJudge::load(llm.clone(), DEFAULT_JUDGE_PROMPT).expect("default prompt loads");
     assert_eq!(judge.name(), "qwen");
 
-    let missing = LlmJudge::load(llm.clone(), "contradiction_engine/prompts/missing.json", 5);
+    let missing = LlmJudge::load(llm.clone(), "contradiction_engine/prompts/missing.json");
     assert!(matches!(missing, Err(ContradictionError::Config(_))));
 
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("judge.json");
     std::fs::write(&path, r#"{"system": "only a system message"}"#).expect("write prompt");
-    let incomplete = LlmJudge::load(llm, path.to_str().expect("utf-8 path"), 5);
+    let incomplete = LlmJudge::load(llm, path.to_str().expect("utf-8 path"));
     assert!(matches!(incomplete, Err(ContradictionError::Config(_))));
 }
 
@@ -143,7 +166,7 @@ fn llm_judge_makes_one_call_per_pair_in_order() {
         r#"{"verdict": "entailment", "confidence": 0.6}"#,
         "They are unrelated.",
     ]));
-    let judge = LlmJudge::new(llm.clone(), default_prompt(), 2);
+    let judge = LlmJudge::new(llm.clone(), default_prompt());
     let verdicts = judge.judge_batch(&[("a1", "b1"), ("a2", "b2"), ("a3", "b3")]);
     assert_eq!(
         verdicts,
@@ -163,7 +186,7 @@ fn llm_judge_makes_one_call_per_pair_in_order() {
 
 #[test]
 fn llm_errors_score_neutral_with_the_error() {
-    let judge = LlmJudge::new(Arc::new(MockLlm::new()), default_prompt(), 5);
+    let judge = LlmJudge::new(Arc::new(MockLlm::new()), default_prompt());
     let v = judge.judge("a", "b");
     assert_eq!(v.label, NliLabel::Neutral);
     assert_close(v.confidence, 0.0);
@@ -179,7 +202,7 @@ fn is_contradiction_applies_label_and_threshold() {
         r#"{"verdict": "contradiction", "confidence": 0.75}"#,
         r#"{"verdict": "neutral", "confidence": 0.99}"#,
     ]));
-    let judge = LlmJudge::new(llm, default_prompt(), 5);
+    let judge = LlmJudge::new(llm, default_prompt());
     let (hit, confidence) = judge.is_contradiction("a", "b", 0.8);
     assert!(hit);
     assert_close(confidence, 0.85);

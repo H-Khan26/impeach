@@ -4,12 +4,13 @@
 //! A judge labels `(premise, hypothesis)` pairs. Failures never propagate: a failed call is
 //! logged and scored [`JudgeVerdict::neutral`] (label neutral, confidence 0.0), as in Python.
 //!
-//! - [`NliJudgeAdapter`]: [`NliJudge::score_pairs`] on the whole batch; label = argmax of the
-//!   scores (ties: contradiction, entailment, neutral), confidence = that score.
+//! - [`NliJudgeAdapter`]: [`NliJudge::score_pairs`] on the whole batch; when that call fails
+//!   or returns the wrong number of scores, each pair is scored on its own so only the failing
+//!   pairs become neutral (Python judged per pair). Label = argmax of the scores (ties:
+//!   contradiction, entailment, neutral), confidence = that score.
 //! - [`LlmJudge`]: one LLM completion per pair with the prompt file (default
 //!   `qwen_judge.json`): `System: <system>\n\nUser: <user_template formatted with fact_a /
-//!   fact_b>\n\nAssistant:`; the response is parsed by [`parse_judge_response`]. Pairs are
-//!   processed in groups of `batch_size` (one call per pair, as in Python).
+//!   fact_b>\n\nAssistant:`; the response is parsed by [`parse_judge_response`].
 //!
 //! The user template is a Python `str.format` template: `{fact_a}` / `{fact_b}` are replaced,
 //! `{{` / `}}` unescaped and other fields left as written (Python raised `KeyError`).
@@ -112,6 +113,21 @@ impl NliJudgeAdapter {
     pub fn new(nli: Arc<dyn NliJudge>) -> Self {
         Self { nli }
     }
+
+    /// Scores one pair; a failed call is logged and scored neutral.
+    fn score_one(&self, pair: (&str, &str)) -> JudgeVerdict {
+        match self.nli.score_pairs(&[pair]) {
+            Ok(scores) if scores.len() == 1 => nli_verdict(&scores[0]),
+            Ok(scores) => {
+                tracing::warn!("NLI call failed: {} scores for 1 pair", scores.len());
+                JudgeVerdict::neutral()
+            }
+            Err(error) => {
+                tracing::warn!("NLI call failed: {error}");
+                JudgeVerdict::neutral()
+            }
+        }
+    }
 }
 
 impl ContradictionJudge for NliJudgeAdapter {
@@ -120,22 +136,24 @@ impl ContradictionJudge for NliJudgeAdapter {
     }
 
     fn judge_batch(&self, pairs: &[(&str, &str)]) -> Vec<JudgeVerdict> {
-        if pairs.is_empty() {
-            return Vec::new();
+        match pairs {
+            [] => return Vec::new(),
+            [pair] => return vec![self.score_one(*pair)],
+            _ => {}
         }
         match self.nli.score_pairs(pairs) {
             Ok(scores) if scores.len() == pairs.len() => scores.iter().map(nli_verdict).collect(),
             Ok(scores) => {
-                tracing::warn!(
-                    "NLI call failed: {} scores for {} pairs",
+                tracing::debug!(
+                    "NLI batch call returned {} scores for {} pairs; scoring pairs individually",
                     scores.len(),
                     pairs.len()
                 );
-                vec![JudgeVerdict::neutral(); pairs.len()]
+                pairs.iter().map(|pair| self.score_one(*pair)).collect()
             }
             Err(error) => {
-                tracing::warn!("NLI call failed: {error}");
-                vec![JudgeVerdict::neutral(); pairs.len()]
+                tracing::debug!("NLI batch call failed ({error}); scoring pairs individually");
+                pairs.iter().map(|pair| self.score_one(*pair)).collect()
             }
         }
     }
@@ -146,20 +164,19 @@ impl ContradictionJudge for NliJudgeAdapter {
 pub struct LlmJudge {
     llm: Arc<dyn Llm>,
     prompt: JudgePrompt,
-    batch_size: usize,
 }
 
 impl fmt::Debug for LlmJudge {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("LlmJudge").field("batch_size", &self.batch_size).finish_non_exhaustive()
+        f.debug_struct("LlmJudge").finish_non_exhaustive()
     }
 }
 
 impl LlmJudge {
-    /// A judge over `llm` with a loaded prompt; `batch_size` is clamped to at least 1.
+    /// A judge over `llm` with a loaded prompt.
     #[must_use]
-    pub fn new(llm: Arc<dyn Llm>, prompt: JudgePrompt, batch_size: usize) -> Self {
-        Self { llm, prompt, batch_size: batch_size.max(1) }
+    pub fn new(llm: Arc<dyn Llm>, prompt: JudgePrompt) -> Self {
+        Self { llm, prompt }
     }
 
     /// Loads the prompt file (resolved with [`ce_config::resolve_asset`]) and builds the judge.
@@ -167,9 +184,9 @@ impl LlmJudge {
     /// # Errors
     /// [`crate::ContradictionError::Config`] when the file is missing or lacks `system` /
     /// `user_template`.
-    pub fn load(llm: Arc<dyn Llm>, prompt_file: &str, batch_size: usize) -> Result<Self> {
+    pub fn load(llm: Arc<dyn Llm>, prompt_file: &str) -> Result<Self> {
         let prompt = JudgePrompt::load(prompt_file)?;
-        Ok(Self::new(llm, prompt, batch_size))
+        Ok(Self::new(llm, prompt))
     }
 
     /// The full prompt for one pair (module docs).
@@ -208,11 +225,7 @@ impl ContradictionJudge for LlmJudge {
     }
 
     fn judge_batch(&self, pairs: &[(&str, &str)]) -> Vec<JudgeVerdict> {
-        let mut verdicts = Vec::with_capacity(pairs.len());
-        for batch in pairs.chunks(self.batch_size) {
-            verdicts.extend(batch.iter().map(|(a, b)| self.judge_one(a, b)));
-        }
-        verdicts
+        pairs.iter().map(|(a, b)| self.judge_one(a, b)).collect()
     }
 }
 

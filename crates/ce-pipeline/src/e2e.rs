@@ -34,11 +34,12 @@ use ce_core::e2e::{
     PairRecord, PipelineSummary, RetrievalStats,
 };
 use ce_core::processing::ProcessingResult;
+use ce_core::util::python_isoformat;
 use ce_core::{ContradictionPair, ContradictionSource, EdResult, ExtractedFact};
 use ce_eval::{EvalOptions, EvalReport};
 use ce_models::{Embedder, ModelRegistry};
 use ce_store::GraphStore;
-use chrono::{Local, NaiveDateTime, Timelike};
+use chrono::Local;
 use serde_json::Value;
 
 use crate::api::{
@@ -381,16 +382,6 @@ fn eval_embedder(injected: Option<Arc<dyn Embedder>>) -> Result<Option<Arc<dyn E
             ce_eval::DEFAULT_MODEL
         );
         Ok(None)
-    }
-}
-
-/// Python `datetime.isoformat()` of a local time (microseconds only when non-zero).
-fn python_isoformat(time: &NaiveDateTime) -> String {
-    let micros = time.nanosecond() / 1000 % 1_000_000;
-    if micros == 0 {
-        time.format("%Y-%m-%dT%H:%M:%S").to_string()
-    } else {
-        format!("{}.{micros:06}", time.format("%Y-%m-%dT%H:%M:%S"))
     }
 }
 
@@ -811,15 +802,6 @@ mod tests {
         assert_eq!(truncate("short", 10), "short");
         assert_eq!(truncate("abcdefghijk", 8), "abcde...");
         assert_eq!(truncate("ééééé", 4), "é...");
-    }
-
-    #[test]
-    fn isoformat_omits_zero_microseconds() {
-        let time = NaiveDateTime::parse_from_str("2026-01-02 03:04:05", "%Y-%m-%d %H:%M:%S")
-            .expect("time");
-        assert_eq!(python_isoformat(&time), "2026-01-02T03:04:05");
-        let time = time.with_nanosecond(1_500_000).expect("time");
-        assert_eq!(python_isoformat(&time), "2026-01-02T03:04:05.001500");
     }
 
     #[test]

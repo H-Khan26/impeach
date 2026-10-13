@@ -6,7 +6,8 @@ use std::sync::Arc;
 use ce_config::pipeline::FactRetrievalStrategy;
 use ce_config::services::SimilarFactRetrieverConfig;
 use ce_contradictions::{
-    CandidateEntityMap, SimilarFactRetriever, SOURCE_BM25, SOURCE_GRAPH, SOURCE_VECTOR,
+    CandidateEntityMap, GraphLookupCache, SimilarFactRetriever, SOURCE_BM25, SOURCE_GRAPH,
+    SOURCE_VECTOR,
 };
 use ce_core::{AssertionTriple, EntityId, ExtractedFact, FactId, RetrievedFact, TemporalValidity};
 use ce_models::{Embedder, MockEmbedder, ModelError};
@@ -99,7 +100,12 @@ fn ids(found: &[RetrievedFact]) -> Vec<FactId> {
 fn all_sources_are_fused_and_ranked() {
     let w = world();
     let found = retriever(&w, SimilarFactRetrieverConfig::default())
-        .retrieve_similar_facts(&new_fact(), std::slice::from_ref(&w.entity), &[])
+        .retrieve_similar_facts(
+            &new_fact(),
+            std::slice::from_ref(&w.entity),
+            &[],
+            &mut GraphLookupCache::default(),
+        )
         .expect("retrieval");
     assert_eq!(
         summary(&found),
@@ -116,7 +122,12 @@ fn all_sources_are_fused_and_ranked() {
 fn retrieved_facts_carry_node_fields() {
     let w = world();
     let found = retriever(&w, SimilarFactRetrieverConfig::default())
-        .retrieve_similar_facts(&new_fact(), std::slice::from_ref(&w.entity), &[])
+        .retrieve_similar_facts(
+            &new_fact(),
+            std::slice::from_ref(&w.entity),
+            &[],
+            &mut GraphLookupCache::default(),
+        )
         .expect("retrieval");
     let graph = found.iter().find(|f| f.fact_id == w.graph).expect("graph fact found");
     assert_eq!(graph.fact_text, "The driver stopped at the light");
@@ -141,6 +152,7 @@ fn excluded_facts_are_dropped_from_every_source() {
             &new_fact(),
             std::slice::from_ref(&w.entity),
             &[w.multi.clone(), w.vector.clone()],
+            &mut GraphLookupCache::default(),
         )
         .expect("retrieval");
     assert_eq!(ids(&found), vec![w.graph.clone(), w.text.clone()]);
@@ -154,12 +166,22 @@ fn strategy_selects_text_sources() {
         ..SimilarFactRetrieverConfig::default()
     };
     let bm25 = retriever(&w, with(FactRetrievalStrategy::Bm25))
-        .retrieve_similar_facts(&new_fact(), std::slice::from_ref(&w.entity), &[])
+        .retrieve_similar_facts(
+            &new_fact(),
+            std::slice::from_ref(&w.entity),
+            &[],
+            &mut GraphLookupCache::default(),
+        )
         .expect("retrieval");
     assert_eq!(ids(&bm25), vec![w.multi.clone(), w.graph.clone(), w.text.clone()]);
 
     let vector = retriever(&w, with(FactRetrievalStrategy::Vector))
-        .retrieve_similar_facts(&new_fact(), std::slice::from_ref(&w.entity), &[])
+        .retrieve_similar_facts(
+            &new_fact(),
+            std::slice::from_ref(&w.entity),
+            &[],
+            &mut GraphLookupCache::default(),
+        )
         .expect("retrieval");
     assert_eq!(
         summary(&vector),
@@ -177,14 +199,24 @@ fn min_score_and_cap() {
     let config =
         SimilarFactRetrieverConfig { min_score: 0.85, ..SimilarFactRetrieverConfig::default() };
     let found = retriever(&w, config)
-        .retrieve_similar_facts(&new_fact(), std::slice::from_ref(&w.entity), &[])
+        .retrieve_similar_facts(
+            &new_fact(),
+            std::slice::from_ref(&w.entity),
+            &[],
+            &mut GraphLookupCache::default(),
+        )
         .expect("retrieval");
     assert_eq!(ids(&found), vec![w.multi.clone(), w.graph.clone(), w.text.clone()]);
 
     let config =
         SimilarFactRetrieverConfig { max_candidates: 2, ..SimilarFactRetrieverConfig::default() };
     let found = retriever(&w, config)
-        .retrieve_similar_facts(&new_fact(), std::slice::from_ref(&w.entity), &[])
+        .retrieve_similar_facts(
+            &new_fact(),
+            std::slice::from_ref(&w.entity),
+            &[],
+            &mut GraphLookupCache::default(),
+        )
         .expect("retrieval");
     assert_eq!(ids(&found), vec![w.multi.clone(), w.graph.clone()]);
 }
@@ -200,7 +232,12 @@ fn custom_weights_reorder_sources() {
         ..SimilarFactRetrieverConfig::default()
     };
     let found = retriever(&w, config)
-        .retrieve_similar_facts(&new_fact(), std::slice::from_ref(&w.entity), &[])
+        .retrieve_similar_facts(
+            &new_fact(),
+            std::slice::from_ref(&w.entity),
+            &[],
+            &mut GraphLookupCache::default(),
+        )
         .expect("retrieval");
     assert_eq!(
         summary(&found),
@@ -222,6 +259,7 @@ fn entity_lookup_errors_are_skipped() {
             &new_fact(),
             &[EntityId::new("not-a-node"), w.other_entity.clone()],
             &[],
+            &mut GraphLookupCache::default(),
         )
         .expect("retrieval");
     assert_eq!(
@@ -256,7 +294,7 @@ fn embedding_failure_drops_only_vector_hits() {
     let w = world();
     let found =
         retriever_with(&w, Arc::new(FailingEmbedder), SimilarFactRetrieverConfig::default())
-            .retrieve_similar_facts(&new_fact(), &[], &[])
+            .retrieve_similar_facts(&new_fact(), &[], &[], &mut GraphLookupCache::default())
             .expect("retrieval");
     assert_eq!(ids(&found), vec![w.multi.clone(), w.text.clone()]);
 }
@@ -266,7 +304,7 @@ fn wrong_dimension_query_is_a_non_fatal_vector_failure() {
     let w = world();
     let embedder = Arc::new(MockEmbedder::new(DIM + 1));
     let found = retriever_with(&w, embedder, SimilarFactRetrieverConfig::default())
-        .retrieve_similar_facts(&new_fact(), &[], &[])
+        .retrieve_similar_facts(&new_fact(), &[], &[], &mut GraphLookupCache::default())
         .expect("retrieval");
     assert_eq!(ids(&found), vec![w.multi.clone(), w.text.clone()]);
 }
@@ -276,15 +314,25 @@ fn candidate_entity_map_follows_fact_about_entity_edges() {
     let w = world();
     let retriever = retriever(&w, SimilarFactRetrieverConfig::default());
     let found = retriever
-        .retrieve_similar_facts(&new_fact(), std::slice::from_ref(&w.entity), &[])
+        .retrieve_similar_facts(
+            &new_fact(),
+            std::slice::from_ref(&w.entity),
+            &[],
+            &mut GraphLookupCache::default(),
+        )
         .expect("retrieval");
     let mut candidates = found;
     candidates.push(RetrievedFact::new("not-a-node", "unknown fact"));
-    let map = retriever.candidate_entity_map(&candidates).expect("entity map");
+    let map = retriever
+        .candidate_entity_map(&candidates, &mut GraphLookupCache::default())
+        .expect("entity map");
     let expected = CandidateEntityMap::from([
         (w.multi.clone(), vec![w.entity.clone(), w.other_entity.clone()]),
         (w.graph.clone(), vec![w.entity.clone()]),
     ]);
     assert_eq!(map, expected);
-    assert!(retriever.candidate_entity_map(&[]).expect("empty map").is_empty());
+    assert!(retriever
+        .candidate_entity_map(&[], &mut GraphLookupCache::default())
+        .expect("empty map")
+        .is_empty());
 }

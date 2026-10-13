@@ -28,7 +28,7 @@ fn prefilter(embedder: Option<Arc<dyn Embedder>>) -> Arc<FactPairPreFilter> {
 }
 
 fn permissive(overrides: Value) -> ContradictionGating {
-    ContradictionGating::new(config(overrides), None, prefilter(None))
+    ContradictionGating::new(config(overrides), prefilter(None))
 }
 
 fn ids(scored: &[(&RetrievedFact, f64)]) -> Vec<String> {
@@ -213,8 +213,7 @@ fn semantic_trigger_uses_cached_embeddings() {
             .with_vector("Signal violation by driver", vec![0.8, 0.6])
             .with_vector("Weather report", vec![0.5, 0.866]),
     );
-    let gating =
-        ContradictionGating::new(config(json!({})), Some(embedder.clone()), prefilter(None));
+    let gating = ContradictionGating::new(config(json!({})), prefilter(Some(embedder.clone())));
     let candidates = [
         retrieved("near", "Signal violation by driver", 1.0),
         retrieved("far", "Weather report", 1.0),
@@ -256,7 +255,6 @@ fn dual_path_delegates_to_the_prefilter() {
     let prefilter = prefilter(None);
     let gating = ContradictionGating::new(
         config(json!({"gating_strategy": "dual_path"})),
-        None,
         prefilter.clone(),
     );
     assert_eq!(gating.config().gating_strategy, ce_config::pipeline::GatingStrategy::DualPath);

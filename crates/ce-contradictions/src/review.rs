@@ -9,11 +9,11 @@
 //! the current UTC time (`%Y-%m-%dT%H:%M:%S%.6f`, Python `datetime.utcnow().isoformat()`);
 //! `dedupe_key` unset (the review store fills it on insert).
 
+use ce_core::util::python_isoformat;
 use ce_core::{
     ContradictionReport, ContradictionReviewItem, DocId, Metadata, ReviewClassification,
     ReviewStatus,
 };
-use chrono::{NaiveDateTime, Timelike};
 use serde_json::{json, Value};
 
 /// Provenance of a batch of review items.
@@ -115,37 +115,4 @@ pub fn build_review_items_from_report(
             }
         })
         .collect()
-}
-
-/// Python `datetime.isoformat()` of a naive timestamp: microseconds, omitted when zero.
-fn python_isoformat(timestamp: &NaiveDateTime) -> String {
-    // Leap-second nanoseconds (>= 1e9) are clamped into the last microsecond of the second.
-    let micros = (timestamp.nanosecond() / 1_000).min(999_999);
-    let base = timestamp.format("%Y-%m-%dT%H:%M:%S");
-    if micros == 0 {
-        base.to_string()
-    } else {
-        format!("{base}.{micros:06}")
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use chrono::NaiveDate;
-
-    fn at(h: u32, m: u32, s: u32, nanos: u32) -> NaiveDateTime {
-        NaiveDate::from_ymd_opt(2024, 3, 5)
-            .and_then(|d| d.and_hms_nano_opt(h, m, s, nanos))
-            .expect("valid timestamp")
-    }
-
-    #[test]
-    fn isoformat_matches_python() {
-        assert_eq!(python_isoformat(&at(7, 8, 9, 0)), "2024-03-05T07:08:09");
-        assert_eq!(python_isoformat(&at(7, 8, 9, 1_000)), "2024-03-05T07:08:09.000001");
-        assert_eq!(python_isoformat(&at(23, 59, 59, 123_456_789)), "2024-03-05T23:59:59.123456");
-        // Sub-microsecond precision truncates, as Python's clock has microsecond resolution.
-        assert_eq!(python_isoformat(&at(0, 0, 0, 999)), "2024-03-05T00:00:00");
-    }
 }
