@@ -4,6 +4,7 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
+use impeach_config::StageConfig;
 use impeach_core::{DocId, DocumentPayload, Metadata};
 use serde_json::Value;
 
@@ -126,6 +127,9 @@ fn read_json_document(path: &Path) -> Result<DocumentPayload> {
     })
 }
 
+/// `stage_type` span field of a stage that is not in the pipeline config.
+pub const CUSTOM_STAGE_TYPE: &str = "custom";
+
 /// Wall time of one stage.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StageTiming {
@@ -151,6 +155,8 @@ pub struct RunReport {
 /// through every stage.
 pub struct Pipeline {
     stages: Vec<Box<dyn Stage>>,
+    /// Config `type` of each stage (`custom` for a stage whose name is not in the config).
+    stage_types: Vec<&'static str>,
     services: StageBuildContext,
 }
 
@@ -167,7 +173,18 @@ impl Pipeline {
     /// A pipeline running `stages` in order against `services`.
     #[must_use]
     pub fn new(stages: Vec<Box<dyn Stage>>, services: StageBuildContext) -> Self {
-        Self { stages, services }
+        let stage_types = stages
+            .iter()
+            .map(|stage| {
+                services
+                    .config
+                    .stages
+                    .iter()
+                    .find(|config| config.name() == stage.name())
+                    .map_or(CUSTOM_STAGE_TYPE, StageConfig::type_name)
+            })
+            .collect();
+        Self { stages, stage_types, services }
     }
 
     /// The stages, in run order.
@@ -194,19 +211,27 @@ impl Pipeline {
         PipelineContext::new(&self.services)
     }
 
-    /// Resolves `input` into `ctx.data.document` and runs every stage in order, logging each
-    /// stage's wall time through `tracing` (target `impeach_pipeline::runner`, span `stage`).
+    /// Resolves `input` into `ctx.data.document` and runs every stage in order. Each stage runs
+    /// inside a `tracing` info span `stage` with the fields `name`, `stage_type` and `doc_id`
+    /// (target `impeach_pipeline::runner`), and its wall time is logged and returned.
     ///
     /// # Errors
     /// Input errors as in [`PipelineInput::into_document`]; the first stage error, wrapped in
     /// [`PipelineError::Stage`].
     pub fn run(&self, ctx: &mut PipelineContext, input: PipelineInput) -> Result<RunReport> {
         let started = Instant::now();
-        ctx.data.document = Some(input.into_document()?);
+        let document = input.into_document()?;
+        let doc_id = document.doc_id.as_str().to_owned();
+        ctx.data.document = Some(document);
         let mut report = RunReport::default();
-        for stage in &self.stages {
+        for (stage, stage_type) in self.stages.iter().zip(&self.stage_types) {
             let name = stage.name();
-            let span = tracing::info_span!("stage", name);
+            let span = tracing::info_span!(
+                "stage",
+                name,
+                stage_type = *stage_type,
+                doc_id = doc_id.as_str()
+            );
             let _entered = span.enter();
             tracing::debug!(stage = name, "stage started");
             let stage_started = Instant::now();

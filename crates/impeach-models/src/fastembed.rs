@@ -7,7 +7,7 @@ use std::sync::{Mutex, PoisonError};
 use fastembed::{EmbeddingModel, TextEmbedding, TextInitOptions};
 use impeach_config::pipeline::BgeModelConfig;
 
-use crate::error::{error_chain, ModelError};
+use crate::error::{error_chain, missing_model, ModelError};
 use crate::traits::{normalize_l2, Embedder};
 
 /// Model ids accepted by [`FastEmbedder`] (case-insensitive) and their fastembed models.
@@ -99,9 +99,13 @@ impl FastEmbedder {
             });
         }
         let load_error = |e: fastembed::Error| match e {
-            fastembed::Error::ModelRetrieval { .. } => {
-                ModelError::Download { resource: options.model.clone(), message: error_chain(&e) }
-            }
+            fastembed::Error::ModelRetrieval { .. } => missing_model(
+                &options.model,
+                &effective_cache_dir(options.cache_dir.as_deref()),
+                "set FASTEMBED_CACHE_DIR (or HF_HOME, which takes precedence) to a directory \
+                 that holds it",
+                &error_chain(&e),
+            ),
             other => {
                 ModelError::Load { model: options.model.clone(), message: error_chain(&other) }
             }
@@ -130,6 +134,17 @@ impl FastEmbedder {
             .find(|(id, _)| id.eq_ignore_ascii_case(model))
             .map(|(_, m)| m.clone())
     }
+}
+
+/// The directory fastembed reads models from: `HF_HOME`, else `cache_dir`, else
+/// `FASTEMBED_CACHE_DIR`, else `.fastembed_cache` (absolute against the working directory).
+fn effective_cache_dir(cache_dir: Option<&std::path::Path>) -> PathBuf {
+    let dir = std::env::var_os("HF_HOME")
+        .map(PathBuf::from)
+        .or_else(|| cache_dir.map(std::path::Path::to_path_buf))
+        .or_else(|| std::env::var_os("FASTEMBED_CACHE_DIR").map(PathBuf::from))
+        .unwrap_or_else(|| PathBuf::from(".fastembed_cache"));
+    std::path::absolute(&dir).unwrap_or(dir)
 }
 
 impl Embedder for FastEmbedder {

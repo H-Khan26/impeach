@@ -44,3 +44,67 @@ pub(crate) fn error_chain(error: &dyn std::error::Error) -> String {
     }
     message
 }
+
+/// [`ModelError::Download`] for a model that is not in its cache and could not be downloaded:
+/// names the model, the cache directory that was searched and how to fix it (`setting`).
+#[cfg_attr(
+    not(any(feature = "fastembed", feature = "ort-nli", feature = "gliner2")),
+    allow(dead_code)
+)]
+pub(crate) fn missing_model(
+    model: &str,
+    cache_dir: &std::path::Path,
+    setting: &str,
+    cause: &str,
+) -> ModelError {
+    ModelError::Download {
+        resource: model.to_owned(),
+        message: format!(
+            "the model is not in the model cache {} and could not be downloaded ({cause}). \
+             Run once with network access to download it, copy the model files into that \
+             directory, or {setting}",
+            cache_dir.display()
+        ),
+    }
+}
+
+/// The Hugging Face hub cache: `$HF_HOME/hub` (when `honour_hf_home`), else
+/// `~/.cache/huggingface/hub`.
+#[cfg_attr(not(any(feature = "ort-nli", feature = "gliner2")), allow(dead_code))]
+pub(crate) fn hf_hub_cache_dir(honour_hf_home: bool) -> std::path::PathBuf {
+    if honour_hf_home {
+        if let Some(home) = std::env::var_os("HF_HOME") {
+            return std::path::PathBuf::from(home).join("hub");
+        }
+    }
+    let home = std::env::var_os("HOME")
+        .or_else(|| std::env::var_os("USERPROFILE"))
+        .map_or_else(|| std::path::PathBuf::from("~"), std::path::PathBuf::from);
+    home.join(".cache").join("huggingface").join("hub")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn missing_model_names_model_cache_and_fix() {
+        let error = missing_model(
+            "BAAI/bge-small-en-v1.5",
+            std::path::Path::new("cache-dir"),
+            "set FASTEMBED_CACHE_DIR",
+            "connection refused",
+        );
+        let text = error.to_string();
+        assert!(text.starts_with("failed to download `BAAI/bge-small-en-v1.5`: "), "{text}");
+        for part in ["cache-dir", "connection refused", "network access", "FASTEMBED_CACHE_DIR"] {
+            assert!(text.contains(part), "`{part}` missing from: {text}");
+        }
+    }
+
+    #[test]
+    fn hub_cache_ends_with_huggingface_hub() {
+        let dir = hf_hub_cache_dir(false);
+        assert!(dir.ends_with(".cache/huggingface/hub"), "{}", dir.display());
+    }
+}

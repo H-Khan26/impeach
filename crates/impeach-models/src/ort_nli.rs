@@ -18,7 +18,7 @@ use tokenizers::{
     TruncationStrategy,
 };
 
-use crate::error::ModelError;
+use crate::error::{missing_model, ModelError};
 use crate::traits::{NliJudge, NliScores};
 
 /// Logit index of each label (Python `DeBERTaNLIService.LABEL_MAP`).
@@ -234,17 +234,24 @@ fn download(options: &OrtNliOptions) -> Result<ModelFiles, ModelError> {
     if let Some(dir) = &options.cache_dir {
         builder = builder.with_cache_dir(dir.clone());
     }
-    let api = builder.build().map_err(|e| ModelError::Download {
-        resource: options.model.clone(),
-        message: format!("cannot initialise the Hugging Face hub client: {e}"),
-    })?;
+    let cache_dir =
+        options.cache_dir.clone().unwrap_or_else(|| crate::error::hf_hub_cache_dir(true));
+    let missing = |cause: String| {
+        missing_model(
+            &options.model,
+            &cache_dir,
+            "set HF_HOME to a Hugging Face cache that holds it (models.deberta_nli.model names \
+             the repo)",
+            &cause,
+        )
+    };
+    let api = builder
+        .build()
+        .map_err(|e| missing(format!("cannot initialise the Hugging Face hub client: {e}")))?;
     let repo = api.model(options.model.clone());
     let get = |file: &str| {
         tracing::debug!(model = %options.model, file, "fetching NLI model file");
-        repo.get(file).map_err(|e| ModelError::Download {
-            resource: format!("{}/{file}", options.model),
-            message: e.to_string(),
-        })
+        repo.get(file).map_err(|e| missing(format!("{file}: {e}")))
     };
     Ok(ModelFiles {
         config: get("config.json")?,
