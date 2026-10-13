@@ -1,5 +1,5 @@
 # Fact Taxonomy Configuration
-# Defines structural types and temporal contexts for the contradiction engine.
+# Defines structural types and temporal contexts for Impeach.
 #
 # NOTE: Domain-specific fact categories have been REMOVED (2025-01).
 # The previous categories (INCIDENT_DATE, SPEED, WEATHER, etc.) were overfitted

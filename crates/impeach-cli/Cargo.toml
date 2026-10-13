@@ -1,0 +1,36 @@
+[package]
+name = "impeach-cli"
+description = "The impeach command-line binary"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "impeach"
+path = "src/main.rs"
+
+[features]
+default = ["helix", "fastembed", "ort-nli", "ollama", "gliner2"]
+helix = ["impeach-pipeline/helix"]
+fastembed = ["impeach-pipeline/fastembed", "impeach-eval/fastembed", "impeach-models/fastembed"]
+ort-nli = ["impeach-pipeline/ort-nli"]
+ollama = ["impeach-pipeline/ollama"]
+gliner2 = ["impeach-pipeline/gliner2"]
+
+[dependencies]
+impeach-config.workspace = true
+impeach-ingest.workspace = true
+impeach-models.workspace = true
+impeach-pipeline.workspace = true
+impeach-eval.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

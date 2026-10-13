@@ -1,0 +1,23 @@
+[package]
+name = "impeach-coref"
+description = "Coreference: cluster post-processing, canonical mentions, pronoun mention synthesis"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+impeach-core.workspace = true
+impeach-config.workspace = true
+impeach-models.workspace = true
+impeach-ner.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+indexmap.workspace = true
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+
+[lints]
+workspace = true

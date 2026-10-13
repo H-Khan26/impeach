@@ -24,7 +24,7 @@ Here’s a clean markdown view of all the embedded contradictions so you can dir
 
 ## 2. Atomic Facts (with structural types)
 
-All facts below use **domain-agnostic structural types** from `contradiction_engine/config/mappings/fact_categorization.yaml`:
+All facts below use **domain-agnostic structural types** from `impeach/config/mappings/fact_categorization.yaml`:
 - `temporal_context`: `current_incident` (this scenario’s incident)
 - `value_type`: one of `NUMERIC, TEMPORAL_POINT, TEMPORAL_INTERVAL, LOCATION, BOOLEAN, CATEGORICAL, ENTITY_REF, TEXT`
 - `property_type`: one of `TEMPORAL, QUANTITATIVE, LOCATION, ATTRIBUTE, RELATION, EXISTENCE, MODALITY`
@@ -64,7 +64,7 @@ All facts below use **domain-agnostic structural types** from `contradiction_eng
 
 ## 3. Entity Key (canonical `entity_types`)
 
-Entity types come from `contradiction_engine/config/mappings/entity_types.yaml`:
+Entity types come from `impeach/config/mappings/entity_types.yaml`:
 `PER, ORG, LOC, CASE, STATUTE, COURT, DOCKET_ENTRY, EXHIBIT, EXHIBIT_ID, DATE, TIME, DOC_LOCAL, PRODUCT, FACILITY, MONEY, OTHER`
 
 ### PER – Person

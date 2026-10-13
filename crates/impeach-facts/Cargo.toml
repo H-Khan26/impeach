@@ -1,0 +1,29 @@
+[package]
+name = "impeach-facts"
+description = "LLM fact extraction (single-pass and multi-pass), entity linking and fact indexing"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+impeach-core.workspace = true
+impeach-config.workspace = true
+impeach-text.workspace = true
+impeach-store.workspace = true
+impeach-models.workspace = true
+impeach-ner.workspace = true
+impeach-ed.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+regex.workspace = true
+indexmap.workspace = true
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+
+[lints]
+workspace = true

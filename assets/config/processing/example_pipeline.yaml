@@ -1,4 +1,4 @@
-# Example Pipeline Configuration for contradiction_engine
+# Example Pipeline Configuration for Impeach
 # =====================================================
 #
 # TEMPLATE configuration demonstrating the experiment knobs that are not
@@ -13,9 +13,9 @@
 # ConfigValidationError at startup.
 #
 # Usage:
-#   cp contradiction_engine/config/processing/example_pipeline.yaml my_pipeline.yaml
+#   cp assets/config/processing/example_pipeline.yaml my_pipeline.yaml
 #   # Edit my_pipeline.yaml with your settings
-#   python -m contradiction_engine document.pdf --config my_pipeline.yaml
+#   impeach run document.pdf --config my_pipeline.yaml
 
 config_version: "2.0"
 
@@ -77,7 +77,7 @@ stages:
     allow_llm: true
     llm_only: false
     create_if_missing: true
-    prompt_file: "contradiction_engine/prompts/ed/disambiguation.json"
+    prompt_file: "impeach/prompts/ed/disambiguation.json"
     max_candidates: 10
     enable_intra_doc_matching: true
     min_embedding_similarity: 0.55
@@ -105,10 +105,10 @@ stages:
     commit_facts: false
     # Multiple prompt files -> auto-detects multi-pass extraction
     prompt_files:
-      - "contradiction_engine/prompts/processing/multipass/processing_mullti_v2/pass1_incident.json"
-      - "contradiction_engine/prompts/processing/multipass/processing_mullti_v2/pass2_party.json"
-      - "contradiction_engine/prompts/processing/multipass/processing_mullti_v2/pass3_history.json"
-      - "contradiction_engine/prompts/processing/multipass/processing_mullti_v2/pass4_damages.json"
+      - "impeach/prompts/processing/multipass/processing_mullti_v2/pass1_incident.json"
+      - "impeach/prompts/processing/multipass/processing_mullti_v2/pass2_party.json"
+      - "impeach/prompts/processing/multipass/processing_mullti_v2/pass3_history.json"
+      - "impeach/prompts/processing/multipass/processing_mullti_v2/pass4_damages.json"
     parallel: true
     max_workers: 4
     model_type: "ollama"
@@ -130,7 +130,7 @@ stages:
       semantic_proximity_threshold: 0.60
       keyword_overlap_threshold: 0.30
       # Qwen judge settings (judge_model = "qwen")
-      qwen_prompt_file: "contradiction_engine/prompts/processing/qwen_judge.json"
+      qwen_prompt_file: "impeach/prompts/processing/qwen_judge.json"
       qwen_batch_size: 5
 
     retrieval:
@@ -229,6 +229,6 @@ rag:
 
 # Mapping files
 mappings:
-  entity_mappings: "contradiction_engine/config/mappings/entity_types.yaml"
-  domain_mappings: "contradiction_engine/config/mappings/entity_types.yaml"
-  relationship_types: "contradiction_engine/config/mappings/relationship_types.yaml"
+  entity_mappings: "impeach/config/mappings/entity_types.yaml"
+  domain_mappings: "impeach/config/mappings/entity_types.yaml"
+  relationship_types: "impeach/config/mappings/relationship_types.yaml"
