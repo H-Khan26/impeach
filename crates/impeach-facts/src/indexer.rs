@@ -1,15 +1,17 @@
 //! Fact indexing (Python `services/facts/indexer.py`): `Fact` nodes, fact embeddings and the
 //! edges linking a fact to its document, entities and source spans.
 //!
-//! [`FactIndexer::index_facts`] writes the nodes one by one (a node the store rejects is
-//! logged and skipped), then embeds the written facts in batches of
+//! [`FactIndexer::index_facts`] writes the nodes in one store batch; when the batch fails
+//! (non-fatally) it writes them one by one and a node the store rejects is logged and skipped.
+//! It then embeds the written facts in batches of
 //! [`FACT_EMBED_BATCH_SIZE`] texts and writes the vectors with one store batch per embedder
 //! batch. Vectors stay aligned with their facts across batch boundaries; a batch whose
 //! embedder call fails or returns the wrong number of vectors leaves its facts without a vector.
 //!
 //! [`FactIndexer::commit_facts`] is the commit path of both `FactStage` (`commit_facts: true`)
 //! and the contradiction stage (clean facts only): nodes, vectors, then the context edges and
-//! `metadata.helix_fact_id` of each written fact.
+//! `metadata.helix_fact_id` of each written fact. The edges of every fact go to the store in
+//! one batch; when it fails they are written fact by fact and failures are logged and skipped.
 
 use std::fmt;
 use std::sync::Arc;
@@ -18,7 +20,7 @@ use impeach_core::pyjson::to_python_json_ascii;
 use impeach_core::{EntityId, ExtractedFact, FactId, Metadata, NodeId, SpanId, TypeVocabulary};
 use impeach_models::json::excerpt;
 use impeach_models::Embedder;
-use impeach_store::{EmbeddingWrite, FactNode, GraphStore, StoreError, VectorLabel};
+use impeach_store::{EmbeddingWrite, FactLink, FactNode, GraphStore, StoreError, VectorLabel};
 use serde::Serialize;
 use serde_json::Value;
 
@@ -138,20 +140,49 @@ impl FactIndexer {
     pub fn index_facts(&self, nodes: &[FactNode]) -> Result<IndexResult> {
         let mut fact_ids = Vec::with_capacity(nodes.len());
         let mut written: Vec<(FactId, &FactNode)> = Vec::with_capacity(nodes.len());
-        for node in nodes {
-            match self.store.create_fact(node) {
-                Ok(stored) => {
+        let batch =
+            if nodes.is_empty() { Ok(Vec::new()) } else { self.store.create_facts_batch(nodes) };
+        let fallback = match batch {
+            Ok(stored) if stored.len() == nodes.len() => {
+                for (stored, node) in stored.into_iter().zip(nodes) {
                     fact_ids.push(Some(stored.id.clone()));
                     written.push((stored.id, node));
                 }
-                Err(error) if error.is_fatal() => return Err(error.into()),
-                Err(error) => {
-                    tracing::error!(
-                        fact = excerpt(&node.fact_text, 30),
-                        error = %error,
-                        "failed to index fact"
-                    );
-                    fact_ids.push(None);
+                false
+            }
+            Ok(stored) => {
+                return Err(StoreError::Query {
+                    query: "CreateFactsBatch".to_owned(),
+                    message: format!(
+                        "the store returned {} facts for {} requested",
+                        stored.len(),
+                        nodes.len()
+                    ),
+                }
+                .into());
+            }
+            Err(error) if error.is_fatal() => return Err(error.into()),
+            Err(error) => {
+                tracing::debug!(error = %error, "fact node batch failed; writing one by one");
+                true
+            }
+        };
+        if fallback {
+            for node in nodes {
+                match self.store.create_fact(node) {
+                    Ok(stored) => {
+                        fact_ids.push(Some(stored.id.clone()));
+                        written.push((stored.id, node));
+                    }
+                    Err(error) if error.is_fatal() => return Err(error.into()),
+                    Err(error) => {
+                        tracing::error!(
+                            fact = excerpt(&node.fact_text, 30),
+                            error = %error,
+                            "failed to index fact"
+                        );
+                        fact_ids.push(None);
+                    }
                 }
             }
         }
@@ -208,6 +239,31 @@ impl FactIndexer {
         Ok(written)
     }
 
+    /// Creates the context edges of several written facts in one store batch, in fact order;
+    /// when the batch fails (non-fatally) each fact's edges are written by
+    /// [`FactIndexer::link_fact_context`].
+    ///
+    /// # Errors
+    /// [`crate::FactError::Store`] for a fatal store error; other failures are logged.
+    pub fn link_fact_contexts(&self, contexts: &[(&FactId, FactContextLinks<'_>)]) -> Result<()> {
+        let links: Vec<FactLink<'_>> =
+            contexts.iter().flat_map(|(fact_id, links)| context_links(fact_id, links)).collect();
+        if links.is_empty() {
+            return Ok(());
+        }
+        match self.store.link_facts_batch(&links) {
+            Ok(_) => return Ok(()),
+            Err(error) if error.is_fatal() => return Err(error.into()),
+            Err(error) => {
+                tracing::debug!(error = %error, "fact edge batch failed; linking fact by fact");
+            }
+        }
+        for (fact_id, links) in contexts {
+            self.link_fact_context(fact_id, links)?;
+        }
+        Ok(())
+    }
+
     /// Creates the context edges of one written fact.
     ///
     /// # Errors
@@ -256,7 +312,8 @@ impl FactIndexer {
         let result = self.index_facts(&nodes)?;
 
         let mut with_spans = 0;
-        for (fact, fact_id) in facts.iter_mut().zip(&result.fact_ids) {
+        let mut targets: Vec<(&FactId, Option<NodeId>, Vec<SpanId>, usize)> = Vec::new();
+        for (index, (fact, fact_id)) in facts.iter_mut().zip(&result.fact_ids).enumerate() {
             let Some(fact_id) = fact_id else {
                 continue;
             };
@@ -270,16 +327,24 @@ impl FactIndexer {
                 .as_ref()
                 .filter(|id| !id.as_str().is_empty())
                 .map(|id| NodeId::new(id.as_str()));
-            let links = FactContextLinks {
-                doc_id: doc_id.as_ref(),
-                subject_entity_id: fact.subject_entity_id.as_ref(),
-                object_entity_id: fact.object_entity_id.as_ref(),
-                source_span_ids: &span_ids,
-                page_number: 0,
-                section: "",
-            };
-            self.link_fact_context(fact_id, &links)?;
+            targets.push((fact_id, doc_id, span_ids, index));
         }
+        let contexts: Vec<(&FactId, FactContextLinks<'_>)> = targets
+            .iter()
+            .map(|(fact_id, doc_id, span_ids, index)| {
+                let fact = &facts[*index];
+                let links = FactContextLinks {
+                    doc_id: doc_id.as_ref(),
+                    subject_entity_id: fact.subject_entity_id.as_ref(),
+                    object_entity_id: fact.object_entity_id.as_ref(),
+                    source_span_ids: span_ids,
+                    page_number: 0,
+                    section: "",
+                };
+                (*fact_id, links)
+            })
+            .collect();
+        self.link_fact_contexts(&contexts)?;
         tracing::info!(
             facts = facts.len(),
             written = result.fact_ids.iter().flatten().count(),
@@ -289,6 +354,34 @@ impl FactIndexer {
         );
         Ok(result)
     }
+}
+
+/// The edges of one fact in write order: document, subject, object, then source spans.
+fn context_links<'a>(fact_id: &'a FactId, links: &FactContextLinks<'a>) -> Vec<FactLink<'a>> {
+    let mut edges = Vec::with_capacity(3 + links.source_span_ids.len());
+    if let Some(doc_id) = links.doc_id {
+        edges.push(FactLink::Document {
+            fact_id,
+            doc_id,
+            page_number: links.page_number,
+            section: links.section,
+        });
+    }
+    if let Some(entity_id) = links.subject_entity_id {
+        edges.push(FactLink::Entity { fact_id, entity_id, role: SUBJECT_ROLE });
+    }
+    if let Some(entity_id) = links.object_entity_id {
+        edges.push(FactLink::Entity { fact_id, entity_id, role: OBJECT_ROLE });
+    }
+    for span_id in links.source_span_ids {
+        edges.push(FactLink::Span {
+            fact_id,
+            span_id,
+            role: SOURCE_SPAN_ROLE,
+            confidence: SOURCE_SPAN_CONFIDENCE,
+        });
+    }
+    edges
 }
 
 /// Logs a failed edge write; a fatal store error is returned.

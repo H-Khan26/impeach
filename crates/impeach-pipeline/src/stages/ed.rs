@@ -17,7 +17,8 @@
 //!    ungrouped types compatible with all), else [`entity_types_compatible`].
 //! 5. Writes `ed_results` and `resolved_mentions`; `role_map` from `defined_terms` when it
 //!    binds a role; `SpanRefersToEntity` edges (confidence 0.85, method `NER+ED`) for resolved
-//!    mentions with a mention span, when the index is persisted.
+//!    mentions with a mention span, when the index is persisted, in one store batch (one by
+//!    one when the batch fails, so a bad link is skipped and logged).
 //!
 //! The LLM is `<pipeline.name>_ollama`, else `ollama`, looked up only when `allow_llm` is set;
 //! a missing or failing model disables the tie-break. Store errors while linking spans are
@@ -33,6 +34,7 @@ use impeach_core::{CorefClusterContext, EdResult, EntityId, Mention, MentionId, 
 use impeach_ed::{entity_types_compatible, CoreEdResolver, EdResolver, Resolution, ResolveInput};
 use impeach_models::{Llm, ModelError, ModelRegistry};
 use impeach_ner::definitions::{DefinitionExtractor, RoleConfig};
+use impeach_store::SpanEntityLink;
 use indexmap::{IndexMap, IndexSet};
 
 use crate::context::{PipelineContext, StageBuildContext};
@@ -280,23 +282,41 @@ impl EdStage {
             tracing::debug!("EDStage: no resolved mentions; skipping span-entity linking");
             return Ok(0);
         }
-        let mut linked = 0;
         let mut skipped_no_span = 0;
-        let mut errors: Vec<String> = Vec::new();
+        let mut mentions: Vec<&MentionId> = Vec::with_capacity(resolved.len());
+        let mut links: Vec<SpanEntityLink<'_>> = Vec::with_capacity(resolved.len());
         for (mention_id, entity_id) in resolved {
             let Some(span_id) = span_ids.get(mention_id) else {
                 skipped_no_span += 1;
                 continue;
             };
-            match ctx.store.link_span_to_entity(
+            mentions.push(mention_id);
+            links.push(SpanEntityLink {
                 span_id,
                 entity_id,
-                SPAN_LINK_CONFIDENCE,
-                SPAN_LINK_METHOD,
-            ) {
-                Ok(()) => linked += 1,
-                Err(error) if error.is_fatal() => return Err(error.into()),
-                Err(error) => errors.push(format!("mention {mention_id}: {error}")),
+                confidence: SPAN_LINK_CONFIDENCE,
+                method: SPAN_LINK_METHOD,
+            });
+        }
+        let mut linked = 0;
+        let mut errors: Vec<String> = Vec::new();
+        match ctx.store.link_spans_to_entities_batch(&links) {
+            Ok(written) => linked = written,
+            Err(error) if error.is_fatal() => return Err(error.into()),
+            Err(error) => {
+                tracing::debug!("SpanRefersToEntity batch failed ({error}); linking one by one");
+                for (mention_id, link) in mentions.iter().zip(&links) {
+                    match ctx.store.link_span_to_entity(
+                        link.span_id,
+                        link.entity_id,
+                        link.confidence,
+                        link.method,
+                    ) {
+                        Ok(()) => linked += 1,
+                        Err(error) if error.is_fatal() => return Err(error.into()),
+                        Err(error) => errors.push(format!("mention {mention_id}: {error}")),
+                    }
+                }
             }
         }
         tracing::info!(

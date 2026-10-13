@@ -13,6 +13,8 @@
 //! - Opening creates the vector and text indexes (idempotent) and waits up to
 //!   [`INDEX_BUILD_TIMEOUT`] for pending builds to activate, then reads or creates the
 //!   `StoreInfo` node holding the store id.
+//! - Batch writes put up to `batch_size` items (the `helix.batch_size` config value) into one
+//!   transaction; validation and endpoint lookups happen before the first write.
 //! - Every request is one transaction. Transaction conflicts (and index backpressure, which
 //!   the SDK marks retryable) are retried up to [`TRANSACTION_CONFLICT_ATTEMPTS`] times with
 //!   capped, jittered exponential backoff. A fenced or closed handle fails with
@@ -22,7 +24,7 @@
 //! which the embedded engine needs in debug builds) and blocks the calling thread on a
 //! channel, so it is safe to call from inside another async runtime as well.
 
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::fs::{File, OpenOptions};
 use std::num::NonZeroUsize;
 use std::path::{Path, PathBuf};
@@ -41,13 +43,14 @@ use serde_json::{Map, Value};
 use crate::error::{Result, StoreError};
 use crate::graph::{
     clamp_limit, merge_hits, node_properties, or_default, parse_node_id, query_names,
-    validate_confidence, validate_vector, ChunkNode, DocumentNode, EmbeddingWrite, EntityHit,
-    EntityNode, FactHit, FactNode, SearchHit, SpanNode, Stored, StoredChunk, StoredDocument,
-    StoredEntity, StoredFact, StoredSpan, VectorLabel, CHUNK_OF_DOCUMENT, DEFAULT_FACT_ENTITY_ROLE,
-    DEFAULT_FACT_SPAN_ROLE, DEFAULT_SPAN_ENTITY_METHOD, DOCUMENT, DOCUMENT_CHUNK,
-    EMBEDDING_PROPERTY, ENTITY, ENTITY_NAME_SEARCH_K, FACT, FACT_ABOUT_ENTITY,
-    FACT_DERIVED_FROM_SPAN, FACT_IN_DOCUMENT, SPAN, SPAN_OF_CHUNK, SPAN_REFERS_TO_ENTITY,
-    STORE_ID_PROPERTY, STORE_INFO, TEXT_INDEXES, VECTOR_INDEXED_LABELS,
+    validate_confidence, validate_vector, ChunkNode, DocumentNode, EdgeValue, EdgeWrite,
+    EmbeddingWrite, EntityHit, EntityNode, FactHit, FactLink, FactNode, SearchHit, SpanEntityLink,
+    SpanNode, Stored, StoredChunk, StoredDocument, StoredEntity, StoredFact, StoredSpan,
+    VectorLabel, CHUNK_OF_DOCUMENT, DEFAULT_FACT_ENTITY_ROLE, DEFAULT_FACT_SPAN_ROLE,
+    DEFAULT_SPAN_ENTITY_METHOD, DOCUMENT, DOCUMENT_CHUNK, EMBEDDING_PROPERTY, ENTITY,
+    ENTITY_NAME_SEARCH_K, FACT, FACT_ABOUT_ENTITY, FACT_DERIVED_FROM_SPAN, FACT_IN_DOCUMENT, SPAN,
+    SPAN_OF_CHUNK, SPAN_REFERS_TO_ENTITY, STORE_ID_PROPERTY, STORE_INFO, TEXT_INDEXES,
+    VECTOR_INDEXED_LABELS,
 };
 use crate::store::GraphStore;
 
@@ -61,7 +64,7 @@ pub const TRANSACTION_CONFLICT_ATTEMPTS: u32 = 20;
 const CONFLICT_BACKOFF_BASE_S: f64 = 0.005;
 /// Largest conflict backoff, seconds.
 const CONFLICT_BACKOFF_CAP_S: f64 = 0.5;
-/// Items written per transaction by the batch methods.
+/// Default number of items written per transaction by the batch methods.
 pub const BATCH_WRITE_SIZE: usize = 100;
 /// Stack size of the runtime's worker threads.
 const WORKER_STACK_BYTES: usize = 16 * 1024 * 1024;
@@ -115,6 +118,9 @@ pub struct HelixOptions {
     pub api_key: Option<String>,
     /// Dimension of the vector indexes.
     pub embedding_dim: usize,
+    /// Items per transaction of the batch writes (at least 1). A database already open in this
+    /// process keeps the batch size it was opened with.
+    pub batch_size: usize,
 }
 
 impl HelixOptions {
@@ -127,6 +133,7 @@ impl HelixOptions {
             namespace: namespace.into(),
             api_key: None,
             embedding_dim,
+            batch_size: BATCH_WRITE_SIZE,
         }
     }
 
@@ -168,6 +175,7 @@ impl HelixOptions {
             namespace: config.namespace.clone(),
             api_key: Some(config.api_key.clone()).filter(|key| !key.is_empty()),
             embedding_dim: config.embedding_dim,
+            batch_size: config.batch_size.max(1),
         }
     }
 
@@ -217,6 +225,7 @@ static REGISTRY: LazyLock<Mutex<HashMap<RegistryKey, Weak<HelixStore>>>> =
 pub struct HelixStore {
     key: RegistryKey,
     embedding_dim: usize,
+    batch_size: usize,
     client: Client,
     runtime: Option<tokio::runtime::Runtime>,
     /// Set once the handle is closed or fenced; every later request fails with it.
@@ -236,6 +245,7 @@ impl std::fmt::Debug for HelixStore {
             .field("location", &self.key.1)
             .field("namespace", &self.key.2)
             .field("embedding_dim", &self.embedding_dim)
+            .field("batch_size", &self.batch_size)
             .finish_non_exhaustive()
     }
 }
@@ -300,6 +310,7 @@ impl HelixStore {
         let store = Self {
             key,
             embedding_dim: dim.get(),
+            batch_size: options.batch_size.max(1),
             client,
             runtime: Some(runtime),
             lost: OnceLock::new(),
@@ -794,6 +805,68 @@ impl HelixStore {
             .collect()
     }
 
+    /// Writes validated edges in groups of `batch_size` after checking every endpoint.
+    fn add_edges(&self, query: &str, edges: &[EdgeWrite<'_>]) -> Result<usize> {
+        if edges.is_empty() {
+            return Ok(0);
+        }
+        let mut by_label: BTreeMap<&'static str, BTreeSet<u64>> = BTreeMap::new();
+        for edge in edges {
+            for end in [&edge.from, &edge.to] {
+                by_label.entry(end.label).or_default().insert(end.node);
+            }
+        }
+        let mut found: BTreeSet<(&'static str, u64)> = BTreeSet::new();
+        for (label, ids) in by_label {
+            let ids: Vec<u64> = ids.into_iter().collect();
+            found.extend(self.existing(query, label, &ids)?.into_iter().map(|id| (label, id)));
+        }
+        for edge in edges {
+            for end in [&edge.from, &edge.to] {
+                if !found.contains(&(end.label, end.node)) {
+                    return Err(StoreError::not_found(end.label, end.id));
+                }
+            }
+        }
+        for group in edges.chunks(self.batch_size) {
+            let mut batch = write_batch();
+            let mut declared = BTreeSet::new();
+            for edge in group {
+                for end in [&edge.from, &edge.to] {
+                    if declared.insert(end.node) {
+                        batch = batch.var_as(
+                            &format!("n{}", end.node),
+                            g().n(NodeRef::id(end.node)).has_label(end.label),
+                        );
+                    }
+                }
+            }
+            let mut names = Vec::with_capacity(group.len());
+            for (index, edge) in group.iter().enumerate() {
+                let name = format!("edge{index}");
+                let from = format!("n{}", edge.from.node);
+                let to = format!("n{}", edge.to.node);
+                let properties: Vec<(&'static str, PropertyValue)> =
+                    edge.properties.iter().map(|(key, value)| (*key, property(*value))).collect();
+                batch = batch.var_as(
+                    &name,
+                    g().n(NodeRef::var(from.as_str()))
+                        .add_e(edge.label, NodeRef::var(to.as_str()), properties)
+                        .count(),
+                );
+                names.push(name);
+            }
+            let result = self.write(query, batch.returning(names))?;
+            for (index, edge) in group.iter().enumerate() {
+                let written = result.get(&format!("edge{index}")).and_then(Value::as_u64);
+                if written.unwrap_or(0) == 0 {
+                    return Err(StoreError::not_found(edge.to.label, edge.to.id));
+                }
+            }
+        }
+        Ok(edges.len())
+    }
+
     fn runtime(&self) -> Result<&tokio::runtime::Runtime> {
         self.runtime.as_ref().ok_or_else(|| {
             StoreError::DatabaseLost(format!("Helix database {} was dropped", self.describe()))
@@ -848,14 +921,23 @@ fn acquire_lock(dir: &Path, namespace: &str) -> Result<File> {
         OpenOptions::new().read(true).write(true).create(true).truncate(false).open(&path)?;
     match fs4::FileExt::try_lock(&file) {
         Ok(()) => Ok(file),
-        Err(fs4::TryLockError::WouldBlock) => Err(StoreError::Connection(format!(
-            "Helix database lock {} is held by another process; an embedded database accepts \
-             one writer process at a time (stop the other process, use a different \
-             data_dir/namespace, or run a Helix server)",
-            path.display()
-        ))),
+        Err(fs4::TryLockError::WouldBlock) => {
+            Err(StoreError::Connection(locked_message(dir, namespace, &path)))
+        }
         Err(fs4::TryLockError::Error(error)) => Err(StoreError::Io(error)),
     }
+}
+
+/// Message of an embedded database whose lock file another process holds.
+fn locked_message(dir: &Path, namespace: &str, lock_path: &Path) -> String {
+    format!(
+        "Helix database `{namespace}` in data directory {} is locked: another impeach process \
+         holds it (lock file {} is held by another process). An embedded database accepts one \
+         writer process at a time: wait for or stop the other process, set helix.data_dir or \
+         helix.namespace to another database, or set helix.mode: server to share a Helix server",
+        dir.display(),
+        lock_path.display()
+    )
 }
 
 fn open_client(
@@ -979,6 +1061,14 @@ fn decode<I: From<String>, T: DeserializeOwned>(row: &Value) -> Result<Stored<I,
     let node = serde_json::from_value(Value::Object(properties))
         .map_err(|error| malformed(format!("cannot decode node {id}: {error}")))?;
     Ok(Stored { id: I::from(id), node })
+}
+
+fn property(value: EdgeValue<'_>) -> PropertyValue {
+    match value {
+        EdgeValue::Int(value) => value.into(),
+        EdgeValue::Float(value) => value.into(),
+        EdgeValue::Text(value) => value.into(),
+    }
 }
 
 fn document_properties(document: &DocumentNode) -> Vec<(&'static str, PropertyValue)> {
@@ -1330,7 +1420,7 @@ impl GraphStore for HelixStore {
     ) -> Result<Vec<StoredChunk>> {
         let parent = parse_node_id("doc_id", doc_id.as_str())?;
         let mut stored = Vec::with_capacity(chunks.len());
-        for group in chunks.chunks(BATCH_WRITE_SIZE) {
+        for group in chunks.chunks(self.batch_size) {
             let mut batch =
                 write_batch().var_as("parent", g().n(NodeRef::id(parent)).has_label(DOCUMENT));
             let mut names = vec!["parent".to_owned()];
@@ -1399,7 +1489,7 @@ impl GraphStore for HelixStore {
         }
         let mut stored = Vec::with_capacity(spans.len());
         for (group, group_parents) in
-            spans.chunks(BATCH_WRITE_SIZE).zip(parents.chunks(BATCH_WRITE_SIZE))
+            spans.chunks(self.batch_size).zip(parents.chunks(self.batch_size))
         {
             let mut batch = write_batch();
             let mut names = Vec::new();
@@ -1451,7 +1541,7 @@ impl GraphStore for HelixStore {
         if let Some(missing) = items.iter().zip(&ids).find(|(_, id)| !found.contains(id)) {
             return Err(StoreError::not_found(label.as_str(), missing.0.node_id));
         }
-        for (group, group_ids) in items.chunks(BATCH_WRITE_SIZE).zip(ids.chunks(BATCH_WRITE_SIZE)) {
+        for (group, group_ids) in items.chunks(self.batch_size).zip(ids.chunks(self.batch_size)) {
             let mut batch = write_batch();
             let mut names = Vec::new();
             for (index, (item, id)) in group.iter().zip(group_ids).enumerate() {
@@ -1471,6 +1561,52 @@ impl GraphStore for HelixStore {
             }
         }
         Ok(items.len())
+    }
+
+    fn create_entity_with_embedding(
+        &self,
+        entity: &EntityNode,
+        embedding: &[f32],
+    ) -> Result<StoredEntity> {
+        let entity = entity.validated()?;
+        validate_vector(embedding, self.embedding_dim)?;
+        let mut properties = entity_properties(&entity);
+        properties.push((EMBEDDING_PROPERTY, PropertyValue::from(embedding.to_vec())));
+        self.create_node("CreateEntityWithEmbedding", ENTITY, properties)
+    }
+
+    fn link_spans_to_entities_batch(&self, links: &[SpanEntityLink<'_>]) -> Result<usize> {
+        let edges = links.iter().map(SpanEntityLink::edge).collect::<Result<Vec<_>>>()?;
+        self.add_edges("LinkSpansToEntitiesBatch", &edges)
+    }
+
+    fn create_facts_batch(&self, facts: &[FactNode]) -> Result<Vec<StoredFact>> {
+        for fact in facts {
+            fact.validate()?;
+        }
+        let mut stored = Vec::with_capacity(facts.len());
+        for group in facts.chunks(self.batch_size) {
+            let mut batch = write_batch();
+            let mut names = Vec::with_capacity(group.len());
+            for (index, fact) in group.iter().enumerate() {
+                let name = format!("node{index}");
+                batch = batch.var_as(
+                    &name,
+                    g().add_n(FACT, fact_properties(fact)).value_map(Some(fields(FACT))),
+                );
+                names.push(name);
+            }
+            let result = self.write("CreateFactsBatch", batch.returning(names))?;
+            for index in 0..group.len() {
+                stored.push(decode(single(&result, &format!("node{index}"), FACT, "(new)")?)?);
+            }
+        }
+        Ok(stored)
+    }
+
+    fn link_facts_batch(&self, links: &[FactLink<'_>]) -> Result<usize> {
+        let edges = links.iter().map(FactLink::edge).collect::<Result<Vec<_>>>()?;
+        self.add_edges("LinkFactsBatch", &edges)
     }
 }
 

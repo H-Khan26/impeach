@@ -89,10 +89,22 @@ fn a_held_lock_fails_open() {
     fs4::FileExt::try_lock(&holder).expect("lock taken by another writer");
     let error =
         HelixStore::open(&HelixOptions::embedded(dir.path(), "busy", DIM)).expect_err("busy");
-    assert!(
-        matches!(&error, StoreError::Connection(message) if message.contains("held by another process")),
-        "{error:?}"
-    );
+    let StoreError::Connection(message) = &error else {
+        panic!("expected a connection error, got {error:?}");
+    };
+    let data_dir = std::fs::canonicalize(dir.path()).expect("canonical data dir");
+    let data_dir = data_dir.to_string_lossy();
+    let data_dir = data_dir.trim_start_matches(r"\\?\");
+    for part in [
+        data_dir,
+        "`busy`",
+        "another impeach process holds it",
+        "held by another process",
+        "helix.data_dir",
+        "helix.mode: server",
+    ] {
+        assert!(message.contains(part), "`{part}` missing from: {message}");
+    }
 }
 
 #[test]
@@ -124,6 +136,7 @@ fn from_config_reads_the_helix_block() {
     assert_eq!(options.mode, HelixMode::Memory);
     assert_eq!(options.namespace, "from-config");
     assert_eq!(options.api_key, None);
+    assert_eq!(options.batch_size, 50);
     let store = HelixStore::from_config(&config).expect("opens");
     assert_eq!(store.embedding_dim(), 4);
 }

@@ -9,6 +9,11 @@
 //! Role terms (`roles.yaml` seed list) never become canonical names: a role-only mention
 //! salvages the first non-role alias or is not created (`<strategy>_skip_role`).
 //!
+//! A new entity and its embedding are written in one store call
+//! ([`GraphStore::create_entity_with_embedding`]); when that call fails non-fatally they are
+//! written separately. Entities are created one mention at a time, because the reuse lookup of
+//! a later mention must see the entities created before it.
+//!
 //! Store errors are logged and treated as "no candidates" / "no entity", except fatal ones,
 //! which propagate. Embedder failures only skip the entity embedding.
 
@@ -506,6 +511,29 @@ impl EntityCreator {
             metadata: if meta.is_empty() { "{}".to_owned() } else { json_text(&meta, "{}") },
         };
 
+        let vector = self.entity_vector(&canonical_name, &description, &alias_list);
+        if let Some(vector) = vector.as_deref() {
+            match self.store.create_entity_with_embedding(&node, vector) {
+                Ok(created) => {
+                    tracing::info!(
+                        entity = %created.id,
+                        mention = %mention.id,
+                        name = canonical_name.as_str(),
+                        "created new entity"
+                    );
+                    // Later mentions of the document must see the new entity.
+                    self.invalidate_cache();
+                    return Ok(Some(EntityOutcome::Created(created.id)));
+                }
+                Err(error) if error.is_fatal() => return Err(error.into()),
+                Err(error) => tracing::debug!(
+                    mention = %mention.id,
+                    error = %error,
+                    "creating the entity with its embedding failed; writing them separately"
+                ),
+            }
+        }
+
         let created = match self.store.create_entity(&node) {
             Ok(created) => created,
             Err(error) if error.is_fatal() => return Err(error.into()),
@@ -522,22 +550,21 @@ impl EntityCreator {
         );
         // Later mentions of the document must see the new entity.
         self.invalidate_cache();
-        self.create_entity_embedding(&created.id, &canonical_name, &description, &alias_list)?;
+        if let Some(vector) = vector {
+            self.store_entity_embedding(&created.id, canonical_name.as_str(), &vector)?;
+        }
         Ok(Some(EntityOutcome::Created(created.id)))
     }
 
-    /// Writes the entity vector of `Name: Description (Aliases: a, b)`; a no-op without an
-    /// embedder. Embedder and non-fatal store failures are logged.
-    fn create_entity_embedding(
+    /// The entity vector of `Name: Description (Aliases: a, b)`; `None` without an embedder or
+    /// when embedding fails (logged).
+    fn entity_vector(
         &self,
-        entity_id: &EntityId,
         canonical_name: &str,
         description: &str,
         aliases: &[String],
-    ) -> Result<()> {
-        let Some(embedder) = &self.embedder else {
-            return Ok(());
-        };
+    ) -> Option<Vec<f32>> {
+        let embedder = self.embedder.as_ref()?;
         let mut text = canonical_name.to_owned();
         if !description.is_empty() {
             text.push_str(": ");
@@ -548,18 +575,27 @@ impl EntityCreator {
             text.push_str(&aliases.join(", "));
             text.push(')');
         }
-        let vector = match embedder.embed(&[text.as_str()]) {
-            Ok(mut vectors) if !vectors.is_empty() => vectors.swap_remove(0),
+        match embedder.embed(&[text.as_str()]) {
+            Ok(mut vectors) if !vectors.is_empty() => Some(vectors.swap_remove(0)),
             Ok(_) => {
-                tracing::warn!(entity = %entity_id, "entity embedding: empty result");
-                return Ok(());
+                tracing::warn!(name = canonical_name, "entity embedding: empty result");
+                None
             }
             Err(error) => {
-                tracing::warn!(entity = %entity_id, error = %error, "entity embedding failed");
-                return Ok(());
+                tracing::warn!(name = canonical_name, error = %error, "entity embedding failed");
+                None
             }
-        };
-        match self.store.create_entity_embedding(entity_id, &vector) {
+        }
+    }
+
+    /// Writes the vector of an existing entity; non-fatal store failures are logged.
+    fn store_entity_embedding(
+        &self,
+        entity_id: &EntityId,
+        canonical_name: &str,
+        vector: &[f32],
+    ) -> Result<()> {
+        match self.store.create_entity_embedding(entity_id, vector) {
             Ok(()) => {
                 tracing::debug!(entity = %entity_id, name = canonical_name, "created entity embedding");
                 Ok(())

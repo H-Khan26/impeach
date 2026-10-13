@@ -8,7 +8,8 @@
 //!   ([`DocumentNode`], [`ChunkNode`], [`SpanNode`], [`EntityNode`], [`FactNode`]) with the
 //!   Python parameter validation, and the result types [`Stored`] and [`SearchHit`].
 //! - [`GraphStore`]: one method per query of the Python Helix client, plus `store_id`,
-//!   `reset`, batch writes for chunks, spans and embeddings, and `delete_document_chunks`
+//!   `reset`, batch writes for chunks, spans, embeddings, facts, span-entity and fact edges,
+//!   `create_entity_with_embedding`, and `delete_document_chunks`
 //!   (clears a document's chunks before it is re-indexed). Synchronous and object safe; share
 //!   one store as `Arc<dyn GraphStore>`.
 //! - [`MemoryStore`]: complete in-process backend (brute-force cosine, Okapi BM25 from
@@ -44,9 +45,9 @@ mod store;
 
 pub use error::{Result, StoreError};
 pub use graph::{
-    ChunkNode, DocumentNode, EmbeddingWrite, EntityHit, EntityNode, FactHit, FactNode, SearchHit,
-    SpanNode, Stored, StoredChunk, StoredDocument, StoredEntity, StoredFact, StoredSpan,
-    VectorLabel,
+    ChunkNode, DocumentNode, EmbeddingWrite, EntityHit, EntityNode, FactHit, FactLink, FactNode,
+    SearchHit, SpanEntityLink, SpanNode, Stored, StoredChunk, StoredDocument, StoredEntity,
+    StoredFact, StoredSpan, VectorLabel,
 };
 #[cfg(feature = "helix")]
 pub use helix::{HelixMode, HelixOptions, HelixStore};

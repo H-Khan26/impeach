@@ -1,18 +1,26 @@
 //! The [`GraphStore`] trait: one method per query of the Python Helix client, plus batch writes
 //! and the chunk cleanup of re-indexed documents.
+//!
+//! The batch methods `create_entity_with_embedding`, `link_spans_to_entities_batch`,
+//! `create_facts_batch` and `link_facts_batch` have default implementations that validate the
+//! whole input and then call the single-item methods (one transaction per item); the memory
+//! and Helix stores override them with batched, all-or-nothing writes.
 
 use impeach_core::{ChunkId, EntityId, FactId, NodeId, SpanId};
 
 use crate::error::Result;
 use crate::graph::{
-    ChunkNode, DocumentNode, EmbeddingWrite, EntityHit, EntityNode, FactHit, FactNode, SpanNode,
-    StoredChunk, StoredDocument, StoredEntity, StoredFact, StoredSpan, VectorLabel,
+    validate_vector, ChunkNode, DocumentNode, EmbeddingWrite, EntityHit, EntityNode, FactHit,
+    FactLink, FactNode, SpanEntityLink, SpanNode, StoredChunk, StoredDocument, StoredEntity,
+    StoredFact, StoredSpan, VectorLabel,
 };
 
 /// Graph, vector and text storage used by the pipeline.
 ///
-/// Every method is one atomic transaction. Methods take `&self` (backends use interior
-/// mutability) so one store is shared as `Arc<dyn GraphStore>`.
+/// Every method is one atomic transaction, except that batch methods may split large inputs
+/// and the default batch implementations write item by item (see the module docs). Methods
+/// take `&self` (backends use interior mutability) so one store is shared as
+/// `Arc<dyn GraphStore>`.
 ///
 /// Errors common to every method: [`crate::StoreError::Validation`] for malformed input
 /// (including ids that are not graph node ids), [`crate::StoreError::NotFound`] when a
@@ -235,4 +243,76 @@ pub trait GraphStore: Send + Sync + std::fmt::Debug {
         label: VectorLabel,
         items: &[EmbeddingWrite<'_>],
     ) -> Result<usize>;
+
+    /// `CreateEntity` plus `CreateEntityEmbedding` in one transaction: the entity is visible
+    /// to searches with its vector at once. The entity and the vector are validated before
+    /// anything is written.
+    ///
+    /// # Errors
+    /// `Validation` per [`EntityNode::validated`] or for a malformed vector.
+    fn create_entity_with_embedding(
+        &self,
+        entity: &EntityNode,
+        embedding: &[f32],
+    ) -> Result<StoredEntity> {
+        let node = entity.validated()?;
+        validate_vector(embedding, self.embedding_dim())?;
+        let stored = self.create_entity(&node)?;
+        self.create_entity_embedding(&stored.id, embedding)?;
+        Ok(stored)
+    }
+
+    /// Batch `LinkSpanToEntity`, edges in input order; returns the number written. Every link
+    /// is validated and every endpoint looked up before anything is written; transactions as
+    /// in [`GraphStore::create_chunks_batch`].
+    ///
+    /// # Errors
+    /// `Validation` for a malformed id or confidence; `NotFound` for a missing endpoint.
+    fn link_spans_to_entities_batch(&self, links: &[SpanEntityLink<'_>]) -> Result<usize> {
+        for link in links {
+            link.edge()?;
+        }
+        for link in links {
+            self.link_span_to_entity(link.span_id, link.entity_id, link.confidence, link.method)?;
+        }
+        Ok(links.len())
+    }
+
+    /// Batch `CreateFact`: results in input order. Every fact is validated before anything is
+    /// written; transactions as in [`GraphStore::create_chunks_batch`].
+    ///
+    /// # Errors
+    /// `Validation` per [`FactNode::validate`].
+    fn create_facts_batch(&self, facts: &[FactNode]) -> Result<Vec<StoredFact>> {
+        for fact in facts {
+            fact.validate()?;
+        }
+        facts.iter().map(|fact| self.create_fact(fact)).collect()
+    }
+
+    /// Batch `LinkFactToDocument` / `LinkFactToEntity` / `LinkFactToSpan`, edges in input
+    /// order; returns the number written. Validation and transactions as in
+    /// [`GraphStore::link_spans_to_entities_batch`].
+    ///
+    /// # Errors
+    /// `Validation` for a malformed id or confidence; `NotFound` for a missing endpoint.
+    fn link_facts_batch(&self, links: &[FactLink<'_>]) -> Result<usize> {
+        for link in links {
+            link.edge()?;
+        }
+        for link in links {
+            match *link {
+                FactLink::Document { fact_id, doc_id, page_number, section } => {
+                    self.link_fact_to_document(fact_id, doc_id, page_number, section)?;
+                }
+                FactLink::Entity { fact_id, entity_id, role } => {
+                    self.link_fact_to_entity(fact_id, entity_id, role)?;
+                }
+                FactLink::Span { fact_id, span_id, role, confidence } => {
+                    self.link_fact_to_span(fact_id, span_id, role, confidence)?;
+                }
+            }
+        }
+        Ok(links.len())
+    }
 }
