@@ -1,10 +1,11 @@
 //! The [`GraphStore`] trait: one method per query of the Python Helix client, plus batch writes
 //! and the chunk cleanup of re-indexed documents.
 //!
-//! The batch methods `create_entity_with_embedding`, `link_spans_to_entities_batch`,
-//! `create_facts_batch` and `link_facts_batch` have default implementations that validate the
-//! whole input and then call the single-item methods (one transaction per item); the memory
-//! and Helix stores override them with batched, all-or-nothing writes.
+//! The span, edge and fact batch methods are all or nothing: every item is validated and every
+//! endpoint looked up before anything is written, and the writes form one transaction. A
+//! failed batch writes nothing, so a caller may retry its items one by one without creating
+//! duplicates. `create_entity_with_embedding` has a default implementation of two writes
+//! (entity, then vector); the memory and Helix stores override it with one transaction.
 
 use impeach_core::{ChunkId, EntityId, FactId, NodeId, SpanId};
 
@@ -17,8 +18,9 @@ use crate::graph::{
 
 /// Graph, vector and text storage used by the pipeline.
 ///
-/// Every method is one atomic transaction, except that batch methods may split large inputs
-/// and the default batch implementations write item by item (see the module docs). Methods
+/// Every method is one atomic transaction, except that `create_chunks_batch` and
+/// `create_embeddings_batch` may split large inputs and the default
+/// `create_entity_with_embedding` writes twice (see the module docs). Methods
 /// take `&self` (backends use interior mutability) so one store is shared as
 /// `Arc<dyn GraphStore>`.
 ///
@@ -226,8 +228,8 @@ pub trait GraphStore: Send + Sync + std::fmt::Debug {
     /// `Validation` for a malformed id; database failures.
     fn delete_document_chunks(&self, doc_id: &NodeId) -> Result<usize>;
 
-    /// Batch `CreateSpanForChunk`: results in input order; transactions as in
-    /// [`GraphStore::create_chunks_batch`].
+    /// Batch `CreateSpanForChunk`: results in input order. All or nothing: every parent chunk is
+    /// looked up first and the spans are written in one transaction.
     ///
     /// # Errors
     /// `NotFound` when any `chunk_id` is not a chunk.
@@ -244,9 +246,12 @@ pub trait GraphStore: Send + Sync + std::fmt::Debug {
         items: &[EmbeddingWrite<'_>],
     ) -> Result<usize>;
 
-    /// `CreateEntity` plus `CreateEntityEmbedding` in one transaction: the entity is visible
-    /// to searches with its vector at once. The entity and the vector are validated before
-    /// anything is written.
+    /// `CreateEntity` plus `CreateEntityEmbedding`: the entity is visible to searches with its
+    /// vector at once. The entity and the vector are validated before anything is written.
+    ///
+    /// The default implementation writes the entity, then its vector. When the vector write
+    /// fails (non-fatally) the entity is kept and returned and the missing vector is logged,
+    /// so callers never create the entity a second time.
     ///
     /// # Errors
     /// `Validation` per [`EntityNode::validated`] or for a malformed vector.
@@ -258,61 +263,38 @@ pub trait GraphStore: Send + Sync + std::fmt::Debug {
         let node = entity.validated()?;
         validate_vector(embedding, self.embedding_dim())?;
         let stored = self.create_entity(&node)?;
-        self.create_entity_embedding(&stored.id, embedding)?;
+        match self.create_entity_embedding(&stored.id, embedding) {
+            Ok(()) => {}
+            Err(error) if error.is_fatal() => return Err(error),
+            Err(error) => tracing::warn!(
+                entity = %stored.id,
+                error = %error,
+                "entity created without its embedding: the vector write failed"
+            ),
+        }
         Ok(stored)
     }
 
-    /// Batch `LinkSpanToEntity`, edges in input order; returns the number written. Every link
-    /// is validated and every endpoint looked up before anything is written; transactions as
-    /// in [`GraphStore::create_chunks_batch`].
+    /// Batch `LinkSpanToEntity`, edges in input order; returns the number written. All or
+    /// nothing: every link is validated and every endpoint looked up before the edges are
+    /// written in one transaction.
     ///
     /// # Errors
     /// `Validation` for a malformed id or confidence; `NotFound` for a missing endpoint.
-    fn link_spans_to_entities_batch(&self, links: &[SpanEntityLink<'_>]) -> Result<usize> {
-        for link in links {
-            link.edge()?;
-        }
-        for link in links {
-            self.link_span_to_entity(link.span_id, link.entity_id, link.confidence, link.method)?;
-        }
-        Ok(links.len())
-    }
+    fn link_spans_to_entities_batch(&self, links: &[SpanEntityLink<'_>]) -> Result<usize>;
 
-    /// Batch `CreateFact`: results in input order. Every fact is validated before anything is
-    /// written; transactions as in [`GraphStore::create_chunks_batch`].
+    /// Batch `CreateFact`: results in input order. All or nothing: every fact is validated
+    /// before the facts are written in one transaction.
     ///
     /// # Errors
     /// `Validation` per [`FactNode::validate`].
-    fn create_facts_batch(&self, facts: &[FactNode]) -> Result<Vec<StoredFact>> {
-        for fact in facts {
-            fact.validate()?;
-        }
-        facts.iter().map(|fact| self.create_fact(fact)).collect()
-    }
+    fn create_facts_batch(&self, facts: &[FactNode]) -> Result<Vec<StoredFact>>;
 
     /// Batch `LinkFactToDocument` / `LinkFactToEntity` / `LinkFactToSpan`, edges in input
-    /// order; returns the number written. Validation and transactions as in
+    /// order; returns the number written. All or nothing, as
     /// [`GraphStore::link_spans_to_entities_batch`].
     ///
     /// # Errors
     /// `Validation` for a malformed id or confidence; `NotFound` for a missing endpoint.
-    fn link_facts_batch(&self, links: &[FactLink<'_>]) -> Result<usize> {
-        for link in links {
-            link.edge()?;
-        }
-        for link in links {
-            match *link {
-                FactLink::Document { fact_id, doc_id, page_number, section } => {
-                    self.link_fact_to_document(fact_id, doc_id, page_number, section)?;
-                }
-                FactLink::Entity { fact_id, entity_id, role } => {
-                    self.link_fact_to_entity(fact_id, entity_id, role)?;
-                }
-                FactLink::Span { fact_id, span_id, role, confidence } => {
-                    self.link_fact_to_span(fact_id, span_id, role, confidence)?;
-                }
-            }
-        }
-        Ok(links.len())
-    }
+    fn link_facts_batch(&self, links: &[FactLink<'_>]) -> Result<usize>;
 }

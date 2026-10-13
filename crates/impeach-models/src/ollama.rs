@@ -4,9 +4,10 @@
 //! The [`Llm`] trait is synchronous, so each [`OllamaLlm`] owns a private current-thread tokio
 //! runtime and blocks on the HTTP call. Do not call it from inside an async task.
 //!
-//! A request that cannot reach the server (connection refused, connect timeout) fails with
-//! [`ModelError::Unavailable`] naming the `base_url` and how to start Ollama or run without it;
-//! [`OllamaLlm::check_reachable`] performs that check up front.
+//! [`OllamaLlm::check_reachable`] (run by the model registry when it resolves the LLM) fails
+//! with [`ModelError::Unavailable`] naming the `base_url` and how to start Ollama or run
+//! without it. A later request that cannot reach the server fails with a short
+//! [`ModelError::Connection`].
 
 use std::time::Duration;
 
@@ -98,6 +99,9 @@ impl OllamaLlm {
             .block_on(async { tokio::time::timeout(REACHABILITY_TIMEOUT, call).await })
         {
             Ok(Ok(_)) => Ok(()),
+            Ok(Err(error)) if is_unreachable(&error) => {
+                Err(unreachable_error(&self.options, &error_chain(&error)))
+            }
             Ok(Err(error)) => Err(self.request_error(&error)),
             Err(_) => Err(unreachable_error(
                 &self.options,
@@ -106,13 +110,15 @@ impl OllamaLlm {
         }
     }
 
-    /// The error of a failed request: [`unreachable_error`] when the server could not be reached,
-    /// else an inference error.
+    /// The error of a failed request: [`ModelError::Connection`] when the server could not be
+    /// reached, else an inference error.
     fn request_error(&self, error: &OllamaError) -> ModelError {
-        if let OllamaError::ReqwestError(source) = error {
-            if source.is_connect() || source.is_timeout() {
-                return unreachable_error(&self.options, &error_chain(error));
-            }
+        if is_unreachable(error) {
+            return ModelError::Connection(format!(
+                "Ollama at {} did not respond: {}",
+                self.options.base_url,
+                error_chain(error)
+            ));
         }
         ModelError::Inference(format!(
             "Ollama request to {} (model `{}`) failed: {}",
@@ -149,6 +155,11 @@ impl OllamaLlm {
         };
         response.map(|r| r.response).map_err(|e| self.request_error(&e))
     }
+}
+
+/// Whether `error` means the server could not be reached (connection failure or timeout).
+fn is_unreachable(error: &OllamaError) -> bool {
+    matches!(error, OllamaError::ReqwestError(source) if source.is_connect() || source.is_timeout())
 }
 
 /// [`ModelError::Unavailable`] for an Ollama server that cannot be reached.

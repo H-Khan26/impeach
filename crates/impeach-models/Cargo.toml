@@ -27,6 +27,8 @@ serde_json.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 process-wrap = { workspace = true, features = ["std"] }
+# Home directory resolution matching hf-hub's Hugging Face cache path.
+dirs.workspace = true
 # ONNX Runtime binaries are downloaded at build time; no image models.
 fastembed = { workspace = true, optional = true, features = ["ort-download-binaries-native-tls", "hf-hub-native-tls"] }
 # Same ort version and feature set as fastembed so both share one ONNX Runtime.

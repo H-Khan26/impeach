@@ -15,9 +15,13 @@ pub enum ModelError {
     /// A backend returned output that does not follow its protocol (bad JSON, wrong shape).
     #[error("protocol error: {0}")]
     Protocol(String),
-    /// The backend is not compiled in or not configured.
+    /// The backend is not compiled in, not configured, or its server is not reachable when the
+    /// model is resolved.
     #[error("model backend `{backend}` is unavailable: {reason}")]
     Unavailable { backend: String, reason: String },
+    /// A request to a model server failed to connect or timed out.
+    #[error("connection failed: {0}")]
+    Connection(String),
     /// No model is registered under the key.
     #[error("unknown model key `{key}`; known keys: {known:?}")]
     UnknownModel { key: String, known: Vec<String> },
@@ -69,7 +73,8 @@ pub(crate) fn missing_model(
 }
 
 /// The Hugging Face hub cache: `$HF_HOME/hub` (when `honour_hf_home`), else
-/// `~/.cache/huggingface/hub`.
+/// `<home>/.cache/huggingface/hub` with the home directory `hf-hub` uses (`dirs::home_dir`:
+/// the user profile folder on Windows, `$HOME` elsewhere).
 #[cfg_attr(not(any(feature = "ort-nli", feature = "gliner2")), allow(dead_code))]
 pub(crate) fn hf_hub_cache_dir(honour_hf_home: bool) -> std::path::PathBuf {
     if honour_hf_home {
@@ -77,9 +82,7 @@ pub(crate) fn hf_hub_cache_dir(honour_hf_home: bool) -> std::path::PathBuf {
             return std::path::PathBuf::from(home).join("hub");
         }
     }
-    let home = std::env::var_os("HOME")
-        .or_else(|| std::env::var_os("USERPROFILE"))
-        .map_or_else(|| std::path::PathBuf::from("~"), std::path::PathBuf::from);
+    let home = dirs::home_dir().unwrap_or_else(|| std::path::PathBuf::from("~"));
     home.join(".cache").join("huggingface").join("hub")
 }
 

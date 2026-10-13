@@ -56,8 +56,10 @@ fn misconfigurations_have_actionable_messages() {
         assert!(matches!(error, ModelError::Download { .. }), "{error:?}");
         assert_names(
             &error.to_string(),
-            &["cross-encoder/nli-deberta-v3-large", &cache_text, "HF_HOME", "deberta_nli"],
+            &["cross-encoder/nli-deberta-v3-large", &cache_text, "cache_dir", "deberta_nli"],
         );
+        // A configured cache directory overrides HF_HOME, so the message does not suggest it.
+        assert!(!error.to_string().contains("HF_HOME"), "{error}");
     }
 
     {
@@ -84,16 +86,18 @@ fn misconfigurations_have_actionable_messages() {
             timeout: Some(std::time::Duration::from_secs(30)),
         };
         let llm = OllamaLlm::new(&options).expect("client construction does not connect");
-        let error = llm.complete(&LlmRequest::new("hello")).expect_err("nothing listens");
+        // Up front (the registry runs this check): the full remedy.
+        let error = llm.check_reachable().expect_err("nothing listens");
         assert!(
             matches!(&error, ModelError::Unavailable { backend, .. } if backend == "ollama"),
             "{error:?}"
         );
+        assert_names(&error.to_string(), &[&base_url, "not reachable", "ollama serve", "mock"]);
+        // During a run: a short connection error.
+        let error = llm.complete(&LlmRequest::new("hello")).expect_err("nothing listens");
+        assert!(matches!(&error, ModelError::Connection(_)), "{error:?}");
         let message = error.to_string();
-        for part in [base_url.as_str(), "not reachable", "ollama serve", "mock"] {
-            assert!(message.contains(part), "`{part}` missing from: {message}");
-        }
-        let error = llm.check_reachable().expect_err("nothing listens");
-        assert!(error.to_string().contains("not reachable"), "{error}");
+        assert_names(&message, &[&base_url, "did not respond"]);
+        assert!(!message.contains("ollama serve"), "{message}");
     }
 }

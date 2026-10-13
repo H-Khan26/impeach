@@ -16,13 +16,11 @@ use serde_json::{json, Map, Value};
 use crate::bm25;
 use crate::error::{Result, StoreError};
 use crate::graph::{
-    clamp_limit, merge_hits, or_default, parse_node_id, validate_confidence, validate_vector,
-    ChunkNode, DocumentNode, EdgeWrite, EmbeddingWrite, EntityHit, EntityNode, FactHit, FactLink,
-    FactNode, SearchHit, SpanEntityLink, SpanNode, Stored, StoredChunk, StoredDocument,
-    StoredEntity, StoredFact, StoredSpan, VectorLabel, CHUNK_OF_DOCUMENT, DEFAULT_FACT_ENTITY_ROLE,
-    DEFAULT_FACT_SPAN_ROLE, DEFAULT_SPAN_ENTITY_METHOD, DOCUMENT, DOCUMENT_CHUNK, ENTITY,
-    ENTITY_NAME_SEARCH_K, FACT, FACT_ABOUT_ENTITY, FACT_DERIVED_FROM_SPAN, FACT_IN_DOCUMENT, SPAN,
-    SPAN_OF_CHUNK, SPAN_REFERS_TO_ENTITY,
+    clamp_limit, merge_hits, parse_node_id, validate_vector, ChunkNode, DocumentNode, EdgeWrite,
+    EmbeddingWrite, EntityHit, EntityNode, FactHit, FactLink, FactNode, SearchHit, SpanEntityLink,
+    SpanNode, Stored, StoredChunk, StoredDocument, StoredEntity, StoredFact, StoredSpan,
+    VectorLabel, CHUNK_OF_DOCUMENT, DOCUMENT, DOCUMENT_CHUNK, ENTITY, ENTITY_NAME_SEARCH_K, FACT,
+    FACT_ABOUT_ENTITY, SPAN, SPAN_OF_CHUNK,
 };
 use crate::store::GraphStore;
 
@@ -456,18 +454,8 @@ impl GraphStore for MemoryStore {
         confidence: f64,
         method: &str,
     ) -> Result<()> {
-        let confidence = validate_confidence(confidence)?;
-        let mut graph = self.write();
-        let from = graph.require(SPAN, "span_id", span_id.as_str())?;
-        let to = graph.require(ENTITY, "entity_id", entity_id.as_str())?;
-        let method = or_default(method, DEFAULT_SPAN_ENTITY_METHOD);
-        graph.add_edge(
-            SPAN_REFERS_TO_ENTITY,
-            from,
-            to,
-            json!({"Confidence": confidence, "Method": method}),
-        );
-        Ok(())
+        let link = SpanEntityLink { span_id, entity_id, confidence, method };
+        self.add_edges(&[link.edge()?]).map(drop)
     }
 
     fn create_fact(&self, fact: &FactNode) -> Result<StoredFact> {
@@ -487,16 +475,8 @@ impl GraphStore for MemoryStore {
         page_number: i64,
         section: &str,
     ) -> Result<()> {
-        let mut graph = self.write();
-        let from = graph.require(FACT, "fact_id", fact_id.as_str())?;
-        let to = graph.require(DOCUMENT, "doc_id", doc_id.as_str())?;
-        graph.add_edge(
-            FACT_IN_DOCUMENT,
-            from,
-            to,
-            json!({"PageNumber": page_number, "Section": section}),
-        );
-        Ok(())
+        let link = FactLink::Document { fact_id, doc_id, page_number, section };
+        self.add_edges(&[link.edge()?]).map(drop)
     }
 
     fn link_fact_to_entity(
@@ -505,12 +485,8 @@ impl GraphStore for MemoryStore {
         entity_id: &EntityId,
         role: &str,
     ) -> Result<()> {
-        let mut graph = self.write();
-        let from = graph.require(FACT, "fact_id", fact_id.as_str())?;
-        let to = graph.require(ENTITY, "entity_id", entity_id.as_str())?;
-        let role = or_default(role, DEFAULT_FACT_ENTITY_ROLE);
-        graph.add_edge(FACT_ABOUT_ENTITY, from, to, json!({"Role": role}));
-        Ok(())
+        let link = FactLink::Entity { fact_id, entity_id, role };
+        self.add_edges(&[link.edge()?]).map(drop)
     }
 
     fn link_fact_to_span(
@@ -520,18 +496,8 @@ impl GraphStore for MemoryStore {
         role: &str,
         confidence: f64,
     ) -> Result<()> {
-        let confidence = validate_confidence(confidence)?;
-        let mut graph = self.write();
-        let from = graph.require(FACT, "fact_id", fact_id.as_str())?;
-        let to = graph.require(SPAN, "span_id", span_id.as_str())?;
-        let role = or_default(role, DEFAULT_FACT_SPAN_ROLE);
-        graph.add_edge(
-            FACT_DERIVED_FROM_SPAN,
-            from,
-            to,
-            json!({"Role": role, "Confidence": confidence}),
-        );
-        Ok(())
+        let link = FactLink::Span { fact_id, span_id, role, confidence };
+        self.add_edges(&[link.edge()?]).map(drop)
     }
 
     fn get_entity_facts(&self, entity_id: &EntityId) -> Result<Vec<StoredFact>> {
@@ -692,6 +658,8 @@ impl GraphStore for MemoryStore {
 mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
+
+    use crate::graph::{FACT_DERIVED_FROM_SPAN, FACT_IN_DOCUMENT, SPAN_REFERS_TO_ENTITY};
 
     #[test]
     fn merge_keeps_the_best_score_per_node() {

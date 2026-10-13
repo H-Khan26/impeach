@@ -9,7 +9,9 @@ use common::{char_slice, config_with, default_config, read_fixture, Harness, DIM
 use impeach_core::{ChunkId, DocumentPayload, EntityId, FactId, IndexingResult, NodeId, SpanId};
 use impeach_models::{Embedder, ModelError, ModelKind, ModelRegistry};
 use impeach_pipeline::{PipelineError, PipelineInput, RagIndexStage, Stage};
-use impeach_store::graph::{CHUNK_OF_DOCUMENT, DOCUMENT, DOCUMENT_CHUNK, SPAN, SPAN_OF_CHUNK};
+use impeach_store::graph::{
+    FactLink, SpanEntityLink, CHUNK_OF_DOCUMENT, DOCUMENT, DOCUMENT_CHUNK, SPAN, SPAN_OF_CHUNK,
+};
 use impeach_store::{
     ChunkNode, DocumentNode, EmbeddingWrite, EntityHit, EntityNode, FactHit, FactNode, GraphStore,
     MemoryStore, SpanNode, StoreError, StoredChunk, StoredDocument, StoredEntity, StoredFact,
@@ -679,6 +681,18 @@ impl GraphStore for FailingUpdateStore {
         items: &[EmbeddingWrite<'_>],
     ) -> impeach_store::Result<usize> {
         self.inner.create_embeddings_batch(label, items)
+    }
+    fn link_spans_to_entities_batch(
+        &self,
+        links: &[SpanEntityLink<'_>],
+    ) -> impeach_store::Result<usize> {
+        self.inner.link_spans_to_entities_batch(links)
+    }
+    fn create_facts_batch(&self, facts: &[FactNode]) -> impeach_store::Result<Vec<StoredFact>> {
+        self.inner.create_facts_batch(facts)
+    }
+    fn link_facts_batch(&self, links: &[FactLink<'_>]) -> impeach_store::Result<usize> {
+        self.inner.link_facts_batch(links)
     }
 }
 

@@ -236,18 +236,21 @@ fn download(options: &OrtNliOptions) -> Result<ModelFiles, ModelError> {
     }
     let cache_dir =
         options.cache_dir.clone().unwrap_or_else(|| crate::error::hf_hub_cache_dir(true));
-    let missing = |cause: String| {
-        missing_model(
-            &options.model,
-            &cache_dir,
-            "set HF_HOME to a Hugging Face cache that holds it (models.deberta_nli.model names \
-             the repo)",
-            &cause,
-        )
+    let setting = if options.cache_dir.is_some() {
+        "point OrtNliOptions::cache_dir at a Hugging Face cache that holds it \
+         (models.deberta_nli.model names the repo)"
+    } else {
+        "set HF_HOME to a Hugging Face cache that holds it (models.deberta_nli.model names the \
+         repo)"
     };
-    let api = builder
-        .build()
-        .map_err(|e| missing(format!("cannot initialise the Hugging Face hub client: {e}")))?;
+    let missing = |cause: String| missing_model(&options.model, &cache_dir, setting, &cause);
+    let api = builder.build().map_err(|e| ModelError::Load {
+        model: options.model.clone(),
+        message: format!(
+            "cannot initialise the Hugging Face hub client (cache {}): {e}",
+            cache_dir.display()
+        ),
+    })?;
     let repo = api.model(options.model.clone());
     let get = |file: &str| {
         tracing::debug!(model = %options.model, file, "fetching NLI model file");

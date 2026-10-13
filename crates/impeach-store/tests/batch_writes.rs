@@ -1,7 +1,7 @@
 //! Contract of the batch write methods (`create_entity_with_embedding`,
 //! `link_spans_to_entities_batch`, `create_facts_batch`, `link_facts_batch`), run against
-//! `MemoryStore`, the trait's default implementations and (feature `helix`) `HelixStore` in
-//! memory mode.
+//! `MemoryStore` and (feature `helix`) `HelixStore` in memory mode, plus the trait's default
+//! `create_entity_with_embedding`.
 
 use std::sync::Arc;
 
@@ -26,7 +26,7 @@ fn memory_store() -> Arc<dyn GraphStore> {
 }
 
 fn default_methods_store() -> Arc<dyn GraphStore> {
-    Arc::new(DefaultMethods(MemoryStore::new(DIM)))
+    Arc::new(DefaultMethods::new(MemoryStore::new(DIM)))
 }
 
 #[cfg(feature = "helix")]
@@ -169,8 +169,7 @@ fn facts_batch(store: &dyn GraphStore) {
     store.create_fact_embedding(&stored[0].id, &X).expect("facts accept vectors");
 }
 
-/// `atomic`: a failed batch writes nothing (the trait defaults write link by link).
-fn fact_links_batch(store: &dyn GraphStore, atomic: bool) {
+fn fact_links_batch(store: &dyn GraphStore) {
     let (doc, spans) = document_with_spans(store, 1);
     let first = store.create_entity(&EntityNode::new("First", "ORG")).expect("entity").id;
     let second = store.create_entity(&EntityNode::new("Second", "ORG")).expect("entity").id;
@@ -202,13 +201,11 @@ fn fact_links_batch(store: &dyn GraphStore, atomic: bool) {
         ])
         .expect_err("missing entity");
     assert!(is_not_found(&error), "{error:?}");
-    if atomic {
-        assert_eq!(
-            store.get_fact_entities(f1).expect("entities"),
-            vec![first.clone()],
-            "a failed batch writes nothing"
-        );
-    }
+    assert_eq!(
+        store.get_fact_entities(f1).expect("entities"),
+        vec![first.clone()],
+        "a failed batch writes nothing"
+    );
     let missing_doc = NodeId::new("987654");
     let error = store
         .link_facts_batch(&[FactLink::Document {
@@ -236,7 +233,7 @@ fn fact_links_batch(store: &dyn GraphStore, atomic: bool) {
 }
 
 macro_rules! batch_contract {
-    ($module:ident, $factory:path, $atomic:expr) => {
+    ($module:ident, $factory:path) => {
         mod $module {
             #[test]
             fn entity_with_embedding() {
@@ -255,16 +252,32 @@ macro_rules! batch_contract {
 
             #[test]
             fn fact_links_batch() {
-                super::fact_links_batch(&*$factory(), $atomic);
+                super::fact_links_batch(&*$factory());
             }
         }
     };
 }
 
-batch_contract!(memory, super::memory_store, true);
-batch_contract!(default_methods, super::default_methods_store, false);
+batch_contract!(memory, super::memory_store);
 #[cfg(feature = "helix")]
-batch_contract!(helix, super::helix_store, true);
+batch_contract!(helix, super::helix_store);
+
+#[test]
+fn default_entity_with_embedding() {
+    entity_with_embedding(&*default_methods_store());
+}
+
+#[test]
+fn default_entity_with_embedding_keeps_the_entity_when_the_vector_fails() {
+    let store = DefaultMethods::new(MemoryStore::new(DIM));
+    store.fail_entity_vectors.store(true, std::sync::atomic::Ordering::SeqCst);
+    let created =
+        store.create_entity_with_embedding(&EntityNode::new("Acme", "ORG"), &X).expect("entity");
+    let entities = store.get_all_entities(10).expect("entities");
+    assert_eq!(entities.len(), 1, "the entity is written once");
+    assert_eq!(entities[0].id, created.id);
+    assert!(store.find_similar_entities(&X, 5).expect("search").is_empty(), "no vector");
+}
 
 /// Edges written by `write`, from a fresh memory store with one document, two spans, two
 /// entities and two facts.
@@ -336,58 +349,70 @@ fn memory_entity_with_embedding_matches_two_calls() {
     assert_eq!(properties["AliasesJson"], "[]");
 }
 
-/// A store that implements only the required methods, so the batch methods use the trait's
-/// default implementations.
+/// A store that implements only the required methods, so `create_entity_with_embedding` uses
+/// the trait's default implementation. `fail_entity_vectors` makes entity vector writes fail.
 #[derive(Debug)]
-struct DefaultMethods(MemoryStore);
+struct DefaultMethods {
+    inner: MemoryStore,
+    fail_entity_vectors: std::sync::atomic::AtomicBool,
+}
+
+impl DefaultMethods {
+    fn new(inner: MemoryStore) -> Self {
+        Self { inner, fail_entity_vectors: std::sync::atomic::AtomicBool::new(false) }
+    }
+}
 
 type R<T> = impeach_store::Result<T>;
 
 impl GraphStore for DefaultMethods {
     fn store_id(&self) -> String {
-        self.0.store_id()
+        self.inner.store_id()
     }
     fn embedding_dim(&self) -> usize {
-        self.0.embedding_dim()
+        self.inner.embedding_dim()
     }
     fn reset(&self) -> R<()> {
-        self.0.reset()
+        self.inner.reset()
     }
     fn create_document(&self, document: &DocumentNode) -> R<StoredDocument> {
-        self.0.create_document(document)
+        self.inner.create_document(document)
     }
     fn update_document(&self, doc_id: &NodeId, document: &DocumentNode) -> R<StoredDocument> {
-        self.0.update_document(doc_id, document)
+        self.inner.update_document(doc_id, document)
     }
     fn get_document_chunks(&self, doc_id: &NodeId) -> R<Vec<StoredChunk>> {
-        self.0.get_document_chunks(doc_id)
+        self.inner.get_document_chunks(doc_id)
     }
     fn create_document_chunk(&self, doc_id: &NodeId, chunk: &ChunkNode) -> R<StoredChunk> {
-        self.0.create_document_chunk(doc_id, chunk)
+        self.inner.create_document_chunk(doc_id, chunk)
     }
     fn update_document_chunk(&self, chunk_id: &ChunkId, chunk: &ChunkNode) -> R<StoredChunk> {
-        self.0.update_document_chunk(chunk_id, chunk)
+        self.inner.update_document_chunk(chunk_id, chunk)
     }
     fn create_chunk_embedding(&self, chunk_id: &ChunkId, embedding: &[f32]) -> R<()> {
-        self.0.create_chunk_embedding(chunk_id, embedding)
+        self.inner.create_chunk_embedding(chunk_id, embedding)
     }
     fn create_span_for_chunk(&self, span: &SpanNode) -> R<StoredSpan> {
-        self.0.create_span_for_chunk(span)
+        self.inner.create_span_for_chunk(span)
     }
     fn create_entity(&self, entity: &EntityNode) -> R<StoredEntity> {
-        self.0.create_entity(entity)
+        self.inner.create_entity(entity)
     }
     fn create_entity_embedding(&self, entity_id: &EntityId, embedding: &[f32]) -> R<()> {
-        self.0.create_entity_embedding(entity_id, embedding)
+        if self.fail_entity_vectors.load(std::sync::atomic::Ordering::SeqCst) {
+            return Err(StoreError::Connection("vector write refused".to_owned()));
+        }
+        self.inner.create_entity_embedding(entity_id, embedding)
     }
     fn find_entity_by_name(&self, name: &str) -> R<Vec<EntityHit>> {
-        self.0.find_entity_by_name(name)
+        self.inner.find_entity_by_name(name)
     }
     fn find_similar_entities(&self, embedding: &[f32], limit: usize) -> R<Vec<EntityHit>> {
-        self.0.find_similar_entities(embedding, limit)
+        self.inner.find_similar_entities(embedding, limit)
     }
     fn get_all_entities(&self, limit: usize) -> R<Vec<StoredEntity>> {
-        self.0.get_all_entities(limit)
+        self.inner.get_all_entities(limit)
     }
     fn link_span_to_entity(
         &self,
@@ -396,13 +421,13 @@ impl GraphStore for DefaultMethods {
         confidence: f64,
         method: &str,
     ) -> R<()> {
-        self.0.link_span_to_entity(span_id, entity_id, confidence, method)
+        self.inner.link_span_to_entity(span_id, entity_id, confidence, method)
     }
     fn create_fact(&self, fact: &FactNode) -> R<StoredFact> {
-        self.0.create_fact(fact)
+        self.inner.create_fact(fact)
     }
     fn create_fact_embedding(&self, fact_id: &FactId, embedding: &[f32]) -> R<()> {
-        self.0.create_fact_embedding(fact_id, embedding)
+        self.inner.create_fact_embedding(fact_id, embedding)
     }
     fn link_fact_to_document(
         &self,
@@ -411,10 +436,10 @@ impl GraphStore for DefaultMethods {
         page_number: i64,
         section: &str,
     ) -> R<()> {
-        self.0.link_fact_to_document(fact_id, doc_id, page_number, section)
+        self.inner.link_fact_to_document(fact_id, doc_id, page_number, section)
     }
     fn link_fact_to_entity(&self, fact_id: &FactId, entity_id: &EntityId, role: &str) -> R<()> {
-        self.0.link_fact_to_entity(fact_id, entity_id, role)
+        self.inner.link_fact_to_entity(fact_id, entity_id, role)
     }
     fn link_fact_to_span(
         &self,
@@ -423,34 +448,43 @@ impl GraphStore for DefaultMethods {
         role: &str,
         confidence: f64,
     ) -> R<()> {
-        self.0.link_fact_to_span(fact_id, span_id, role, confidence)
+        self.inner.link_fact_to_span(fact_id, span_id, role, confidence)
     }
     fn get_entity_facts(&self, entity_id: &EntityId) -> R<Vec<StoredFact>> {
-        self.0.get_entity_facts(entity_id)
+        self.inner.get_entity_facts(entity_id)
     }
     fn get_fact_entities(&self, fact_id: &FactId) -> R<Vec<EntityId>> {
-        self.0.get_fact_entities(fact_id)
+        self.inner.get_fact_entities(fact_id)
     }
     fn find_facts_by_text(&self, keywords: &str, limit: usize) -> R<Vec<FactHit>> {
-        self.0.find_facts_by_text(keywords, limit)
+        self.inner.find_facts_by_text(keywords, limit)
     }
     fn find_similar_facts(&self, embedding: &[f32], limit: usize) -> R<Vec<FactHit>> {
-        self.0.find_similar_facts(embedding, limit)
+        self.inner.find_similar_facts(embedding, limit)
     }
     fn create_chunks_batch(&self, doc_id: &NodeId, chunks: &[ChunkNode]) -> R<Vec<StoredChunk>> {
-        self.0.create_chunks_batch(doc_id, chunks)
+        self.inner.create_chunks_batch(doc_id, chunks)
     }
     fn delete_document_chunks(&self, doc_id: &NodeId) -> R<usize> {
-        self.0.delete_document_chunks(doc_id)
+        self.inner.delete_document_chunks(doc_id)
     }
     fn create_spans_batch(&self, spans: &[SpanNode]) -> R<Vec<StoredSpan>> {
-        self.0.create_spans_batch(spans)
+        self.inner.create_spans_batch(spans)
     }
     fn create_embeddings_batch(
         &self,
         label: VectorLabel,
         items: &[EmbeddingWrite<'_>],
     ) -> R<usize> {
-        self.0.create_embeddings_batch(label, items)
+        self.inner.create_embeddings_batch(label, items)
+    }
+    fn link_spans_to_entities_batch(&self, links: &[SpanEntityLink<'_>]) -> R<usize> {
+        self.inner.link_spans_to_entities_batch(links)
+    }
+    fn create_facts_batch(&self, facts: &[FactNode]) -> R<Vec<StoredFact>> {
+        self.inner.create_facts_batch(facts)
+    }
+    fn link_facts_batch(&self, links: &[FactLink<'_>]) -> R<usize> {
+        self.inner.link_facts_batch(links)
     }
 }

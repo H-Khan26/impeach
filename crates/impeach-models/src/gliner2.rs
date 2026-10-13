@@ -5,6 +5,7 @@
 //! relation's score is the lower of its head and tail confidences (GLiNER2 scores the two
 //! argument spans, not the relation).
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 
 use ::gliner2::config::{download_model, ModelFiles};
@@ -180,33 +181,47 @@ fn entities_from_output(output: &Value, text: &str) -> Result<Vec<NerSpan>, Mode
             }
         }
     }
-    let reported = spans.len();
-    for index in 0..reported {
-        let extra = other_occurrences(&spans[index], text, &spans);
-        spans.extend(extra);
-    }
+    add_other_occurrences(&mut spans, text);
     spans.sort_by_key(|s| s.start);
     Ok(spans)
 }
 
-/// Whole-word occurrences of `span.text` in `text` that no span of the same label overlaps.
-fn other_occurrences(span: &NerSpan, text: &str, spans: &[NerSpan]) -> Vec<NerSpan> {
-    let is_word = |c: Option<char>| c.is_some_and(char::is_alphanumeric);
-    let mut found: Vec<NerSpan> = Vec::new();
-    for (byte, _) in text.match_indices(span.text.as_str()) {
-        let byte_end = byte + span.text.len();
-        if is_word(text[..byte].chars().next_back()) || is_word(text[byte_end..].chars().next()) {
-            continue;
-        }
-        let start = text[..byte].chars().count();
-        let end = start + span.text.chars().count();
-        let overlaps = |s: &NerSpan| s.label == span.label && s.start < end && start < s.end;
-        if spans.iter().chain(&found).any(overlaps) {
-            continue;
-        }
-        found.push(NerSpan { start, end, ..span.clone() });
+/// Adds every whole-word occurrence of a reported span's text that no span of the same label
+/// overlaps, with the reported label and score.
+fn add_other_occurrences(spans: &mut Vec<NerSpan>, text: &str) {
+    // Character offset of every byte offset that starts a character (and of the end).
+    let mut char_at = vec![0; text.len() + 1];
+    for (chars, (byte, _)) in text.char_indices().enumerate() {
+        char_at[byte] = chars;
     }
-    found
+    let char_len = text.chars().count();
+    char_at[text.len()] = char_len;
+    // Characters covered by a span, per label.
+    let mut covered: HashMap<String, Vec<bool>> = HashMap::new();
+    for span in spans.iter() {
+        let taken = covered.entry(span.label.clone()).or_insert_with(|| vec![false; char_len]);
+        taken[span.start..span.end].fill(true);
+    }
+    let is_word = |c: Option<char>| c.is_some_and(char::is_alphanumeric);
+    for index in 0..spans.len() {
+        let reported = spans[index].clone();
+        let Some(taken) = covered.get_mut(&reported.label) else {
+            continue;
+        };
+        for (byte, found) in text.match_indices(reported.text.as_str()) {
+            let byte_end = byte + found.len();
+            if is_word(text[..byte].chars().next_back()) || is_word(text[byte_end..].chars().next())
+            {
+                continue;
+            }
+            let (start, end) = (char_at[byte], char_at[byte_end]);
+            if taken[start..end].iter().any(|&t| t) {
+                continue;
+            }
+            taken[start..end].fill(true);
+            spans.push(NerSpan { start, end, ..reported.clone() });
+        }
+    }
 }
 
 /// Relations from formatted output

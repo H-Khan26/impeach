@@ -340,7 +340,9 @@ impl ModelRegistry {
         #[cfg(feature = "ollama")]
         {
             let options = crate::ollama::OllamaOptions::from_config(&models.ollama);
-            Ok(Arc::new(crate::ollama::OllamaLlm::new(&options)?))
+            let llm = crate::ollama::OllamaLlm::new(&options)?;
+            llm.check_reachable()?;
+            Ok(Arc::new(llm))
         }
         #[cfg(not(feature = "ollama"))]
         {
@@ -660,11 +662,21 @@ mod tests {
 
     #[cfg(feature = "ollama")]
     #[test]
-    fn ollama_client_is_built_lazily_once() {
-        let registry = ModelRegistry::new("p", models(false));
-        let first = registry.llm("p_ollama").expect("ollama client");
-        let second = registry.llm("p_ollama").expect("cached client");
-        assert!(Arc::ptr_eq(&first, &second));
+    fn unreachable_ollama_fails_when_resolved() {
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind a free port");
+        let port = listener.local_addr().expect("local address").port();
+        drop(listener);
+        let mut config = models(false);
+        config.ollama.base_url = format!("http://127.0.0.1:{port}");
+        let registry = ModelRegistry::new("p", config);
+        let Err(error) = registry.llm("p_ollama") else {
+            panic!("nothing listens");
+        };
+        assert!(
+            matches!(&error, ModelError::Unavailable { backend, .. } if backend == "ollama"),
+            "{error:?}"
+        );
+        assert!(error.to_string().contains("ollama serve"), "{error}");
     }
 
     #[cfg(not(feature = "ollama"))]

@@ -154,7 +154,8 @@ impl FactIndexer {
                 return Err(StoreError::Query {
                     query: "CreateFactsBatch".to_owned(),
                     message: format!(
-                        "the store returned {} facts for {} requested",
+                        "the store returned {} facts for {} requested; some facts may already \
+                         be written",
                         stored.len(),
                         nodes.len()
                     ),
