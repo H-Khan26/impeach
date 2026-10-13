@@ -9,9 +9,10 @@
 //!   [`UnregisteredStages::Error`] fails with [`PipelineError::UnknownStage`] listing the
 //!   registered types, [`UnregisteredStages::Skip`] logs a warning and leaves it out.
 //!
-//! The config schema already rejects stage types it does not know, so "unregistered" means a
-//! stage type whose implementation has not been ported yet. [`StageRegistry::builtin`] holds
-//! every ported stage; later phases add theirs there.
+//! [`StageRegistry::builtin`] registers all eight stage types of the config schema, so with
+//! it every enabled stage is built. "Unregistered" stage types arise with a custom registry
+//! ([`StageRegistry::empty`] plus selected constructors, as tests use); the default is
+//! [`UnregisteredStages::Error`] and [`UnregisteredStages::Skip`] opts into leaving them out.
 
 use std::fmt;
 use std::sync::Arc;
@@ -26,8 +27,8 @@ use crate::error::{PipelineError, Result};
 use crate::runner::Pipeline;
 use crate::stage::Stage;
 use crate::stages::{
-    CoreferenceStage, DefinitionStage, EdStage, FactStage, MentionStage, RagIndexStage,
-    RelationStage,
+    ContradictionStage, CoreferenceStage, DefinitionStage, EdStage, FactStage, MentionStage,
+    RagIndexStage, RelationStage,
 };
 
 /// Constructor of one stage type: receives the stage's config block and the shared services.
@@ -63,8 +64,8 @@ impl StageRegistry {
         Self::default()
     }
 
-    /// Every ported stage: `RAGIndexStage`, `MentionStage`, `DefinitionStage`,
-    /// `CoreferenceStage`, `EDStage`, `RelationStage`, `FactStage`.
+    /// Every stage: `RAGIndexStage`, `MentionStage`, `DefinitionStage`, `CoreferenceStage`,
+    /// `EDStage`, `RelationStage`, `FactStage`, `ContradictionCheckStage`.
     #[must_use]
     pub fn builtin() -> Self {
         let mut registry = Self::empty();
@@ -75,7 +76,8 @@ impl StageRegistry {
             .register(CoreferenceStage::TYPE_NAME, CoreferenceStage::construct)
             .register(EdStage::TYPE_NAME, EdStage::construct)
             .register(RelationStage::TYPE_NAME, RelationStage::construct)
-            .register(FactStage::TYPE_NAME, FactStage::construct);
+            .register(FactStage::TYPE_NAME, FactStage::construct)
+            .register(ContradictionStage::TYPE_NAME, ContradictionStage::construct);
         registry
     }
 
@@ -149,7 +151,7 @@ impl StageRegistry {
                 tracing::warn!(
                     stage = stage.name(),
                     stage_type = stage.type_name(),
-                    "stage type is not implemented yet; skipped"
+                    "stage type has no registered constructor; skipped"
                 );
                 continue;
             }
@@ -172,8 +174,8 @@ impl StageRegistry {
     }
 }
 
-/// Builds the pipeline of `config` with [`StageRegistry::builtin`], skipping stage types that
-/// are not ported yet ([`UnregisteredStages::Skip`]).
+/// Builds the pipeline of `config` with [`StageRegistry::builtin`] (every stage type is
+/// registered; [`UnregisteredStages::Error`]).
 ///
 /// # Errors
 /// Stage constructor errors.
@@ -183,5 +185,5 @@ pub fn build_pipeline(
     store: Arc<dyn GraphStore>,
 ) -> Result<Pipeline> {
     StageRegistry::builtin()
-        .build(StageBuildContext::new(config, registry, store), UnregisteredStages::Skip)
+        .build(StageBuildContext::new(config, registry, store), UnregisteredStages::Error)
 }

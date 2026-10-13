@@ -1,5 +1,5 @@
-//! `contradiction-engine` command-line binary: `ingest`, `process`, `run`, `eval` and
-//! `store reset` (Python `python -m contradiction_engine` and `tests/e2e/evaluate_output.py`).
+//! `contradiction-engine` command-line binary: `ingest`, `process`, `run`, `eval`, `run-e2e`
+//! and `store reset` (Python `python -m contradiction_engine` and `tests/e2e/evaluate_output.py`).
 
 mod cli;
 mod commands;

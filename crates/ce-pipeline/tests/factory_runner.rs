@@ -47,7 +47,7 @@ fn probe(name: &str, fail: bool) -> (Probe, Arc<Mutex<Vec<DocumentPayload>>>) {
     (Probe { name: name.to_owned(), seen: Arc::clone(&seen), fail }, seen)
 }
 
-const BUILTIN_TYPES: [&str; 7] = [
+const BUILTIN_TYPES: [&str; 8] = [
     "RAGIndexStage",
     "MentionStage",
     "DefinitionStage",
@@ -55,10 +55,11 @@ const BUILTIN_TYPES: [&str; 7] = [
     "EDStage",
     "RelationStage",
     "FactStage",
+    "ContradictionCheckStage",
 ];
 
 #[test]
-fn builtin_registry_builds_ported_stages_and_skips_the_rest() {
+fn builtin_registry_builds_every_stage() {
     let harness = Harness::new(default_config());
     let pipeline = build_pipeline(
         Arc::clone(&harness.services.config),
@@ -75,7 +76,8 @@ fn builtin_registry_builds_ported_stages_and_skips_the_rest() {
             "coreference",
             "ed_resolution",
             "relation_extraction",
-            "fact_extraction"
+            "fact_extraction",
+            "contradiction_check"
         ]
     );
     assert_eq!(StageRegistry::builtin().type_names(), BUILTIN_TYPES);
@@ -84,16 +86,22 @@ fn builtin_registry_builds_ported_stages_and_skips_the_rest() {
 #[test]
 fn unregistered_stage_types_error_with_the_known_types() {
     let harness = Harness::new(default_config());
-    let error = StageRegistry::builtin()
+    let registry = StageRegistry::empty()
+        .with(RagIndexStage::TYPE_NAME, RagIndexStage::construct)
+        .with("MentionStage", ce_pipeline::MentionStage::construct);
+    let error = registry
         .build(harness.services.clone(), UnregisteredStages::Error)
-        .expect_err("ContradictionCheckStage is not ported");
+        .expect_err("DefinitionStage has no constructor");
     match error {
         PipelineError::UnknownStage { stage_type, known } => {
-            assert_eq!(stage_type, "ContradictionCheckStage");
-            assert_eq!(known, BUILTIN_TYPES);
+            assert_eq!(stage_type, "DefinitionStage");
+            assert_eq!(known, ["RAGIndexStage", "MentionStage"]);
         }
         other => panic!("unexpected error {other}"),
     }
+    StageRegistry::builtin()
+        .build(harness.services.clone(), UnregisteredStages::Error)
+        .expect("every stage type is registered");
     let message = StageRegistry::empty()
         .build_stage(&harness.services.config.stages[0], &harness.services)
         .err()
@@ -138,7 +146,8 @@ fn custom_constructors_follow_config_order() {
             "coreference",
             "ed_resolution",
             "relation_extraction",
-            "fact_extraction"
+            "fact_extraction",
+            "contradiction_check"
         ]
     );
 }

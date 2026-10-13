@@ -4,9 +4,10 @@ use std::collections::{BTreeSet, HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 use ce_core::e2e::E2eOutput;
+use ce_core::util::python_isoformat;
 use ce_models::Embedder;
 use ce_text::values::{extract_values, values_compatible, Value};
-use chrono::{Local, NaiveDateTime, Timelike};
+use chrono::{Local, NaiveDateTime};
 use indexmap::IndexMap;
 
 use crate::assignment::{assign_one_to_one, AssignmentMethod};
@@ -396,16 +397,6 @@ pub fn evaluate_body(
     })
 }
 
-/// Python `datetime.isoformat()` of a naive local time (microseconds only when non-zero).
-fn python_isoformat(time: &NaiveDateTime) -> String {
-    let micros = time.nanosecond() / 1000;
-    if micros == 0 {
-        time.format("%Y-%m-%dT%H:%M:%S").to_string()
-    } else {
-        format!("{}.{micros:06}", time.format("%Y-%m-%dT%H:%M:%S"))
-    }
-}
-
 /// Evaluates an e2e output against a key and builds the full report.
 ///
 /// # Errors
@@ -515,14 +506,6 @@ mod tests {
     fn argmax_takes_first_maximum() {
         assert_eq!(argmax([0.1, 0.5, 0.5, 0.2].into_iter()), 1);
         assert_eq!(argmax(std::iter::empty()), 0);
-    }
-
-    #[test]
-    fn isoformat_like_python() {
-        let t = NaiveDateTime::parse_from_str("2026-01-02 03:04:05", "%Y-%m-%d %H:%M:%S").unwrap();
-        assert_eq!(python_isoformat(&t), "2026-01-02T03:04:05");
-        let t = t + chrono::Duration::microseconds(1234);
-        assert_eq!(python_isoformat(&t), "2026-01-02T03:04:05.001234");
     }
 
     #[test]

@@ -1,0 +1,48 @@
+[
+  {
+    "when": "at or below the posted speed limit",
+    "response": {
+      "nodes": [
+        {
+          "node_type": "STATED_FACT",
+          "id": "STATED_FACT_0",
+          "text": "Lopez was traveling at or below the posted speed limit of 35 miles per hour.",
+          "value_type": "NUMERIC",
+          "property_type": "QUANTITATIVE",
+          "slot_name": "speed",
+          "value_raw": "at or below thirty-five (35) miles per hour",
+          "assertion_triple": {"subject": "Lopez", "relationship": "TRAVELED_AT_SPEED", "object": "35 miles per hour"},
+          "certainty": 0.9,
+          "temporal_context": "current_incident",
+          "is_denial": false,
+          "is_boilerplate": false,
+          "temporal_validity": {"t_valid_from": "2023-03-05", "t_valid_until": "2023-03-05"},
+          "metadata": {}
+        }
+      ]
+    }
+  },
+  {
+    "when": "solid red traffic signal",
+    "response": {
+      "nodes": [
+        {
+          "node_type": "STATED_FACT",
+          "id": "STATED_FACT_0",
+          "text": "Reed failed to stop for a solid red traffic signal on 14th Avenue.",
+          "value_type": "TEXT",
+          "property_type": "STATE",
+          "slot_name": "signal_state",
+          "value_raw": "solid red",
+          "assertion_triple": {"subject": "Reed", "relationship": "FAILED_TO_STOP_AT", "object": "solid red traffic signal"},
+          "certainty": 0.85,
+          "temporal_context": "current_incident",
+          "is_denial": false,
+          "is_boilerplate": false,
+          "temporal_validity": {"t_valid_from": "2023-03-05", "t_valid_until": "2023-03-05"},
+          "metadata": {}
+        }
+      ]
+    }
+  }
+]

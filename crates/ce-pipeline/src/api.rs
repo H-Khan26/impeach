@@ -46,8 +46,9 @@ pub struct ProcessingEnv {
     pub store: Option<Arc<dyn GraphStore>>,
     /// Stage constructors; default [`StageRegistry::builtin`].
     pub stages: Option<StageRegistry>,
-    /// Handling of stage types without a constructor; default
-    /// [`UnregisteredStages::Skip`] (stage types not ported yet are left out with a warning).
+    /// Handling of stage types without a constructor in `stages`; default
+    /// [`UnregisteredStages::Error`] (every stage type has a built-in constructor; pass
+    /// [`UnregisteredStages::Skip`] to run a registry with only some stages).
     pub unregistered: Option<UnregisteredStages>,
 }
 
@@ -106,7 +107,7 @@ pub fn run_processing_with(
     let review_store_attached = review_store_stage_is_built(&config, &stage_registry);
     let services = StageBuildContext::new(config, registry, store);
     let pipeline =
-        stage_registry.build(services, env.unregistered.unwrap_or(UnregisteredStages::Skip))?;
+        stage_registry.build(services, env.unregistered.unwrap_or(UnregisteredStages::Error))?;
 
     let mut ctx = pipeline.new_context();
     if !document.metadata.is_empty() {

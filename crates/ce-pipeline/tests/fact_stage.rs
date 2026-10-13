@@ -766,7 +766,8 @@ fn smoke_green_valley_through_the_fact_stage() {
             "coreference",
             "ed_resolution",
             "relation_extraction",
-            "fact_extraction"
+            "fact_extraction",
+            "contradiction_check"
         ]
     );
     let data = &run.data;

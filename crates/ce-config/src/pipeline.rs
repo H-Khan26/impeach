@@ -936,7 +936,8 @@ pub struct VerificationStrategyConfig {
     /// Qwen judge prompt file.
     #[serde(default)]
     pub qwen_prompt_file: Option<String>,
-    /// Qwen batch size, in [1, 50]; defaults to 5.
+    /// Qwen batch size, in [1, 50]; defaults to 5. Validated but unused: the LLM judge makes
+    /// one call per pair.
     #[serde(default = "default_qwen_batch_size")]
     pub qwen_batch_size: usize,
 }

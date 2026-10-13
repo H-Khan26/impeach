@@ -102,12 +102,26 @@ impl Embedder for MockEmbedder {
     }
 }
 
-/// NLI judge with scripted scores per `(premise, hypothesis)` pair; unscripted pairs get the
-/// default scores (neutral 1.0 unless changed).
-#[derive(Debug)]
+type NliRule = Box<dyn Fn(&str, &str) -> Option<NliScores> + Send + Sync>;
+
+/// NLI judge with scripted scores per `(premise, hypothesis)` pair, then rules (closures tried
+/// in insertion order); other pairs get the default scores (neutral 1.0 unless changed).
+/// Records every scored pair.
 pub struct MockNli {
     scripted: HashMap<(String, String), NliScores>,
+    rules: Vec<NliRule>,
     default: NliScores,
+    calls: Mutex<Vec<(String, String)>>,
+}
+
+impl fmt::Debug for MockNli {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("MockNli")
+            .field("scripted", &self.scripted.len())
+            .field("rules", &self.rules.len())
+            .field("default", &self.default)
+            .finish_non_exhaustive()
+    }
 }
 
 impl Default for MockNli {
@@ -121,7 +135,9 @@ impl MockNli {
     pub fn new() -> Self {
         Self {
             scripted: HashMap::new(),
+            rules: Vec::new(),
             default: NliScores { contradiction: 0.0, entailment: 0.0, neutral: 1.0 },
+            calls: Mutex::new(Vec::new()),
         }
     }
 
@@ -136,21 +152,37 @@ impl MockNli {
         self
     }
 
-    /// Sets the scores of unscripted pairs.
+    /// Adds a rule for unscripted pairs: the first rule returning `Some` decides the scores.
+    pub fn with_rule<F>(mut self, rule: F) -> Self
+    where
+        F: Fn(&str, &str) -> Option<NliScores> + Send + Sync + 'static,
+    {
+        self.rules.push(Box::new(rule));
+        self
+    }
+
+    /// Sets the scores of pairs no script or rule matches.
     pub fn with_default(mut self, scores: NliScores) -> Self {
         self.default = scores;
         self
+    }
+
+    /// Every `(premise, hypothesis)` pair scored so far, in call order.
+    pub fn calls(&self) -> Vec<(String, String)> {
+        lock(&self.calls).clone()
     }
 }
 
 impl NliJudge for MockNli {
     fn score_pairs(&self, pairs: &[(&str, &str)]) -> Result<Vec<NliScores>, ModelError> {
+        lock(&self.calls).extend(pairs.iter().map(|(p, h)| ((*p).to_owned(), (*h).to_owned())));
         Ok(pairs
             .iter()
             .map(|(p, h)| {
                 self.scripted
                     .get(&((*p).to_owned(), (*h).to_owned()))
                     .copied()
+                    .or_else(|| self.rules.iter().find_map(|rule| rule(p, h)))
                     .unwrap_or(self.default)
             })
             .collect())

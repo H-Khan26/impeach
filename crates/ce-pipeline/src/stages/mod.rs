@@ -1,6 +1,7 @@
 //! Pipeline stages. [`crate::StageRegistry::builtin`] registers each one under its config
 //! `type` name.
 
+pub mod contradiction;
 pub mod coreference;
 pub mod definition;
 pub mod ed;
@@ -9,6 +10,7 @@ pub mod mention;
 pub mod rag_index;
 pub mod relation;
 
+pub use contradiction::ContradictionStage;
 pub use coreference::CoreferenceStage;
 pub use definition::DefinitionStage;
 pub use ed::EdStage;

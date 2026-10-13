@@ -1284,6 +1284,31 @@ impl GraphStore for HelixStore {
         rows(&result, "facts").iter().map(decode).collect()
     }
 
+    fn get_fact_entities(&self, fact_id: &FactId) -> Result<Vec<EntityId>> {
+        let id = parse_node_id("fact_id", fact_id.as_str())?;
+        let result = self.read(
+            query_names::GET_FACT_ENTITIES,
+            read_batch()
+                .var_as(
+                    "entities",
+                    g().n(NodeRef::id(id))
+                        .has_label(FACT)
+                        .out(Some(FACT_ABOUT_ENTITY))
+                        .has_label(ENTITY)
+                        .value_map(Some(fields(ENTITY))),
+                )
+                .returning(["entities"]),
+        )?;
+        let mut ids: Vec<EntityId> = Vec::new();
+        for row in rows(&result, "entities") {
+            let entity: StoredEntity = decode(row)?;
+            if !ids.contains(&entity.id) {
+                ids.push(entity.id);
+            }
+        }
+        Ok(ids)
+    }
+
     fn find_facts_by_text(&self, keywords: &str, limit: usize) -> Result<Vec<FactHit>> {
         self.text_search(
             query_names::FIND_FACTS_BY_TEXT,

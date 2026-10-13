@@ -662,6 +662,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "ce-contradictions"
+version = "0.1.0"
+dependencies = [
+ "ce-config",
+ "ce-core",
+ "ce-facts",
+ "ce-models",
+ "ce-store",
+ "ce-text",
+ "chrono",
+ "indexmap",
+ "pretty_assertions",
+ "regex",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tracing",
+]
+
+[[package]]
 name = "ce-core"
 version = "0.1.0"
 dependencies = [
@@ -809,9 +830,11 @@ name = "ce-pipeline"
 version = "0.1.0"
 dependencies = [
  "ce-config",
+ "ce-contradictions",
  "ce-core",
  "ce-coref",
  "ce-ed",
+ "ce-eval",
  "ce-facts",
  "ce-ingest",
  "ce-models",

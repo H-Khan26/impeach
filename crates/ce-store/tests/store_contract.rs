@@ -396,6 +396,17 @@ fn links_and_entity_facts(store: &dyn GraphStore) {
     assert_eq!(facts[0].node, first.node);
     assert!(store.get_entity_facts(&other.id).expect("no facts").is_empty());
     assert!(store.get_entity_facts(&EntityId::new("987654")).expect("missing").is_empty());
+
+    let linked = store.get_fact_entities(&first.id).expect("fact entities");
+    assert_eq!(linked, vec![acme.id.clone()], "each linked entity once");
+    store.link_fact_to_entity(&second.id, &other.id, "SUBJECT").expect("fact-entity");
+    let mut linked = store.get_fact_entities(&second.id).expect("fact entities");
+    linked.sort();
+    let mut expected = vec![acme.id.clone(), other.id.clone()];
+    expected.sort();
+    assert_eq!(linked, expected);
+    assert!(store.get_fact_entities(&FactId::new("987654")).expect("missing").is_empty());
+    assert!(is_validation(&store.get_fact_entities(&FactId::new("")).expect_err("id"), "fact_id"));
 }
 
 fn batches(store: &dyn GraphStore) {

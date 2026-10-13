@@ -3,7 +3,9 @@
 use std::path::PathBuf;
 
 use ce_config::ConfigError;
+use ce_contradictions::ContradictionError;
 use ce_ed::EdError;
+use ce_eval::EvalError;
 use ce_facts::FactError;
 use ce_ingest::IngestError;
 use ce_models::ModelError;
@@ -34,6 +36,12 @@ pub enum PipelineError {
     /// Fact extraction or indexing failure.
     #[error(transparent)]
     Fact(#[from] FactError),
+    /// Contradiction check failure.
+    #[error(transparent)]
+    Contradiction(#[from] ContradictionError),
+    /// Evaluation failure (e2e runner).
+    #[error(transparent)]
+    Eval(#[from] EvalError),
     /// No constructor is registered for a stage type.
     #[error("unknown stage type `{stage_type}`; registered stage types: {known:?}")]
     UnknownStage {
@@ -109,6 +117,7 @@ impl PipelineError {
             Self::Store(error) => error.is_fatal(),
             Self::Ed(error) => error.is_fatal(),
             Self::Fact(error) => error.is_fatal(),
+            Self::Contradiction(error) => error.is_fatal(),
             Self::Stage { source, .. } => source.is_fatal(),
             _ => false,
         }
