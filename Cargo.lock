@@ -627,265 +627,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ce-cli"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "ce-config",
- "ce-eval",
- "ce-ingest",
- "ce-models",
- "ce-pipeline",
- "clap",
- "serde_json",
- "tempfile",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "ce-config"
-version = "0.1.0"
-dependencies = [
- "ce-core",
- "ce-text",
- "include_dir",
- "indexmap",
- "pretty_assertions",
- "regex",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "tracing",
- "yaml_serde",
-]
-
-[[package]]
-name = "ce-contradictions"
-version = "0.1.0"
-dependencies = [
- "ce-config",
- "ce-core",
- "ce-facts",
- "ce-models",
- "ce-store",
- "ce-text",
- "chrono",
- "indexmap",
- "pretty_assertions",
- "regex",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "tracing",
-]
-
-[[package]]
-name = "ce-core"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "indexmap",
- "pretty_assertions",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "ce-coref"
-version = "0.1.0"
-dependencies = [
- "ce-config",
- "ce-core",
- "ce-models",
- "ce-ner",
- "indexmap",
- "pretty_assertions",
- "serde_json",
- "tracing",
-]
-
-[[package]]
-name = "ce-ed"
-version = "0.1.0"
-dependencies = [
- "ce-config",
- "ce-core",
- "ce-models",
- "ce-ner",
- "ce-store",
- "ce-text",
- "indexmap",
- "once_cell",
- "pretty_assertions",
- "regex",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
- "tracing",
-]
-
-[[package]]
-name = "ce-eval"
-version = "0.1.0"
-dependencies = [
- "ce-core",
- "ce-models",
- "ce-text",
- "chrono",
- "indexmap",
- "pretty_assertions",
- "regex",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "tracing",
-]
-
-[[package]]
-name = "ce-facts"
-version = "0.1.0"
-dependencies = [
- "ce-config",
- "ce-core",
- "ce-ed",
- "ce-models",
- "ce-ner",
- "ce-store",
- "ce-text",
- "indexmap",
- "pretty_assertions",
- "regex",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
- "tracing",
-]
-
-[[package]]
-name = "ce-ingest"
-version = "0.1.0"
-dependencies = [
- "ce-core",
- "ce-text",
- "chrono",
- "csv",
- "pdf-extract",
- "pretty_assertions",
- "regex",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "unicode-general-category",
-]
-
-[[package]]
-name = "ce-models"
-version = "0.1.0"
-dependencies = [
- "ce-config",
- "ce-core",
- "ce-text",
- "fastembed",
- "gliner2",
- "hf-hub",
- "ollama-rs",
- "ort",
- "pretty_assertions",
- "process-wrap",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "tokenizers 0.23.2",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "ce-ner"
-version = "0.1.0"
-dependencies = [
- "ce-config",
- "ce-core",
- "ce-models",
- "ce-text",
- "indexmap",
- "once_cell",
- "pretty_assertions",
- "regex",
- "serde_json",
- "thiserror 2.0.21",
- "tracing",
-]
-
-[[package]]
-name = "ce-pipeline"
-version = "0.1.0"
-dependencies = [
- "ce-config",
- "ce-contradictions",
- "ce-core",
- "ce-coref",
- "ce-ed",
- "ce-eval",
- "ce-facts",
- "ce-ingest",
- "ce-models",
- "ce-ner",
- "ce-store",
- "ce-text",
- "chrono",
- "indexmap",
- "pretty_assertions",
- "serde",
- "serde_json",
- "tempfile",
- "text-splitter",
- "thiserror 2.0.21",
- "tracing",
-]
-
-[[package]]
-name = "ce-store"
-version = "0.1.0"
-dependencies = [
- "ce-config",
- "ce-core",
- "ce-text",
- "chrono",
- "fs4 1.1.0",
- "helix-db",
- "pretty_assertions",
- "rusqlite",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "tokio",
- "tracing",
- "uuid",
- "yaml_serde",
-]
-
-[[package]]
-name = "ce-text"
-version = "0.1.0"
-dependencies = [
- "pretty_assertions",
- "regex",
- "serde",
- "serde_json",
- "tracing",
-]
-
-[[package]]
 name = "census"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3013,6 +2754,265 @@ checksum = "cb68373c0d6620ef8105e855e7745e18b0d00d3bdb07fb532e434244cdb9a714"
 dependencies = [
  "icu_normalizer",
  "icu_properties",
+]
+
+[[package]]
+name = "impeach-cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "impeach-config",
+ "impeach-eval",
+ "impeach-ingest",
+ "impeach-models",
+ "impeach-pipeline",
+ "serde_json",
+ "tempfile",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "impeach-config"
+version = "0.1.0"
+dependencies = [
+ "impeach-core",
+ "impeach-text",
+ "include_dir",
+ "indexmap",
+ "pretty_assertions",
+ "regex",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tracing",
+ "yaml_serde",
+]
+
+[[package]]
+name = "impeach-contradictions"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "impeach-config",
+ "impeach-core",
+ "impeach-facts",
+ "impeach-models",
+ "impeach-store",
+ "impeach-text",
+ "indexmap",
+ "pretty_assertions",
+ "regex",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tracing",
+]
+
+[[package]]
+name = "impeach-core"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "indexmap",
+ "pretty_assertions",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "impeach-coref"
+version = "0.1.0"
+dependencies = [
+ "impeach-config",
+ "impeach-core",
+ "impeach-models",
+ "impeach-ner",
+ "indexmap",
+ "pretty_assertions",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
+name = "impeach-ed"
+version = "0.1.0"
+dependencies = [
+ "impeach-config",
+ "impeach-core",
+ "impeach-models",
+ "impeach-ner",
+ "impeach-store",
+ "impeach-text",
+ "indexmap",
+ "once_cell",
+ "pretty_assertions",
+ "regex",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tracing",
+]
+
+[[package]]
+name = "impeach-eval"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "impeach-core",
+ "impeach-models",
+ "impeach-text",
+ "indexmap",
+ "pretty_assertions",
+ "regex",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tracing",
+]
+
+[[package]]
+name = "impeach-facts"
+version = "0.1.0"
+dependencies = [
+ "impeach-config",
+ "impeach-core",
+ "impeach-ed",
+ "impeach-models",
+ "impeach-ner",
+ "impeach-store",
+ "impeach-text",
+ "indexmap",
+ "pretty_assertions",
+ "regex",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tracing",
+]
+
+[[package]]
+name = "impeach-ingest"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "csv",
+ "impeach-core",
+ "impeach-text",
+ "pdf-extract",
+ "pretty_assertions",
+ "regex",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "unicode-general-category",
+]
+
+[[package]]
+name = "impeach-models"
+version = "0.1.0"
+dependencies = [
+ "fastembed",
+ "gliner2",
+ "hf-hub",
+ "impeach-config",
+ "impeach-core",
+ "impeach-text",
+ "ollama-rs",
+ "ort",
+ "pretty_assertions",
+ "process-wrap",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tokenizers 0.23.2",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "impeach-ner"
+version = "0.1.0"
+dependencies = [
+ "impeach-config",
+ "impeach-core",
+ "impeach-models",
+ "impeach-text",
+ "indexmap",
+ "once_cell",
+ "pretty_assertions",
+ "regex",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tracing",
+]
+
+[[package]]
+name = "impeach-pipeline"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "impeach-config",
+ "impeach-contradictions",
+ "impeach-core",
+ "impeach-coref",
+ "impeach-ed",
+ "impeach-eval",
+ "impeach-facts",
+ "impeach-ingest",
+ "impeach-models",
+ "impeach-ner",
+ "impeach-store",
+ "impeach-text",
+ "indexmap",
+ "pretty_assertions",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "text-splitter",
+ "thiserror 2.0.21",
+ "tracing",
+]
+
+[[package]]
+name = "impeach-store"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "fs4 1.1.0",
+ "helix-db",
+ "impeach-config",
+ "impeach-core",
+ "impeach-text",
+ "pretty_assertions",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tokio",
+ "tracing",
+ "uuid",
+ "yaml_serde",
+]
+
+[[package]]
+name = "impeach-text"
+version = "0.1.0"
+dependencies = [
+ "pretty_assertions",
+ "regex",
+ "serde",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]

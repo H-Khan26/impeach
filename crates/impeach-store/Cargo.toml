@@ -1,0 +1,35 @@
+[package]
+name = "impeach-store"
+description = "GraphStore trait with helix and memory backends, and the SQLite review store"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["helix"]
+helix = ["dep:helix-db", "dep:tokio", "dep:fs4", "dep:impeach-config", "dep:impeach-text"]
+
+[dependencies]
+impeach-core.workspace = true
+impeach-config = { workspace = true, optional = true }
+impeach-text = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+rusqlite.workspace = true
+fs4 = { workspace = true, optional = true }
+helix-db = { workspace = true, optional = true, features = ["embedded"] }
+tokio = { workspace = true, optional = true }
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+tempfile.workspace = true
+yaml_serde.workspace = true
+
+[lints]
+workspace = true

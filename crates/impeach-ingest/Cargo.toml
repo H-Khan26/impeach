@@ -1,0 +1,32 @@
+[package]
+name = "impeach-ingest"
+description = "Document loaders, transcript parser and JSONL ingestion"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["pdf"]
+# PDF text extraction through `pdf-extract`; without it `.pdf` inputs are rejected.
+pdf = ["dep:pdf-extract"]
+
+[dependencies]
+impeach-core.workspace = true
+impeach-text.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+chrono.workspace = true
+csv.workspace = true
+regex.workspace = true
+unicode-general-category.workspace = true
+pdf-extract = { workspace = true, optional = true }
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

@@ -3,7 +3,7 @@
   "timestamp": "2026-01-01T00:00:00",
   "scenario": null,
   "pipeline_name": "processing_v17",
-  "helix_namespace": "contradiction_engine",
+  "helix_namespace": "impeach",
   "helix_url": null,
   "helix_mode": "embedded",
   "helix_data_dir": ".helix_data",

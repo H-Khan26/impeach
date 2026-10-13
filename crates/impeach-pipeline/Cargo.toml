@@ -1,0 +1,44 @@
+[package]
+name = "impeach-pipeline"
+description = "Stage trait, pipeline context, runner, factory and the processing stages"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["helix", "fastembed", "ort-nli", "ollama", "gliner2"]
+helix = ["impeach-store/helix"]
+fastembed = ["impeach-models/fastembed", "impeach-eval/fastembed"]
+ort-nli = ["impeach-models/ort-nli"]
+ollama = ["impeach-models/ollama"]
+gliner2 = ["impeach-models/gliner2"]
+
+[dependencies]
+impeach-core.workspace = true
+impeach-config.workspace = true
+impeach-text.workspace = true
+impeach-ingest.workspace = true
+impeach-store.workspace = true
+impeach-models.workspace = true
+impeach-ner.workspace = true
+impeach-coref.workspace = true
+impeach-ed.workspace = true
+impeach-facts.workspace = true
+impeach-contradictions.workspace = true
+impeach-eval.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+chrono.workspace = true
+text-splitter.workspace = true
+indexmap.workspace = true
+tempfile.workspace = true
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+
+[lints]
+workspace = true

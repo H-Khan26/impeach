@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="100%" role="img" aria-label="Processing stages left to right with the local model used by each, the HelixDB graph nodes each stage writes, and the SQLite review queue fed by the contradiction check.">
+<title>Impeach model pipeline</title>
+<style>
+:root,svg{--ink:#1f2328;--muted:#656d76;--surface:#f6f8fa;--line:#d0d7de;--accent:#0969da;--danger:#cf222e}
+@media (prefers-color-scheme:dark){:root,svg{--ink:#e6edf3;--muted:#8b949e;--surface:#161b22;--line:#30363d;--accent:#58a6ff;--danger:#f85149}}
+text{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;fill:var(--ink);font-size:17px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+.muted{fill:var(--muted)}
+.b{font-weight:600}
+.card{fill:var(--surface);stroke:var(--line);stroke-width:1.25}
+.node{fill:var(--surface);stroke:var(--muted);stroke-width:1.25}
+.edge{stroke:var(--line);stroke-width:1.25;fill:none}
+.wr{stroke:var(--muted);stroke-width:1.25;stroke-dasharray:4 3;fill:none}
+.ar{stroke:var(--muted);stroke-width:1.25;fill:none}
+.mk{fill:var(--muted)}
+.tl{stroke:var(--line);stroke-width:3;stroke-linecap:round}
+.acc{stroke:var(--accent)}
+.accf{fill:var(--accent)}
+.acct{fill:var(--accent)}
+.dng{stroke:var(--danger)}
+.dngt{fill:var(--danger)}
+.hl{fill:none;stroke-width:2}
+.pill{fill:var(--surface);stroke:var(--accent);stroke-width:1.25}
+</style>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk" d="M0 0L10 5L0 10z"/></marker></defs>
+<text class="muted" x="21" y="28">Batch processing stages · all models run locally</text>
+<rect class="card" x="21" y="52" width="118" height="60" rx="6"/>
+<text class="b" x="80" y="88" text-anchor="middle">Ingest</text>
+<text class="muted" x="80" y="140" text-anchor="middle">pdf-extract</text>
+<line class="ar" x1="140" y1="82" x2="150" y2="82" marker-end="url(#ar)"/>
+<rect class="card" x="151" y="52" width="118" height="60" rx="6"/>
+<text class="b" x="210" y="78" text-anchor="middle">Chunk &amp;</text>
+<text class="b" x="210" y="98" text-anchor="middle">embed</text>
+<text class="muted" x="210" y="140" text-anchor="middle">text-splitter +</text>
+<text class="muted" x="210" y="160" text-anchor="middle">BGE-small</text>
+<line class="ar" x1="270" y1="82" x2="280" y2="82" marker-end="url(#ar)"/>
+<rect class="card" x="281" y="52" width="118" height="60" rx="6"/>
+<text class="b" x="340" y="78" text-anchor="middle">Mentions</text>
+<text class="b" x="340" y="98" text-anchor="middle">(NER)</text>
+<text class="muted" x="340" y="140" text-anchor="middle">GLiNER2 +</text>
+<text class="muted" x="340" y="160" text-anchor="middle">citation +</text>
+<text class="muted" x="340" y="180" text-anchor="middle">regex</text>
+<line class="ar" x1="400" y1="82" x2="410" y2="82" marker-end="url(#ar)"/>
+<rect class="card" x="411" y="52" width="118" height="60" rx="6"/>
+<text class="b" x="470" y="78" text-anchor="middle">Defined</text>
+<text class="b" x="470" y="98" text-anchor="middle">terms</text>
+<text class="muted" x="470" y="140" text-anchor="middle">rules</text>
+<line class="ar" x1="530" y1="82" x2="540" y2="82" marker-end="url(#ar)"/>
+<rect class="card" x="541" y="52" width="118" height="60" rx="6"/>
+<text class="b" x="600" y="88" text-anchor="middle">Coreference</text>
+<text class="muted" x="600" y="140" text-anchor="middle">rules / LLM</text>
+<line class="ar" x1="660" y1="82" x2="670" y2="82" marker-end="url(#ar)"/>
+<rect class="card" x="671" y="52" width="118" height="60" rx="6"/>
+<text class="b" x="730" y="78" text-anchor="middle">Entity</text>
+<text class="b" x="730" y="98" text-anchor="middle">resolution</text>
+<text class="muted" x="730" y="140" text-anchor="middle">string, BM25,</text>
+<text class="muted" x="730" y="160" text-anchor="middle">vector match,</text>
+<text class="muted" x="730" y="180" text-anchor="middle">Qwen tie-break</text>
+<line class="ar" x1="790" y1="82" x2="800" y2="82" marker-end="url(#ar)"/>
+<rect class="card" x="801" y="52" width="118" height="60" rx="6"/>
+<text class="b" x="860" y="88" text-anchor="middle">Relations</text>
+<text class="muted" x="860" y="140" text-anchor="middle">GLiNER2</text>
+<line class="ar" x1="920" y1="82" x2="930" y2="82" marker-end="url(#ar)"/>
+<rect class="card" x="931" y="52" width="118" height="60" rx="6"/>
+<text class="b" x="990" y="78" text-anchor="middle">Fact</text>
+<text class="b" x="990" y="98" text-anchor="middle">extraction</text>
+<text class="muted" x="990" y="140" text-anchor="middle">Qwen2.5-7B</text>
+<text class="muted" x="990" y="160" text-anchor="middle">(Ollama)</text>
+<line class="ar" x1="1050" y1="82" x2="1060" y2="82" marker-end="url(#ar)"/>
+<rect class="card" x="1061" y="52" width="118" height="60" rx="6"/>
+<text class="b" x="1120" y="78" text-anchor="middle">Contradiction</text>
+<text class="b" x="1120" y="98" text-anchor="middle">check</text>
+<text class="muted" x="1120" y="140" text-anchor="middle">DeBERTa-v3</text>
+<text class="muted" x="1120" y="160" text-anchor="middle">NLI</text>
+<text class="b" x="21" y="272">HelixDB graph</text>
+<rect class="edge" x="151" y="232" width="989" height="70" rx="6" stroke-dasharray="4 4"/>
+<rect class="pill" x="166" y="253" width="88" height="28" rx="14"/><text x="210" y="272" text-anchor="middle">Document</text>
+<rect class="pill" x="265" y="253" width="60" height="28" rx="14"/><text x="295" y="272" text-anchor="middle">Chunk</text>
+<rect class="pill" x="332" y="253" width="56" height="28" rx="14"/><text x="360" y="272" text-anchor="middle">Span</text>
+<rect class="pill" x="700" y="253" width="60" height="28" rx="14"/><text x="730" y="272" text-anchor="middle">Entity</text>
+<rect class="pill" x="1074" y="253" width="52" height="28" rx="14"/><text x="1100" y="272" text-anchor="middle">Fact</text>
+<path class="wr" d="M210 190V252" marker-end="url(#ar)"/>
+<path class="wr" d="M210 215H295V252" marker-end="url(#ar)"/>
+<path class="wr" d="M340 190V252" marker-end="url(#ar)"/>
+<path class="wr" d="M730 190V252" marker-end="url(#ar)"/>
+<path class="wr" d="M1100 190V252" marker-end="url(#ar)"/>
+<text class="muted" x="1092" y="228" text-anchor="end">clean</text>
+<path class="wr" d="M1165 190V334" marker-end="url(#ar)"/>
+<text class="muted" x="1158" y="325" text-anchor="end">flagged</text>
+<rect class="card" x="1001" y="335" width="178" height="44" rx="6"/>
+<text x="1090" y="363" text-anchor="middle">SQLite review queue</text>
+<rect class="card" x="21" y="393" width="22" height="14" rx="3"/>
+<text x="51" y="405">stage</text>
+<text class="muted" x="120" y="405">model / tool</text>
+<rect class="pill" x="240" y="393" width="24" height="14" rx="7"/>
+<text x="272" y="405">stored node</text>
+<path class="wr" d="M380 400H410" marker-end="url(#ar)"/>
+<text x="420" y="405">writes</text>
+<path class="ar" d="M490 400H520" marker-end="url(#ar)"/>
+<text x="530" y="405">next stage</text>
+</svg>

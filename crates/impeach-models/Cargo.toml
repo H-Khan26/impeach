@@ -1,0 +1,50 @@
+[package]
+name = "impeach-models"
+description = "Model traits (embedder, NLI, LLM, NER, coreference), registry and backends"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["fastembed", "ort-nli", "ollama", "gliner2"]
+# Sentence embeddings through fastembed (ONNX Runtime).
+fastembed = ["dep:fastembed"]
+# DeBERTa NLI cross-encoder through ONNX Runtime, model files from the Hugging Face hub.
+ort-nli = ["dep:ort", "dep:tokenizers", "dep:hf-hub"]
+# Ollama HTTP LLM backend.
+ollama = ["dep:ollama-rs", "dep:tokio"]
+# GLiNER2 NER and relation extraction (candle).
+gliner2 = ["dep:gliner2"]
+
+[dependencies]
+impeach-core.workspace = true
+impeach-config.workspace = true
+impeach-text.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+process-wrap = { workspace = true, features = ["std"] }
+# ONNX Runtime binaries are downloaded at build time; no image models.
+fastembed = { workspace = true, optional = true, features = ["ort-download-binaries-native-tls", "hf-hub-native-tls"] }
+# Same ort version and feature set as fastembed so both share one ONNX Runtime.
+ort = { workspace = true, optional = true, features = ["std", "ndarray", "api-24", "download-binaries", "tls-native"] }
+tokenizers = { workspace = true, optional = true, features = ["onig"] }
+hf-hub = { workspace = true, optional = true, features = ["ureq", "native-tls"] }
+ollama-rs = { workspace = true, optional = true, features = ["default"] }
+tokio = { workspace = true, optional = true, features = ["rt"] }
+gliner2 = { workspace = true, optional = true, features = ["candle"] }
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+tempfile.workspace = true
+tracing-subscriber.workspace = true
+
+[[test]]
+name = "sidecar"
+harness = false
+
+[lints]
+workspace = true

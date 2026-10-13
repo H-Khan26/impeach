@@ -2,8 +2,7 @@
 # ======================================
 
 # Usage:
-#   from contradiction_engine.api import run_processing
-#   result = run_processing("ingested.jsonl", config_path="contradiction_engine/config/processing/processing_v17.yaml")
+#   impeach process ingested.jsonl --config assets/config/processing/processing_v17.yaml
 
 config_version: "2.0"
 
@@ -64,7 +63,7 @@ stages:
     allow_llm: true
     llm_only: false
     create_if_missing: true
-    prompt_file: "contradiction_engine/prompts/ed/disambiguation.json"
+    prompt_file: "impeach/prompts/ed/disambiguation.json"
     max_candidates: 10
     enable_intra_doc_matching: true
     min_embedding_similarity: 0.55
@@ -90,7 +89,7 @@ stages:
     extraction_mode: "processing"
     commit_facts: false
     prompt_files:
-      - "contradiction_engine/prompts/processing/singlepass/processing_single_v3.json"
+      - "impeach/prompts/processing/singlepass/processing_single_v3.json"
     parallel: false
     max_workers: 1
     model_type: "ollama"
@@ -123,7 +122,7 @@ stages:
       keyword_overlap_threshold: 0.30  # Jaccard token overlap threshold
       
       # Qwen-specific settings (used when judge_model = "qwen")
-      qwen_prompt_file: "contradiction_engine/prompts/processing/qwen_judge.json"
+      qwen_prompt_file: "impeach/prompts/processing/qwen_judge.json"
       qwen_batch_size: 5  # Batch pairs for efficiency (future optimization)
     
     # Existing configuration (still used for retrieval and backward compatibility)
@@ -223,7 +222,7 @@ rag:
 
 # Mapping files
 mappings:
-  entity_mappings: "contradiction_engine/config/mappings/entity_types.yaml"
-  domain_mappings: "contradiction_engine/config/mappings/entity_types.yaml"
-  relationship_types: "contradiction_engine/config/mappings/relationship_types.yaml"
+  entity_mappings: "impeach/config/mappings/entity_types.yaml"
+  domain_mappings: "impeach/config/mappings/entity_types.yaml"
+  relationship_types: "impeach/config/mappings/relationship_types.yaml"
 

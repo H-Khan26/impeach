@@ -1,0 +1,29 @@
+[package]
+name = "impeach-ed"
+description = "Entity disambiguation: candidate retrieval, name matching, rule resolvers, LLM tie-break, entity creation"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+impeach-core.workspace = true
+impeach-config.workspace = true
+impeach-text.workspace = true
+impeach-store.workspace = true
+impeach-models.workspace = true
+impeach-ner.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+regex.workspace = true
+once_cell.workspace = true
+indexmap.workspace = true
+
+[dev-dependencies]
+pretty_assertions.workspace = true
+
+[lints]
+workspace = true

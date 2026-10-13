@@ -11,19 +11,19 @@ rust-version = "1.99"
 
 [workspace.dependencies]
 # Internal crates
-ce-core = { path = "crates/ce-core" }
-ce-config = { path = "crates/ce-config" }
-ce-text = { path = "crates/ce-text" }
-ce-ingest = { path = "crates/ce-ingest" }
-ce-store = { path = "crates/ce-store", default-features = false }
-ce-models = { path = "crates/ce-models", default-features = false }
-ce-ner = { path = "crates/ce-ner" }
-ce-coref = { path = "crates/ce-coref" }
-ce-ed = { path = "crates/ce-ed" }
-ce-facts = { path = "crates/ce-facts" }
-ce-contradictions = { path = "crates/ce-contradictions" }
-ce-pipeline = { path = "crates/ce-pipeline", default-features = false }
-ce-eval = { path = "crates/ce-eval", default-features = false }
+impeach-core = { path = "crates/impeach-core" }
+impeach-config = { path = "crates/impeach-config" }
+impeach-text = { path = "crates/impeach-text" }
+impeach-ingest = { path = "crates/impeach-ingest" }
+impeach-store = { path = "crates/impeach-store", default-features = false }
+impeach-models = { path = "crates/impeach-models", default-features = false }
+impeach-ner = { path = "crates/impeach-ner" }
+impeach-coref = { path = "crates/impeach-coref" }
+impeach-ed = { path = "crates/impeach-ed" }
+impeach-facts = { path = "crates/impeach-facts" }
+impeach-contradictions = { path = "crates/impeach-contradictions" }
+impeach-pipeline = { path = "crates/impeach-pipeline", default-features = false }
+impeach-eval = { path = "crates/impeach-eval", default-features = false }
 
 # Serialization and errors
 serde = { version = "1.0.229", features = ["derive"] }
