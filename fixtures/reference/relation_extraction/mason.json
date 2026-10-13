@@ -1,0 +1,17 @@
+{
+ "scenario": "mason",
+ "documents": [
+  {
+   "input": "Mason_billy.jsonl",
+   "doc_id": "001",
+   "extracted_relations": [],
+   "relations_by_type": {}
+  },
+  {
+   "input": "Mason_watson.jsonl",
+   "doc_id": "002",
+   "extracted_relations": [],
+   "relations_by_type": {}
+  }
+ ]
+}

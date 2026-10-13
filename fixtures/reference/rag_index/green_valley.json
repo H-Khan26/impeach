@@ -1,0 +1,179 @@
+{
+ "scenario": "green_valley",
+ "documents": [
+  {
+   "input": "green_valley_incident_report.jsonl",
+   "doc_id": "001",
+   "doc_text_len": 8182,
+   "chunks": [
+    {
+     "helix_id": "2",
+     "sequence_number": 0,
+     "start_char": 0,
+     "end_char": 1449,
+     "sentence_spans": [
+      {
+       "start": 0,
+       "end": 1449
+      }
+     ]
+    },
+    {
+     "helix_id": "3",
+     "sequence_number": 1,
+     "start_char": 1373,
+     "end_char": 2825,
+     "sentence_spans": [
+      {
+       "start": 1373,
+       "end": 2825
+      }
+     ]
+    },
+    {
+     "helix_id": "4",
+     "sequence_number": 2,
+     "start_char": 2716,
+     "end_char": 4009,
+     "sentence_spans": [
+      {
+       "start": 2716,
+       "end": 4009
+      }
+     ]
+    },
+    {
+     "helix_id": "5",
+     "sequence_number": 3,
+     "start_char": 3880,
+     "end_char": 5189,
+     "sentence_spans": [
+      {
+       "start": 3880,
+       "end": 5189
+      }
+     ]
+    },
+    {
+     "helix_id": "6",
+     "sequence_number": 4,
+     "start_char": 5189,
+     "end_char": 6570,
+     "sentence_spans": [
+      {
+       "start": 5189,
+       "end": 6570
+      }
+     ]
+    },
+    {
+     "helix_id": "7",
+     "sequence_number": 5,
+     "start_char": 6570,
+     "end_char": 7940,
+     "sentence_spans": [
+      {
+       "start": 6570,
+       "end": 7940
+      }
+     ]
+    },
+    {
+     "helix_id": "8",
+     "sequence_number": 6,
+     "start_char": 7940,
+     "end_char": 8182,
+     "sentence_spans": [
+      {
+       "start": 7940,
+       "end": 8182
+      }
+     ]
+    }
+   ],
+   "span_count": 7,
+   "embedding_count": 7
+  },
+  {
+   "input": "lopez_v_green_valley_complaint.jsonl",
+   "doc_id": "002",
+   "doc_text_len": 7171,
+   "chunks": [
+    {
+     "helix_id": "151",
+     "sequence_number": 0,
+     "start_char": 0,
+     "end_char": 1319,
+     "sentence_spans": [
+      {
+       "start": 0,
+       "end": 1319
+      }
+     ]
+    },
+    {
+     "helix_id": "152",
+     "sequence_number": 1,
+     "start_char": 1319,
+     "end_char": 2673,
+     "sentence_spans": [
+      {
+       "start": 1319,
+       "end": 2673
+      }
+     ]
+    },
+    {
+     "helix_id": "153",
+     "sequence_number": 2,
+     "start_char": 2570,
+     "end_char": 3979,
+     "sentence_spans": [
+      {
+       "start": 2570,
+       "end": 3979
+      }
+     ]
+    },
+    {
+     "helix_id": "154",
+     "sequence_number": 3,
+     "start_char": 3979,
+     "end_char": 5433,
+     "sentence_spans": [
+      {
+       "start": 3979,
+       "end": 5433
+      }
+     ]
+    },
+    {
+     "helix_id": "155",
+     "sequence_number": 4,
+     "start_char": 5371,
+     "end_char": 6867,
+     "sentence_spans": [
+      {
+       "start": 5371,
+       "end": 6867
+      }
+     ]
+    },
+    {
+     "helix_id": "156",
+     "sequence_number": 5,
+     "start_char": 6734,
+     "end_char": 7171,
+     "sentence_spans": [
+      {
+       "start": 6734,
+       "end": 7171
+      }
+     ]
+    }
+   ],
+   "span_count": 6,
+   "embedding_count": 6
+  }
+ ]
+}

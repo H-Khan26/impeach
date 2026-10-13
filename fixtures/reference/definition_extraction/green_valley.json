@@ -1,0 +1,15 @@
+{
+ "scenario": "green_valley",
+ "documents": [
+  {
+   "input": "green_valley_incident_report.jsonl",
+   "doc_id": "001",
+   "defined_terms": []
+  },
+  {
+   "input": "lopez_v_green_valley_complaint.jsonl",
+   "doc_id": "002",
+   "defined_terms": []
+  }
+ ]
+}

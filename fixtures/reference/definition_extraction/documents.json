@@ -1,0 +1,3626 @@
+{
+ "documents": [
+  {
+   "input": "example_deposition.json.jsonl",
+   "doc_id": "example_deposition",
+   "doc_text": "Attorney Smith (attorney): Good morning. Can you please state your name for the record?\nJane Doe (witness): My name is Jane Doe.\nAttorney Smith (attorney): Ms. Doe, were you the CEO of Acme Corporation from 2010 until 2015?\nJane Doe (witness): I was never the CEO of that company.\nAttorney Smith (attorney): So you're saying you were never the CEO of Acme Corporation?\nJane Doe (witness): That's correct. I was never the CEO.\nAttorney Smith (attorney): Can you tell me about your role at Acme Corporation during that time period?\nJane Doe (witness): I was the Chief Operating Officer from 2012 to 2016.\nAttorney Smith (attorney): And when did you first join Acme Corporation?\nJane Doe (witness): I joined the company in 2010 as a senior executive.\nAttorney Smith (attorney): Thank you. That's all for now.",
+   "doc_mentions": [
+    {
+     "id": "ent_example_deposition_0_21",
+     "type": "PER",
+     "name": "Attorney Smith",
+     "span": {
+      "start": 0,
+      "end": 14
+     },
+     "score": 0.9958880543708801,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9958880543708801
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_3",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 88,
+      "end": 96
+     },
+     "score": 0.9998998641967773,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9998998641967773
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_5",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 119,
+      "end": 127
+     },
+     "score": 0.9997656941413879,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9997656941413879
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_20",
+     "type": "PER",
+     "name": "Attorney Smith",
+     "span": {
+      "start": 129,
+      "end": 143
+     },
+     "score": 0.9960350394248962,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9960350394248962
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_11",
+     "type": "ORG",
+     "name": "Acme Corporation",
+     "span": {
+      "start": 185,
+      "end": 201
+     },
+     "score": 0.42371323704719543,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.42371323704719543
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_15",
+     "type": "DATE",
+     "name": "2010",
+     "span": {
+      "start": 207,
+      "end": 211
+     },
+     "score": 0.931060254573822,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.931060254573822
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_14",
+     "type": "DATE",
+     "name": "2015",
+     "span": {
+      "start": 218,
+      "end": 222
+     },
+     "score": 0.9321169853210449,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9321169853210449
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_0",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 224,
+      "end": 232
+     },
+     "score": 0.9999339580535889,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9999339580535889
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_22",
+     "type": "PER",
+     "name": "Attorney Smith",
+     "span": {
+      "start": 281,
+      "end": 295
+     },
+     "score": 0.9957966804504395,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9957966804504395
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_10",
+     "type": "ORG",
+     "name": "Acme Corporation",
+     "span": {
+      "start": 351,
+      "end": 367
+     },
+     "score": 0.44943830370903015,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.44943830370903015
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_1",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 369,
+      "end": 377
+     },
+     "score": 0.9999277591705322,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9999277591705322
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_19",
+     "type": "PER",
+     "name": "Attorney Smith",
+     "span": {
+      "start": 426,
+      "end": 440
+     },
+     "score": 0.9962661862373352,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9962661862373352
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_12",
+     "type": "ORG",
+     "name": "Acme Corporation",
+     "span": {
+      "start": 488,
+      "end": 504
+     },
+     "score": 0.41842296719551086,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.41842296719551086
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_2",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 530,
+      "end": 538
+     },
+     "score": 0.9999171495437622,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9999171495437622
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_18",
+     "type": "DATE",
+     "name": "2012",
+     "span": {
+      "start": 589,
+      "end": 593
+     },
+     "score": 0.7864789366722107,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.7864789366722107
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_17",
+     "type": "DATE",
+     "name": "2016",
+     "span": {
+      "start": 597,
+      "end": 601
+     },
+     "score": 0.8396835923194885,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.8396835923194885
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_23",
+     "type": "PER",
+     "name": "Attorney Smith",
+     "span": {
+      "start": 603,
+      "end": 617
+     },
+     "score": 0.995711088180542,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.995711088180542
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_13",
+     "type": "ORG",
+     "name": "Acme Corporation",
+     "span": {
+      "start": 658,
+      "end": 674
+     },
+     "score": 0.9876547455787659,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9876547455787659
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_4",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 676,
+      "end": 684
+     },
+     "score": 0.9998900890350342,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9998900890350342
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_16",
+     "type": "DATE",
+     "name": "2010",
+     "span": {
+      "start": 720,
+      "end": 724
+     },
+     "score": 0.9287960529327393,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9287960529327393
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_example_deposition_0_24",
+     "type": "PER",
+     "name": "Attorney Smith",
+     "span": {
+      "start": 748,
+      "end": 762
+     },
+     "score": 0.9954816102981567,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9954816102981567
+      }
+     ],
+     "metadata": {},
+     "doc_id": "example_deposition",
+     "chunk_id": "2",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "sample_memo.json.jsonl",
+   "doc_id": "memo-007",
+   "doc_text": "Memo: the Lopez lease began on 1 June 2021.\nRent was $1,450 per month — payable on the 1st.",
+   "doc_mentions": [
+    {
+     "id": "ent_memo-007_0_0",
+     "type": "PER",
+     "name": "Lopez",
+     "span": {
+      "start": 10,
+      "end": 15
+     },
+     "score": 0.920806884765625,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.920806884765625
+      }
+     ],
+     "metadata": {},
+     "doc_id": "memo-007",
+     "chunk_id": "26",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_memo-007_0_2",
+     "type": "DATE",
+     "name": "1 June 2021",
+     "span": {
+      "start": 31,
+      "end": 42
+     },
+     "score": 0.8795400261878967,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.8795400261878967
+      }
+     ],
+     "metadata": {},
+     "doc_id": "memo-007",
+     "chunk_id": "26",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-5b50fb6d",
+     "type": "MONEY",
+     "name": "$1,450",
+     "span": {
+      "start": 53,
+      "end": 59
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "MONEY",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.5720311999320984
+      }
+     ],
+     "metadata": {},
+     "doc_id": "memo-007",
+     "chunk_id": "26",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_memo-007_0_3",
+     "type": "DATE",
+     "name": "1st",
+     "span": {
+      "start": 87,
+      "end": 90
+     },
+     "score": 0.82569420337677,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.82569420337677
+      }
+     ],
+     "metadata": {},
+     "doc_id": "memo-007",
+     "chunk_id": "26",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "sample_note.txt.jsonl",
+   "doc_id": "sample_note",
+   "doc_text": "Incident note — 14 March 2024\n\nThomas Reynolds said the meeting at Silver Ridge Technologies ended at 4 p.m.\nHe later told Ana Muñoz that it ended at 5 p.m. and that \"nobody\" stayed late.\n\tIndented line with a tab.\n",
+   "doc_mentions": [
+    {
+     "id": "ent_sample_note_0_2",
+     "type": "DATE",
+     "name": "14 March 2024",
+     "span": {
+      "start": 16,
+      "end": 29
+     },
+     "score": 0.969102680683136,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.969102680683136
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_note",
+     "chunk_id": "33",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_note_0_0",
+     "type": "PER",
+     "name": "Thomas Reynolds",
+     "span": {
+      "start": 31,
+      "end": 46
+     },
+     "score": 0.9997346997261047,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9997346997261047
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_note",
+     "chunk_id": "33",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_note_0_1",
+     "type": "ORG",
+     "name": "Silver Ridge Technologies",
+     "span": {
+      "start": 67,
+      "end": 92
+     },
+     "score": 0.9506280422210693,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9506280422210693
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_note",
+     "chunk_id": "33",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_note_0_4",
+     "type": "TIME",
+     "name": "4 p.m.",
+     "span": {
+      "start": 102,
+      "end": 108
+     },
+     "score": 0.9854916930198669,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "TIME",
+       "score": 0.9854916930198669
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_note",
+     "chunk_id": "33",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_note_0_5",
+     "type": "PER",
+     "name": "Ana Muñoz",
+     "span": {
+      "start": 123,
+      "end": 132
+     },
+     "score": 0.6296767592430115,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.6296767592430115
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_note",
+     "chunk_id": "33",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_note_0_3",
+     "type": "TIME",
+     "name": "5 p.m.",
+     "span": {
+      "start": 150,
+      "end": 156
+     },
+     "score": 0.9973493814468384,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "TIME",
+       "score": 0.9973493814468384
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_note",
+     "chunk_id": "33",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "sample_transcript.csv.jsonl",
+   "doc_id": "sample_transcript",
+   "doc_text": "MR. SMITH (attorney): Where were you on March 3, 2024?\nJane Doe (witness): At the office, \"all day\".\nJane Doe: I left at 5 p.m.\nCOURT: Sustained.\nBob (witness): None",
+   "doc_mentions": [
+    {
+     "id": "ent_sample_transcript_0_10",
+     "type": "PER",
+     "name": "MR. SMITH",
+     "span": {
+      "start": 0,
+      "end": 9
+     },
+     "score": 0.9933860898017883,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9933860898017883
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "42",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-9bc6bf03",
+     "type": "DATE",
+     "name": "March 3, 2024",
+     "span": {
+      "start": 40,
+      "end": 53
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "DATE",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9955505132675171
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "42",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_0",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 55,
+      "end": 63
+     },
+     "score": 0.9997931122779846,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9997931122779846
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "42",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_3",
+     "type": "LOC",
+     "name": "office",
+     "span": {
+      "start": 82,
+      "end": 88
+     },
+     "score": 0.5107670426368713,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.5107670426368713
+      },
+      {
+       "name": "gliner2",
+       "label": "FACILITY",
+       "score": 0.4089844524860382
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "42",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_1",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 101,
+      "end": 109
+     },
+     "score": 0.9997791647911072,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9997791647911072
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "42",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_7",
+     "type": "TIME",
+     "name": "5 p.m.",
+     "span": {
+      "start": 121,
+      "end": 127
+     },
+     "score": 0.99722820520401,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "TIME",
+       "score": 0.99722820520401
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "42",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_8",
+     "type": "COURT",
+     "name": "COURT",
+     "span": {
+      "start": 128,
+      "end": 133
+     },
+     "score": 0.9242950677871704,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "COURT",
+       "score": 0.9242950677871704
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "42",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_9",
+     "type": "CASE",
+     "name": "Sustained",
+     "span": {
+      "start": 135,
+      "end": 144
+     },
+     "score": 0.9899564981460571,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "CASE",
+       "score": 0.9899564981460571
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "42",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_2",
+     "type": "PER",
+     "name": "Bob",
+     "span": {
+      "start": 146,
+      "end": 149
+     },
+     "score": 0.9978517293930054,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9978517293930054
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "42",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_5",
+     "type": "MONEY",
+     "name": "None",
+     "span": {
+      "start": 161,
+      "end": 165
+     },
+     "score": 0.8223873972892761,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.8223873972892761
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "42",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "sample_transcript.txt.jsonl",
+   "doc_id": "sample_transcript",
+   "doc_text": "MR. SMITH (ATTORNEY): Please state your name for the record.\nTHE WITNESS (WITNESS): Jane Doe.\nMR. SMITH (ATTORNEY): Were you the CEO of Acme Corporation from 2010 until 2015?\nTHE WITNESS (WITNESS): No. I was the Chief Operating Officer.\nMS. JONES (ATTORNEY): Objection, form.\nTHE COURT (JUDGE): Overruled.\nJANE DOE (WITNESS): I joined Acme in 2012.\nunknown: Unlabeled continuation line.\nMS. JONES (ATTORNEY): When did you leave?\nJANE DOE (WITNESS): In 2016.\nMS. JONES (ATTORNEY): Did you sign the contract?\nJANE DOE (WITNESS): I did not.\nMR. SMITH (ATTORNEY): \nMR. SMITH (ATTORNEY): Anything else?",
+   "doc_mentions": [
+    {
+     "id": "ent_sample_transcript_0_4",
+     "type": "PER",
+     "name": "MR. SMITH",
+     "span": {
+      "start": 0,
+      "end": 9
+     },
+     "score": 0.5214512348175049,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.5214512348175049
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_3",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 84,
+      "end": 92
+     },
+     "score": 0.9989529848098755,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9989529848098755
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_15",
+     "type": "PER",
+     "name": "MR. SMITH",
+     "span": {
+      "start": 94,
+      "end": 103
+     },
+     "score": 0.993729829788208,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.993729829788208
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_7",
+     "type": "ORG",
+     "name": "Acme Corporation",
+     "span": {
+      "start": 136,
+      "end": 152
+     },
+     "score": 0.5717566013336182,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.5717566013336182
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_9",
+     "type": "DATE",
+     "name": "2015",
+     "span": {
+      "start": 169,
+      "end": 173
+     },
+     "score": 0.8073936700820923,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.8073936700820923
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_17",
+     "type": "PER",
+     "name": "MS. JONES",
+     "span": {
+      "start": 237,
+      "end": 246
+     },
+     "score": 0.9822445511817932,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9822445511817932
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_0",
+     "type": "PER",
+     "name": "JANE DOE",
+     "span": {
+      "start": 306,
+      "end": 314
+     },
+     "score": 0.9995632767677307,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9995632767677307
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_10",
+     "type": "DATE",
+     "name": "2012",
+     "span": {
+      "start": 343,
+      "end": 347
+     },
+     "score": 0.7877036333084106,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.7877036333084106
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_18",
+     "type": "PER",
+     "name": "MS. JONES",
+     "span": {
+      "start": 387,
+      "end": 396
+     },
+     "score": 0.982006311416626,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.982006311416626
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_1",
+     "type": "PER",
+     "name": "JANE DOE",
+     "span": {
+      "start": 429,
+      "end": 437
+     },
+     "score": 0.9995324611663818,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9995324611663818
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_8",
+     "type": "DATE",
+     "name": "2016",
+     "span": {
+      "start": 452,
+      "end": 456
+     },
+     "score": 0.9003884196281433,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9003884196281433
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_16",
+     "type": "PER",
+     "name": "MS. JONES",
+     "span": {
+      "start": 458,
+      "end": 467
+     },
+     "score": 0.9840853214263916,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9840853214263916
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_13",
+     "type": "CASE",
+     "name": "contract",
+     "span": {
+      "start": 497,
+      "end": 505
+     },
+     "score": 0.4048645496368408,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "CASE",
+       "score": 0.4048645496368408
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_2",
+     "type": "PER",
+     "name": "JANE DOE",
+     "span": {
+      "start": 507,
+      "end": 515
+     },
+     "score": 0.9993946552276611,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9993946552276611
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_5",
+     "type": "PER",
+     "name": "MR. SMITH",
+     "span": {
+      "start": 538,
+      "end": 547
+     },
+     "score": 0.4817580282688141,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.4817580282688141
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_sample_transcript_0_6",
+     "type": "PER",
+     "name": "MR. SMITH",
+     "span": {
+      "start": 561,
+      "end": 570
+     },
+     "score": 0.43770599365234375,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.43770599365234375
+      }
+     ],
+     "metadata": {},
+     "doc_id": "sample_transcript",
+     "chunk_id": "55",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "generated/contradiction_test.jsonl",
+   "doc_id": "doc_test_002",
+   "doc_text": "I recall that Meridian Construction was actually founded in 2010, much later than they claim. When James Carter became CEO in 2019, things changed rapidly. During my time there, I worked as a Senior Safety Analyst, a role I took very seriously. I eventually resigned in August 2023 due to safety concerns. I heard that James Carter was fired from Meridian in 2022, though I cannot confirm it. Regarding Project Atlas, I am certain it started on July 1, 2022, because I was there on day one. Everyone knows the headquarters of Meridian are located in Seattle.",
+   "doc_mentions": [
+    {
+     "id": "ent_doc_test_002_0_2",
+     "type": "ORG",
+     "name": "Meridian Construction",
+     "span": {
+      "start": 14,
+      "end": 35
+     },
+     "score": 0.9859210848808289,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9859210848808289
+      }
+     ],
+     "metadata": {},
+     "doc_id": "doc_test_002",
+     "chunk_id": "74",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_doc_test_002_0_1",
+     "type": "PER",
+     "name": "James Carter",
+     "span": {
+      "start": 99,
+      "end": 111
+     },
+     "score": 0.9999288320541382,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9999288320541382
+      }
+     ],
+     "metadata": {},
+     "doc_id": "doc_test_002",
+     "chunk_id": "74",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_doc_test_002_0_8",
+     "type": "DATE",
+     "name": "2019",
+     "span": {
+      "start": 126,
+      "end": 130
+     },
+     "score": 0.802506685256958,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.802506685256958
+      }
+     ],
+     "metadata": {},
+     "doc_id": "doc_test_002",
+     "chunk_id": "74",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_doc_test_002_0_5",
+     "type": "DATE",
+     "name": "August 2023",
+     "span": {
+      "start": 270,
+      "end": 281
+     },
+     "score": 0.9351205229759216,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9351205229759216
+      }
+     ],
+     "metadata": {},
+     "doc_id": "doc_test_002",
+     "chunk_id": "74",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_doc_test_002_0_0",
+     "type": "PER",
+     "name": "James Carter",
+     "span": {
+      "start": 319,
+      "end": 331
+     },
+     "score": 0.9999516010284424,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9999516010284424
+      }
+     ],
+     "metadata": {},
+     "doc_id": "doc_test_002",
+     "chunk_id": "74",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_doc_test_002_0_7",
+     "type": "DATE",
+     "name": "2022",
+     "span": {
+      "start": 359,
+      "end": 363
+     },
+     "score": 0.8223275542259216,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.8223275542259216
+      }
+     ],
+     "metadata": {},
+     "doc_id": "doc_test_002",
+     "chunk_id": "74",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_doc_test_002_0_4",
+     "type": "PRODUCT",
+     "name": "Project Atlas",
+     "span": {
+      "start": 403,
+      "end": 416
+     },
+     "score": 0.9415319561958313,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PRODUCT",
+       "score": 0.9415319561958313
+      }
+     ],
+     "metadata": {},
+     "doc_id": "doc_test_002",
+     "chunk_id": "74",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-f718f5d8",
+     "type": "DATE",
+     "name": "July 1, 2022",
+     "span": {
+      "start": 445,
+      "end": 457
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "DATE",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9169706702232361
+      }
+     ],
+     "metadata": {},
+     "doc_id": "doc_test_002",
+     "chunk_id": "74",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_doc_test_002_0_10",
+     "type": "TIME",
+     "name": "day one",
+     "span": {
+      "start": 482,
+      "end": 489
+     },
+     "score": 0.48780664801597595,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "TIME",
+       "score": 0.48780664801597595
+      }
+     ],
+     "metadata": {},
+     "doc_id": "doc_test_002",
+     "chunk_id": "74",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_doc_test_002_0_3",
+     "type": "LOC",
+     "name": "Seattle",
+     "span": {
+      "start": 550,
+      "end": 557
+     },
+     "score": 0.9929803013801575,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.9929803013801575
+      }
+     ],
+     "metadata": {},
+     "doc_id": "doc_test_002",
+     "chunk_id": "74",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "generated/scenario_entailment.jsonl",
+   "doc_id": "scenario_entailment_001",
+   "doc_text": "Meridian Construction was founded in 2005 by a group of engineers. James Carter is the CEO of Meridian Construction. The company employs 500 people across three offices. Sarah Miller was hired as a Safety Inspector in March 2020. The project was completed on time and under budget. The founding of Meridian Construction took place in 2005. James Carter serves as Chief Executive Officer at Meridian Construction. 500 employees work for the company in three different locations. Sarah Miller joined Meridian as Safety Inspector in spring 2020. The project finished by the deadline without exceeding the allocated budget.",
+   "doc_mentions": [
+    {
+     "id": "ent_scenario_entailment_001_0_4",
+     "type": "ORG",
+     "name": "Meridian Construction",
+     "span": {
+      "start": 0,
+      "end": 21
+     },
+     "score": 0.9987918734550476,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9987918734550476
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_13",
+     "type": "DATE",
+     "name": "2005",
+     "span": {
+      "start": 37,
+      "end": 41
+     },
+     "score": 0.7958042025566101,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.7958042025566101
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_2",
+     "type": "PER",
+     "name": "James Carter",
+     "span": {
+      "start": 67,
+      "end": 79
+     },
+     "score": 0.9997071623802185,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9997071623802185
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_5",
+     "type": "ORG",
+     "name": "Meridian Construction",
+     "span": {
+      "start": 94,
+      "end": 115
+     },
+     "score": 0.997420072555542,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.997420072555542
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_3",
+     "type": "PER",
+     "name": "Sarah Miller",
+     "span": {
+      "start": 170,
+      "end": 182
+     },
+     "score": 0.9996823072433472,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9996823072433472
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_11",
+     "type": "DATE",
+     "name": "March 2020",
+     "span": {
+      "start": 218,
+      "end": 228
+     },
+     "score": 0.9402719736099243,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9402719736099243
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_10",
+     "type": "MONEY",
+     "name": "budget",
+     "span": {
+      "start": 274,
+      "end": 280
+     },
+     "score": 0.694385290145874,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.694385290145874
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_7",
+     "type": "ORG",
+     "name": "Meridian Construction",
+     "span": {
+      "start": 298,
+      "end": 319
+     },
+     "score": 0.9963585734367371,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9963585734367371
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_0",
+     "type": "PER",
+     "name": "James Carter",
+     "span": {
+      "start": 340,
+      "end": 352
+     },
+     "score": 0.9998701810836792,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9998701810836792
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_6",
+     "type": "ORG",
+     "name": "Meridian Construction",
+     "span": {
+      "start": 390,
+      "end": 411
+     },
+     "score": 0.9973020553588867,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9973020553588867
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_8",
+     "type": "LOC",
+     "name": "three different locations",
+     "span": {
+      "start": 451,
+      "end": 476
+     },
+     "score": 0.5746169686317444,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.5746169686317444
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_1",
+     "type": "PER",
+     "name": "Sarah Miller",
+     "span": {
+      "start": 478,
+      "end": 490
+     },
+     "score": 0.9998202919960022,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9998202919960022
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_12",
+     "type": "DATE",
+     "name": "spring 2020",
+     "span": {
+      "start": 530,
+      "end": 541
+     },
+     "score": 0.8368105888366699,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.8368105888366699
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_15",
+     "type": "TIME",
+     "name": "deadline",
+     "span": {
+      "start": 571,
+      "end": 579
+     },
+     "score": 0.9546536803245544,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "TIME",
+       "score": 0.9546536803245544
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_entailment_001_0_9",
+     "type": "MONEY",
+     "name": "allocated budget",
+     "span": {
+      "start": 602,
+      "end": 618
+     },
+     "score": 0.8357303142547607,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.8357303142547607
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_entailment_001",
+     "chunk_id": "87",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "generated/scenario_negation.jsonl",
+   "doc_id": "scenario_negation_001",
+   "doc_text": "James Carter attended the board meeting on March 5th. The safety report was submitted to the city inspector. Sarah Miller confirmed the accuracy of the financial statements. The defendant was present at the construction site that day. The company approved the budget for Project Atlas. James Carter did not attend the board meeting on March 5th. The safety report was never submitted to the city inspector. Sarah Miller denied the accuracy of the financial statements. The defendant was absent from the construction site that day. The company rejected the budget for Project Atlas.",
+   "doc_mentions": [
+    {
+     "id": "ent_scenario_negation_001_0_1",
+     "type": "PER",
+     "name": "James Carter",
+     "span": {
+      "start": 0,
+      "end": 12
+     },
+     "score": 0.9981446266174316,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9981446266174316
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_17",
+     "type": "DATE",
+     "name": "March 5th",
+     "span": {
+      "start": 43,
+      "end": 52
+     },
+     "score": 0.9928185939788818,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9928185939788818
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_5",
+     "type": "PER",
+     "name": "Sarah Miller",
+     "span": {
+      "start": 109,
+      "end": 121
+     },
+     "score": 0.4586183726787567,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.4586183726787567
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_3",
+     "type": "PER",
+     "name": "defendant",
+     "span": {
+      "start": 178,
+      "end": 187
+     },
+     "score": 0.955305278301239,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.955305278301239
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_11",
+     "type": "LOC",
+     "name": "construction site",
+     "span": {
+      "start": 207,
+      "end": 224
+     },
+     "score": 0.9758431315422058,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.9758431315422058
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_6",
+     "type": "ORG",
+     "name": "company",
+     "span": {
+      "start": 239,
+      "end": 246
+     },
+     "score": 0.5415493249893188,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.5415493249893188
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_14",
+     "type": "MONEY",
+     "name": "budget",
+     "span": {
+      "start": 260,
+      "end": 266
+     },
+     "score": 0.6968991756439209,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.6968991756439209
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_9",
+     "type": "ORG",
+     "name": "Project Atlas",
+     "span": {
+      "start": 271,
+      "end": 284
+     },
+     "score": 0.6221014857292175,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.6221014857292175
+      },
+      {
+       "name": "gliner2",
+       "label": "PRODUCT",
+       "score": 0.89103102684021
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_0",
+     "type": "PER",
+     "name": "James Carter",
+     "span": {
+      "start": 286,
+      "end": 298
+     },
+     "score": 0.9989444613456726,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9989444613456726
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_16",
+     "type": "DATE",
+     "name": "March 5th",
+     "span": {
+      "start": 335,
+      "end": 344
+     },
+     "score": 0.9935981035232544,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9935981035232544
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_4",
+     "type": "PER",
+     "name": "Sarah Miller",
+     "span": {
+      "start": 407,
+      "end": 419
+     },
+     "score": 0.5507831573486328,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.5507831573486328
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_2",
+     "type": "PER",
+     "name": "defendant",
+     "span": {
+      "start": 473,
+      "end": 482
+     },
+     "score": 0.9683974981307983,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9683974981307983
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_10",
+     "type": "LOC",
+     "name": "construction site",
+     "span": {
+      "start": 503,
+      "end": 520
+     },
+     "score": 0.9830127358436584,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.9830127358436584
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_7",
+     "type": "ORG",
+     "name": "company",
+     "span": {
+      "start": 535,
+      "end": 542
+     },
+     "score": 0.5306325554847717,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.5306325554847717
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_15",
+     "type": "MONEY",
+     "name": "budget",
+     "span": {
+      "start": 556,
+      "end": 562
+     },
+     "score": 0.680587112903595,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.680587112903595
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_negation_001_0_8",
+     "type": "ORG",
+     "name": "Project Atlas",
+     "span": {
+      "start": 567,
+      "end": 580
+     },
+     "score": 0.675809383392334,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.675809383392334
+      },
+      {
+       "name": "gliner2",
+       "label": "PRODUCT",
+       "score": 0.8882529735565186
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_negation_001",
+     "chunk_id": "105",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "generated/scenario_quantitative.jsonl",
+   "doc_id": "scenario_quantitative_001",
+   "doc_text": "Meridian Construction employs 500 people. The contract was valued at $2.5 million. The building has 15 stories. Revenue increased by 25% in fiscal year 2023. The project required 18 months to complete. Meridian Construction has only 50 employees. The contract was worth $250,000. The building is 40 floors tall. Revenue declined by 10% in 2023. The project was completed in just 6 months.",
+   "doc_mentions": [
+    {
+     "id": "ent_scenario_quantitative_001_0_0",
+     "type": "ORG",
+     "name": "Meridian Construction",
+     "span": {
+      "start": 0,
+      "end": 21
+     },
+     "score": 0.9944880604743958,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9944880604743958
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_7",
+     "type": "MONEY",
+     "name": "$2.5 million",
+     "span": {
+      "start": 69,
+      "end": 81
+     },
+     "score": 0.8861035704612732,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.8861035704612732
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_2",
+     "type": "FACILITY",
+     "name": "building",
+     "span": {
+      "start": 87,
+      "end": 95
+     },
+     "score": 0.43639376759529114,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "FACILITY",
+       "score": 0.43639376759529114
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_4",
+     "type": "MONEY",
+     "name": "Revenue",
+     "span": {
+      "start": 112,
+      "end": 119
+     },
+     "score": 0.4603530764579773,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.4603530764579773
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_8",
+     "type": "DATE",
+     "name": "fiscal year 2023",
+     "span": {
+      "start": 140,
+      "end": 156
+     },
+     "score": 0.9186730980873108,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9186730980873108
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_11",
+     "type": "TIME",
+     "name": "18 months",
+     "span": {
+      "start": 179,
+      "end": 188
+     },
+     "score": 0.955096423625946,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "TIME",
+       "score": 0.955096423625946
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_1",
+     "type": "ORG",
+     "name": "Meridian Construction",
+     "span": {
+      "start": 202,
+      "end": 223
+     },
+     "score": 0.991992712020874,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.991992712020874
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_12",
+     "type": "CASE",
+     "name": "contract",
+     "span": {
+      "start": 251,
+      "end": 259
+     },
+     "score": 0.4013199806213379,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "CASE",
+       "score": 0.4013199806213379
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-e5e71322",
+     "type": "MONEY",
+     "name": "$250,000",
+     "span": {
+      "start": 270,
+      "end": 278
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "MONEY",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.9555822014808655
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_3",
+     "type": "FACILITY",
+     "name": "40 floors",
+     "span": {
+      "start": 296,
+      "end": 305
+     },
+     "score": 0.4160041809082031,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "FACILITY",
+       "score": 0.4160041809082031
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_5",
+     "type": "MONEY",
+     "name": "Revenue",
+     "span": {
+      "start": 312,
+      "end": 319
+     },
+     "score": 0.41504713892936707,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.41504713892936707
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_9",
+     "type": "DATE",
+     "name": "2023",
+     "span": {
+      "start": 339,
+      "end": 343
+     },
+     "score": 0.8095777034759521,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.8095777034759521
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_quantitative_001_0_10",
+     "type": "TIME",
+     "name": "6 months",
+     "span": {
+      "start": 379,
+      "end": 387
+     },
+     "score": 0.9861575365066528,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "TIME",
+       "score": 0.9861575365066528
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_quantitative_001",
+     "chunk_id": "124",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "generated/scenario_temporal.jsonl",
+   "doc_id": "scenario_temporal_001",
+   "doc_text": "Meridian Construction was founded in 2005 by a group of engineers. James Carter became CEO of Meridian on January 15, 2018. The merger was finalized on December 31, 2021. The safety inspection was conducted in Q1 2023. Meridian Construction was established in 2010. James Carter took over as CEO in March 2019. The merger was completed in early 2022. The safety inspection occurred in Q4 2023.",
+   "doc_mentions": [
+    {
+     "id": "ent_scenario_temporal_001_0_2",
+     "type": "ORG",
+     "name": "Meridian Construction",
+     "span": {
+      "start": 0,
+      "end": 21
+     },
+     "score": 0.9870635271072388,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9870635271072388
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_1",
+     "type": "PER",
+     "name": "James Carter",
+     "span": {
+      "start": 67,
+      "end": 79
+     },
+     "score": 0.9997103810310364,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9997103810310364
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-af292021",
+     "type": "DATE",
+     "name": "January 15, 2018",
+     "span": {
+      "start": 106,
+      "end": 122
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "DATE",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.821311354637146
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_13",
+     "type": "CASE",
+     "name": "merger",
+     "span": {
+      "start": 128,
+      "end": 134
+     },
+     "score": 0.9766992330551147,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "CASE",
+       "score": 0.9766992330551147
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-185151aa",
+     "type": "DATE",
+     "name": "December 31, 2021",
+     "span": {
+      "start": 152,
+      "end": 169
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "DATE",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9250855445861816
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_14",
+     "type": "CASE",
+     "name": "safety inspection",
+     "span": {
+      "start": 175,
+      "end": 192
+     },
+     "score": 0.9409769177436829,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "CASE",
+       "score": 0.9409769177436829
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_4",
+     "type": "DATE",
+     "name": "Q1 2023",
+     "span": {
+      "start": 210,
+      "end": 217
+     },
+     "score": 0.9699841141700745,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9699841141700745
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_3",
+     "type": "ORG",
+     "name": "Meridian Construction",
+     "span": {
+      "start": 219,
+      "end": 240
+     },
+     "score": 0.9840256571769714,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9840256571769714
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_10",
+     "type": "DATE",
+     "name": "2010",
+     "span": {
+      "start": 260,
+      "end": 264
+     },
+     "score": 0.7923449277877808,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.7923449277877808
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_0",
+     "type": "PER",
+     "name": "James Carter",
+     "span": {
+      "start": 266,
+      "end": 278
+     },
+     "score": 0.9998685121536255,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9998685121536255
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_7",
+     "type": "DATE",
+     "name": "March 2019",
+     "span": {
+      "start": 299,
+      "end": 309
+     },
+     "score": 0.8929937481880188,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.8929937481880188
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_12",
+     "type": "CASE",
+     "name": "merger",
+     "span": {
+      "start": 315,
+      "end": 321
+     },
+     "score": 0.9779890179634094,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "CASE",
+       "score": 0.9779890179634094
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_8",
+     "type": "DATE",
+     "name": "early 2022",
+     "span": {
+      "start": 339,
+      "end": 349
+     },
+     "score": 0.867329478263855,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.867329478263855
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_15",
+     "type": "CASE",
+     "name": "safety inspection",
+     "span": {
+      "start": 355,
+      "end": 372
+     },
+     "score": 0.9354455471038818,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "CASE",
+       "score": 0.9354455471038818
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_temporal_001_0_5",
+     "type": "DATE",
+     "name": "Q4 2023",
+     "span": {
+      "start": 385,
+      "end": 392
+     },
+     "score": 0.9686672687530518,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9686672687530518
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_temporal_001",
+     "chunk_id": "140",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "generated/scenario_unrelated.jsonl",
+   "doc_id": "scenario_unrelated_001",
+   "doc_text": "Meridian Construction was founded in 2005. James Carter became CEO in January 2018. The company headquarters is located in Seattle, Washington. Project Atlas began construction on June 10, 2022. The weather in Chicago was unusually cold last winter. Sarah Miller enjoys hiking on weekends. The stock market experienced volatility in Q3 2023. New environmental regulations were passed by Congress. The cafeteria serves lunch from 11am to 2pm daily.",
+   "doc_mentions": [
+    {
+     "id": "ent_scenario_unrelated_001_0_3",
+     "type": "ORG",
+     "name": "Meridian Construction",
+     "span": {
+      "start": 0,
+      "end": 21
+     },
+     "score": 0.9982794523239136,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9982794523239136
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_0",
+     "type": "PER",
+     "name": "James Carter",
+     "span": {
+      "start": 43,
+      "end": 55
+     },
+     "score": 0.9979357719421387,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9979357719421387
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_11",
+     "type": "DATE",
+     "name": "January 2018",
+     "span": {
+      "start": 70,
+      "end": 82
+     },
+     "score": 0.6314297318458557,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.6314297318458557
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_5",
+     "type": "LOC",
+     "name": "Seattle",
+     "span": {
+      "start": 123,
+      "end": 130
+     },
+     "score": 0.8384819030761719,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.8384819030761719
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_6",
+     "type": "LOC",
+     "name": "Washington",
+     "span": {
+      "start": 132,
+      "end": 142
+     },
+     "score": 0.6958620548248291,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.6958620548248291
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_8",
+     "type": "PRODUCT",
+     "name": "Project Atlas",
+     "span": {
+      "start": 144,
+      "end": 157
+     },
+     "score": 0.900637149810791,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PRODUCT",
+       "score": 0.900637149810791
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-e4e0af5f",
+     "type": "DATE",
+     "name": "June 10, 2022",
+     "span": {
+      "start": 180,
+      "end": 193
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "DATE",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.7243538498878479
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_4",
+     "type": "LOC",
+     "name": "Chicago",
+     "span": {
+      "start": 210,
+      "end": 217
+     },
+     "score": 0.9849206805229187,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.9849206805229187
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_1",
+     "type": "PER",
+     "name": "Sarah Miller",
+     "span": {
+      "start": 250,
+      "end": 262
+     },
+     "score": 0.9976219534873962,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9976219534873962
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_9",
+     "type": "DATE",
+     "name": "Q3 2023",
+     "span": {
+      "start": 333,
+      "end": 340
+     },
+     "score": 0.9502045512199402,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9502045512199402
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_2",
+     "type": "ORG",
+     "name": "Congress",
+     "span": {
+      "start": 387,
+      "end": 395
+     },
+     "score": 0.9543219208717346,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9543219208717346
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_7",
+     "type": "FACILITY",
+     "name": "cafeteria",
+     "span": {
+      "start": 401,
+      "end": 410
+     },
+     "score": 0.9349726438522339,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "FACILITY",
+       "score": 0.9349726438522339
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_scenario_unrelated_001_0_13",
+     "type": "TIME",
+     "name": "11am to 2pm",
+     "span": {
+      "start": 429,
+      "end": 440
+     },
+     "score": 0.8505966663360596,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "TIME",
+       "score": 0.8505966663360596
+      }
+     ],
+     "metadata": {},
+     "doc_id": "scenario_unrelated_001",
+     "chunk_id": "158",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "input": "generated/synthetic_definitions.jsonl",
+   "doc_id": "synthetic_definitions",
+   "doc_text": "COMPLAINT FOR DAMAGES. Maria Lopez (\"Plaintiff\") brings this action against Green Valley Logistics, Inc. (the \"Company\") and Daniel Reed (hereafter \"Defendant\"). Acme Holdings LLC, hereinafter referred to as the Landlord, leased the warehouse at 200 Mission Street to Jane Doe, hereinafter \"Tenant\", on March 4, 2023. \"Buyer\" is defined as Global Traders LLC. Judge Alan Brown (\"Court\") presided. Smith and Jones (\"Plaintiffs\") joined the suit. Riverside Insurance Company (the \"Insurer\") denied coverage of $14,250.00.",
+   "doc_mentions": [
+    {
+     "id": "ent_synthetic_definitions_0_14",
+     "type": "CASE",
+     "name": "COMPLAINT FOR DAMAGES",
+     "span": {
+      "start": 0,
+      "end": 21
+     },
+     "score": 0.9303937554359436,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "CASE",
+       "score": 0.9303937554359436
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_0",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 23,
+      "end": 34
+     },
+     "score": 0.9979104399681091,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9979104399681091
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_5",
+     "type": "ORG",
+     "name": "Green Valley Logistics, Inc.",
+     "span": {
+      "start": 76,
+      "end": 104
+     },
+     "score": 0.981684148311615,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.981684148311615
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_2",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 125,
+      "end": 136
+     },
+     "score": 0.9957665205001831,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9957665205001831
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_8",
+     "type": "ORG",
+     "name": "Acme Holdings LLC",
+     "span": {
+      "start": 162,
+      "end": 179
+     },
+     "score": 0.9703052639961243,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9703052639961243
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_10",
+     "type": "FACILITY",
+     "name": "warehouse",
+     "span": {
+      "start": 233,
+      "end": 242
+     },
+     "score": 0.9465565085411072,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "FACILITY",
+       "score": 0.9465565085411072
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_9",
+     "type": "LOC",
+     "name": "200 Mission Street",
+     "span": {
+      "start": 246,
+      "end": 264
+     },
+     "score": 0.9933155179023743,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "LOC",
+       "score": 0.9933155179023743
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_1",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 268,
+      "end": 276
+     },
+     "score": 0.9961954355239868,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9961954355239868
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-17093f2e",
+     "type": "DATE",
+     "name": "March 4, 2023",
+     "span": {
+      "start": 303,
+      "end": 316
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "DATE",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "DATE",
+       "score": 0.9843665361404419
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_7",
+     "type": "ORG",
+     "name": "Global Traders LLC",
+     "span": {
+      "start": 340,
+      "end": 358
+     },
+     "score": 0.9706676602363586,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9706676602363586
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_15",
+     "type": "PER",
+     "name": "Judge Alan Brown",
+     "span": {
+      "start": 360,
+      "end": 376
+     },
+     "score": 0.9435958862304688,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9435958862304688
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_3",
+     "type": "PER",
+     "name": "Smith",
+     "span": {
+      "start": 397,
+      "end": 402
+     },
+     "score": 0.9564552307128906,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9564552307128906
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_4",
+     "type": "PER",
+     "name": "Jones",
+     "span": {
+      "start": 407,
+      "end": 412
+     },
+     "score": 0.9525700211524963,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "PER",
+       "score": 0.9525700211524963
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "ent_synthetic_definitions_0_6",
+     "type": "ORG",
+     "name": "Riverside Insurance Company",
+     "span": {
+      "start": 445,
+      "end": 472
+     },
+     "score": 0.9785169959068298,
+     "source": "gliner2",
+     "sources": [
+      {
+       "name": "gliner2",
+       "label": "ORG",
+       "score": 0.9785169959068298
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    },
+    {
+     "id": "span-a63cfa52",
+     "type": "MONEY",
+     "name": "$14,250.00",
+     "span": {
+      "start": 508,
+      "end": 518
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [
+      {
+       "name": "regex_detector",
+       "label": "MONEY",
+       "score": 1.0
+      },
+      {
+       "name": "gliner2",
+       "label": "MONEY",
+       "score": 0.4806879162788391
+      }
+     ],
+     "metadata": {},
+     "doc_id": "synthetic_definitions",
+     "chunk_id": "174",
+     "sentence_index": 0
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "ent_synthetic_definitions_0_14",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiff",
+     "span": {
+      "start": 0,
+      "end": 48
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    },
+    {
+     "entity_mention_id": "ent_synthetic_definitions_0_3",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiffs",
+     "span": {
+      "start": 397,
+      "end": 427
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    },
+    {
+     "entity_mention_id": "ent_synthetic_definitions_0_5",
+     "defined_term": "COMPANY",
+     "original_term": "Company",
+     "span": {
+      "start": 76,
+      "end": 120
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_with_article"
+    },
+    {
+     "entity_mention_id": "ent_synthetic_definitions_0_1",
+     "defined_term": "TENANT",
+     "original_term": "Tenant",
+     "span": {
+      "start": 250,
+      "end": 298
+     },
+     "confidence": 0.9,
+     "extraction_method": "pattern:hereinafter_quoted"
+    },
+    {
+     "entity_mention_id": "ent_synthetic_definitions_0_8",
+     "defined_term": "LANDLORD",
+     "original_term": "Landlord",
+     "span": {
+      "start": 162,
+      "end": 220
+     },
+     "confidence": 0.85,
+     "extraction_method": "pattern:hereinafter_unquoted"
+    },
+    {
+     "entity_mention_id": "ent_synthetic_definitions_0_2",
+     "defined_term": "DEFENDANT",
+     "original_term": "Defendant",
+     "span": {
+      "start": 125,
+      "end": 160
+     },
+     "confidence": 0.9,
+     "extraction_method": "pattern:hereafter_quoted"
+    },
+    {
+     "entity_mention_id": "ent_synthetic_definitions_0_7",
+     "defined_term": "BUYER",
+     "original_term": "Buyer",
+     "span": {
+      "start": 318,
+      "end": 377
+     },
+     "confidence": 0.85,
+     "extraction_method": "pattern:defined_as"
+    }
+   ]
+  }
+ ]
+}

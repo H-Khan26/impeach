@@ -1,0 +1,674 @@
+{
+ "cases": [
+  {
+   "segment_id": "case_0",
+   "text": "See Brown v. Board of Education, 347 U.S. 483, 495 (1954). Id. at 496. Smith, 347 U.S. at 490.",
+   "eyecite": [
+    {
+     "id": "span-7d268613",
+     "type": "CASE_CITATION",
+     "name": "347 U.S. 483",
+     "span": {
+      "start": 33,
+      "end": 45
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "volume": "347",
+      "reporter": "U.S.",
+      "page": "483",
+      "year": 1954
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-ce90b905",
+     "type": "CASE_CITATION",
+     "name": "Id.",
+     "span": {
+      "start": 59,
+      "end": 62
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "is_short_form": true
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-d6c16ef6",
+     "type": "CASE_CITATION",
+     "name": "347 U.S. at 490",
+     "span": {
+      "start": 78,
+      "end": 93
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "volume": "347",
+      "reporter": "U.S.",
+      "page": "490"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "regex": []
+  },
+  {
+   "segment_id": "case_1",
+   "text": "Lopez v. Green Valley, 5 Cal. App. 5th 100 (2016); 12 Cal. Rptr. 3d 45; 99 P.3d 1 (Cal. 2004); 410 F. Supp. 2d 77 (S.D.N.Y. 2005); 19 F. App'x 20; 5 Cal.4th 1, 10 (1993); 100 F.3d 200, 205 n.3 (2d Cir. 1996); 347 US 483",
+   "eyecite": [
+    {
+     "id": "span-d9ad51e7",
+     "type": "CASE_CITATION",
+     "name": "5 Cal. App. 5th 100",
+     "span": {
+      "start": 23,
+      "end": 42
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "volume": "5",
+      "reporter": "Cal. App. 5th",
+      "page": "100",
+      "year": 2004
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-d1320385",
+     "type": "CASE_CITATION",
+     "name": "12 Cal. Rptr. 3d 45",
+     "span": {
+      "start": 51,
+      "end": 70
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "volume": "12",
+      "reporter": "Cal. Rptr. 3d",
+      "page": "45"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-f175bd23",
+     "type": "CASE_CITATION",
+     "name": "99 P.3d 1",
+     "span": {
+      "start": 72,
+      "end": 81
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "volume": "99",
+      "reporter": "P.3d",
+      "page": "1"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-e1aa29fd",
+     "type": "CASE_CITATION",
+     "name": "410 F. Supp. 2d 77",
+     "span": {
+      "start": 95,
+      "end": 113
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "volume": "410",
+      "reporter": "F. Supp. 2d",
+      "page": "77"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-1fdc3774",
+     "type": "CASE_CITATION",
+     "name": "19 F. App'x 20",
+     "span": {
+      "start": 131,
+      "end": 145
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "volume": "19",
+      "reporter": "F. App'x",
+      "page": "20"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-160438c5",
+     "type": "CASE_CITATION",
+     "name": "5 Cal.4th 1",
+     "span": {
+      "start": 147,
+      "end": 158
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "volume": "5",
+      "reporter": "Cal.4th",
+      "page": "1"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-cb711e78",
+     "type": "CASE_CITATION",
+     "name": "100 F.3d 200",
+     "span": {
+      "start": 171,
+      "end": 183
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "volume": "100",
+      "reporter": "F.3d",
+      "page": "200"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-901167d7",
+     "type": "CASE_CITATION",
+     "name": "347 US 483",
+     "span": {
+      "start": 209,
+      "end": 219
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "volume": "347",
+      "reporter": "US",
+      "page": "483"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "regex": []
+  },
+  {
+   "segment_id": "case_2",
+   "text": "A: 42 U.S.C. § 1983 B and 42 U.S.C. §§ 1983-1985; x 18 USC § 1001 y; 28 C.F.R. § 35.130.",
+   "eyecite": [
+    {
+     "id": "span-40a99366",
+     "type": "CASE_CITATION",
+     "name": "42 U.S.C. § 1983",
+     "span": {
+      "start": 3,
+      "end": 19
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "title": "42",
+      "reporter": "U.S.C.",
+      "section": "1983"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-3080cae2",
+     "type": "CASE_CITATION",
+     "name": "42 U.S.C. §§ 1983-1985",
+     "span": {
+      "start": 26,
+      "end": 48
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "title": "42",
+      "reporter": "U.S.C.",
+      "section": "1983-1985"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-5c67ddac",
+     "type": "CASE_CITATION",
+     "name": "18 USC § 1001",
+     "span": {
+      "start": 52,
+      "end": 65
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "title": "18",
+      "reporter": "USC",
+      "section": "1001"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-f67533ae",
+     "type": "CASE_CITATION",
+     "name": "28 C.F.R. § 35.130",
+     "span": {
+      "start": 69,
+      "end": 87
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "chapter": "28",
+      "reporter": "C.F.R.",
+      "section": "35.130"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "regex": [
+    {
+     "id": "span-b33f661d",
+     "type": "STATUTE",
+     "name": "42 U.S.C. § 1983",
+     "span": {
+      "start": 3,
+      "end": 19
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-3fd5de68",
+     "type": "STATUTE",
+     "name": "18 USC § 1001",
+     "span": {
+      "start": 52,
+      "end": 65
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ]
+  },
+  {
+   "segment_id": "case_3",
+   "text": "x Cal. Bus. & Prof. Code § 17200 y; Cal. Civ. Code §1714; Tex. Penal Code Ann. § 22.01; N.Y. Penal Law § 120.00; Fla. Stat. § 768.81.",
+   "eyecite": [
+    {
+     "id": "span-60573baf",
+     "type": "STATUTE_CITATION",
+     "name": "Cal. Bus. & Prof. Code § 17200",
+     "span": {
+      "start": 2,
+      "end": 32
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "reporter": "Cal. Bus. & Prof. Code",
+      "subject": "Bus. & Prof.",
+      "section": "17200"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-d2e2c93a",
+     "type": "STATUTE_CITATION",
+     "name": "Cal. Civ. Code §1714",
+     "span": {
+      "start": 36,
+      "end": 56
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "reporter": "Cal. Civ. Code",
+      "subject": "Civ.",
+      "section": "1714"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-b00211ea",
+     "type": "STATUTE_CITATION",
+     "name": "Tex. Penal Code Ann. § 22.01",
+     "span": {
+      "start": 58,
+      "end": 86
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "reporter": "Tex. Penal Code Ann.",
+      "subject": "Penal",
+      "section": "22.01"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-54175b3f",
+     "type": "CASE_CITATION",
+     "name": "N.Y. Penal Law § 120.00",
+     "span": {
+      "start": 88,
+      "end": 111
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "reporter": "N.Y. Penal Law",
+      "subject": "Penal",
+      "section": "120.00"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-89daa203",
+     "type": "CASE_CITATION",
+     "name": "Fla. Stat. § 768.81",
+     "span": {
+      "start": 113,
+      "end": 132
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "reporter": "Fla. Stat.",
+      "section": "768.81"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "regex": [
+    {
+     "id": "span-991bf9b6",
+     "type": "EXHIBIT_ID",
+     "name": "ex. Penal",
+     "span": {
+      "start": 59,
+      "end": 68
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ]
+  },
+  {
+   "segment_id": "case_4",
+   "text": "Plaintiff relies on Smith, supra, and Ibid. The motion under Fed. R. Civ. P. 12(b)(6) fails. Case No. 2:23-cv-01492; Exhibit 12A; damages of $1,234.56 million on January 15, 2023.",
+   "eyecite": [
+    {
+     "id": "span-02877fb4",
+     "type": "CASE_CITATION",
+     "name": "supra,",
+     "span": {
+      "start": 27,
+      "end": 33
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-a079ff6c",
+     "type": "CASE_CITATION",
+     "name": "Ibid.",
+     "span": {
+      "start": 38,
+      "end": 43
+     },
+     "score": 1.0,
+     "source": "eyecite",
+     "sources": [],
+     "metadata": {
+      "is_short_form": true
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "regex": [
+    {
+     "id": "span-ea641ca2",
+     "type": "DOCKET_ENTRY",
+     "name": "Case No. 2:23-cv-01492",
+     "span": {
+      "start": 93,
+      "end": 115
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-37b1be0b",
+     "type": "EXHIBIT_ID",
+     "name": "Exhibit 12A",
+     "span": {
+      "start": 117,
+      "end": 128
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-fd66ad66",
+     "type": "STATUTE",
+     "name": "Fed. R. Civ. P. 12(b)(6)",
+     "span": {
+      "start": 61,
+      "end": 85
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-1903910c",
+     "type": "MONEY",
+     "name": "$1,234.56 million",
+     "span": {
+      "start": 141,
+      "end": 158
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-d7e994b9",
+     "type": "DATE",
+     "name": "January 15, 2023",
+     "span": {
+      "start": 162,
+      "end": 178
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ]
+  },
+  {
+   "segment_id": "case_5",
+   "text": "On March 4, 2023, at 9:20 p.m., Maria Lopez paid $14,250.00 under 42 U.S.C. 1983 (see Ex. 3).",
+   "eyecite": [],
+   "regex": [
+    {
+     "id": "span-7bd1afab",
+     "type": "EXHIBIT_ID",
+     "name": "Ex. 3",
+     "span": {
+      "start": 86,
+      "end": 91
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-82bce72f",
+     "type": "STATUTE",
+     "name": "42 U.S.C. 1983",
+     "span": {
+      "start": 66,
+      "end": 80
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-704947c7",
+     "type": "MONEY",
+     "name": "$14,250.00",
+     "span": {
+      "start": 49,
+      "end": 59
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "span-b2545a6b",
+     "type": "DATE",
+     "name": "March 4, 2023",
+     "span": {
+      "start": 3,
+      "end": 16
+     },
+     "score": 1.0,
+     "source": "regex_detector",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ]
+  }
+ ]
+}

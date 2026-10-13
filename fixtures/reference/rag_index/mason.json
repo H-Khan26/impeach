@@ -1,0 +1,47 @@
+{
+ "scenario": "mason",
+ "documents": [
+  {
+   "input": "Mason_billy.jsonl",
+   "doc_id": "001",
+   "doc_text_len": 292,
+   "chunks": [
+    {
+     "helix_id": "2",
+     "sequence_number": 0,
+     "start_char": 0,
+     "end_char": 292,
+     "sentence_spans": [
+      {
+       "start": 0,
+       "end": 292
+      }
+     ]
+    }
+   ],
+   "span_count": 1,
+   "embedding_count": 1
+  },
+  {
+   "input": "Mason_watson.jsonl",
+   "doc_id": "002",
+   "doc_text_len": 265,
+   "chunks": [
+    {
+     "helix_id": "21",
+     "sequence_number": 0,
+     "start_char": 0,
+     "end_char": 265,
+     "sentence_spans": [
+      {
+       "start": 0,
+       "end": 265
+      }
+     ]
+    }
+   ],
+   "span_count": 1,
+   "embedding_count": 1
+  }
+ ]
+}

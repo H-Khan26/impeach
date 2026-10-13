@@ -1,0 +1,1076 @@
+{
+ "cases": [
+  {
+   "name": "parenthetical_quoted",
+   "text": "Maria Lopez (\"Plaintiff\") filed suit against Acme Corp.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 0,
+      "end": 11
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Acme Corp",
+     "span": {
+      "start": 45,
+      "end": 54
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m1",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiff",
+     "span": {
+      "start": 0,
+      "end": 25
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    }
+   ]
+  },
+  {
+   "name": "article_and_hereinafter",
+   "text": "Acme Corporation (the \"Company\") hired John Smith, hereinafter \"Employee\", on May 1.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Acme Corporation",
+     "span": {
+      "start": 0,
+      "end": 16
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "John Smith",
+     "span": {
+      "start": 39,
+      "end": 49
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m1",
+     "defined_term": "COMPANY",
+     "original_term": "Company",
+     "span": {
+      "start": 0,
+      "end": 32
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_with_article"
+    },
+    {
+     "entity_mention_id": "m2",
+     "defined_term": "EMPLOYEE",
+     "original_term": "Employee",
+     "span": {
+      "start": 39,
+      "end": 73
+     },
+     "confidence": 0.9,
+     "extraction_method": "pattern:hereinafter_quoted"
+    }
+   ]
+  },
+  {
+   "name": "hereinafter_unquoted",
+   "text": "Jane Doe, hereinafter referred to as the Tenant, signed the lease.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 0,
+      "end": 8
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m1",
+     "defined_term": "TENANT",
+     "original_term": "Tenant",
+     "span": {
+      "start": 0,
+      "end": 47
+     },
+     "confidence": 0.85,
+     "extraction_method": "pattern:hereinafter_unquoted"
+    }
+   ]
+  },
+  {
+   "name": "hereinafter_quoted_article",
+   "text": "Jane Doe, hereinafter referred to as \"the Tenant\", signed.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Jane Doe",
+     "span": {
+      "start": 0,
+      "end": 8
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m1",
+     "defined_term": "TENANT",
+     "original_term": "Tenant",
+     "span": {
+      "start": 0,
+      "end": 49
+     },
+     "confidence": 0.9,
+     "extraction_method": "pattern:hereinafter_quoted"
+    }
+   ]
+  },
+  {
+   "name": "hereafter_quoted",
+   "text": "Robert Reed (hereafter \"Defendant\") denied it.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Robert Reed",
+     "span": {
+      "start": 0,
+      "end": 11
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m1",
+     "defined_term": "DEFENDANT",
+     "original_term": "Defendant",
+     "span": {
+      "start": 0,
+      "end": 35
+     },
+     "confidence": 0.9,
+     "extraction_method": "pattern:hereafter_quoted"
+    }
+   ]
+  },
+  {
+   "name": "defined_as_substring",
+   "text": "\"Buyer\" defined as Global Traders LLC. The rest follows.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Global Traders LLC",
+     "span": {
+      "start": 19,
+      "end": 37
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m1",
+     "defined_term": "BUYER",
+     "original_term": "Buyer",
+     "span": {
+      "start": 0,
+      "end": 56
+     },
+     "confidence": 0.85,
+     "extraction_method": "pattern:defined_as"
+    }
+   ]
+  },
+  {
+   "name": "closest_mention",
+   "text": "On Monday, Maria Lopez (\"Plaintiff\") testified. Later Maria Lopez left.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 54,
+      "end": 65
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 11,
+      "end": 22
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m2",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiff",
+     "span": {
+      "start": 0,
+      "end": 36
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    }
+   ]
+  },
+  {
+   "name": "excluded_and_plural",
+   "text": "Judge Brown (\"Court\") ruled. Acme Ltd (\"Widget\") sold. Smith and Jones (\"Plaintiffs\") sued.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Judge Brown",
+     "span": {
+      "start": 0,
+      "end": 11
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Acme Ltd",
+     "span": {
+      "start": 29,
+      "end": 37
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m3",
+     "type": "PER",
+     "name": "Smith and Jones",
+     "span": {
+      "start": 55,
+      "end": 70
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m3",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiffs",
+     "span": {
+      "start": 55,
+      "end": 85
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    }
+   ]
+  },
+  {
+   "name": "no_matching_mention",
+   "text": "Unknown Person (\"Plaintiff\") appeared.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Somebody",
+     "span": {
+      "start": 0,
+      "end": 8
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "name": "unicode_offsets",
+   "text": "Résumé: Ana Ruiz (\"Tenant\") paid über rent.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Ana Ruiz",
+     "span": {
+      "start": 8,
+      "end": 16
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m1",
+     "defined_term": "TENANT",
+     "original_term": "Tenant",
+     "span": {
+      "start": 8,
+      "end": 27
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    }
+   ]
+  },
+  {
+   "name": "partial_ties",
+   "text": "Lopez met Maria Lopez (\"Plaintiff\") and Lopez.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Lopez",
+     "span": {
+      "start": 40,
+      "end": 45
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Lopez",
+     "span": {
+      "start": 0,
+      "end": 5
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m3",
+     "type": "PER",
+     "name": "Maria",
+     "span": {
+      "start": 10,
+      "end": 15
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m2",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiff",
+     "span": {
+      "start": 0,
+      "end": 35
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    }
+   ]
+  },
+  {
+   "name": "exact_beats_partial",
+   "text": "Maria Lopez (\"Plaintiff\") sued.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Lopez",
+     "span": {
+      "start": 20,
+      "end": 25
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Maria",
+     "span": {
+      "start": 20,
+      "end": 25
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m3",
+     "type": "PER",
+     "name": "maria lopez ",
+     "span": {
+      "start": 40,
+      "end": 51
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m4",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 30,
+      "end": 41
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m4",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiff",
+     "span": {
+      "start": 0,
+      "end": 25
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    }
+   ]
+  },
+  {
+   "name": "partial_index_order",
+   "text": "Maria Lopez (\"Plaintiff\") sued.",
+   "mentions": [
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Maria",
+     "span": {
+      "start": 20,
+      "end": 25
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Lopez",
+     "span": {
+      "start": 20,
+      "end": 25
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m2",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiff",
+     "span": {
+      "start": 0,
+      "end": 25
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    }
+   ]
+  },
+  {
+   "name": "multiple_patterns_one_text",
+   "text": "Daniel Reed (\"Defendant\") and Acme Inc. (the \"Seller\") met. Reed, hereinafter \"Driver\", left. \"Lessee\" is defined as Bay Freight Co. today.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 0,
+      "end": 11
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Acme Inc.",
+     "span": {
+      "start": 30,
+      "end": 39
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m3",
+     "type": "PER",
+     "name": "Reed,",
+     "span": {
+      "start": 60,
+      "end": 65
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m4",
+     "type": "PER",
+     "name": "Bay Freight Co",
+     "span": {
+      "start": 117,
+      "end": 131
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m1",
+     "defined_term": "DEFENDANT",
+     "original_term": "Defendant",
+     "span": {
+      "start": 0,
+      "end": 25
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    },
+    {
+     "entity_mention_id": "m2",
+     "defined_term": "SELLER",
+     "original_term": "Seller",
+     "span": {
+      "start": 30,
+      "end": 54
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_with_article"
+    },
+    {
+     "entity_mention_id": "m4",
+     "defined_term": "LESSEE",
+     "original_term": "Lessee",
+     "span": {
+      "start": 94,
+      "end": 139
+     },
+     "confidence": 0.85,
+     "extraction_method": "pattern:defined_as"
+    }
+   ]
+  },
+  {
+   "name": "newline_in_name",
+   "text": "The parties are\nMaria\nLopez (\"Plaintiff\") and others.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 16,
+      "end": 27
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Lopez",
+     "span": {
+      "start": 22,
+      "end": 27
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m2",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiff",
+     "span": {
+      "start": 0,
+      "end": 41
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    }
+   ]
+  },
+  {
+   "name": "lowercase_term_rejected",
+   "text": "Maria Lopez (\"plaintiff\") sued; Daniel Reed (\"Defendants\") answered.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 0,
+      "end": 11
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 32,
+      "end": 43
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m2",
+     "defined_term": "DEFENDANT",
+     "original_term": "Defendants",
+     "span": {
+      "start": 32,
+      "end": 58
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    }
+   ]
+  },
+  {
+   "name": "hyphenated_role",
+   "text": "Atlas Freight (\"Third-Party Defendant\") was joined; Bo Li (\"Cross-Defendant\") too.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Atlas Freight",
+     "span": {
+      "start": 0,
+      "end": 13
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Bo Li",
+     "span": {
+      "start": 52,
+      "end": 57
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": []
+  },
+  {
+   "name": "metadata_roles",
+   "text": "Maria Lopez sued Daniel Reed and the Court.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 0,
+      "end": 11
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {
+      "role": "Plaintiff"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 17,
+      "end": 28
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {
+      "role": "",
+      "role_in_doc": "defendants"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m3",
+     "type": "PER",
+     "name": "Court",
+     "span": {
+      "start": 37,
+      "end": 42
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {
+      "role": "Court"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m4",
+     "type": "PER",
+     "name": "Maria",
+     "span": {
+      "start": 0,
+      "end": 5
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {
+      "role": "Witness Of Fact"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m5",
+     "type": "PER",
+     "name": "Lopez",
+     "span": {
+      "start": 6,
+      "end": 11
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {
+      "role_in_doc": "Tenant"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m1",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiff",
+     "span": {
+      "start": 0,
+      "end": 11
+     },
+     "confidence": 0.9,
+     "extraction_method": "metadata:role"
+    },
+    {
+     "entity_mention_id": "m2",
+     "defined_term": "DEFENDANT",
+     "original_term": "defendants",
+     "span": {
+      "start": 17,
+      "end": 28
+     },
+     "confidence": 0.9,
+     "extraction_method": "metadata:role"
+    },
+    {
+     "entity_mention_id": "m5",
+     "defined_term": "TENANT",
+     "original_term": "Tenant",
+     "span": {
+      "start": 6,
+      "end": 11
+     },
+     "confidence": 0.9,
+     "extraction_method": "metadata:role"
+    }
+   ]
+  },
+  {
+   "name": "pattern_and_metadata",
+   "text": "Maria Lopez (\"Plaintiff\") sued Daniel Reed.",
+   "mentions": [
+    {
+     "id": "m1",
+     "type": "PER",
+     "name": "Maria Lopez",
+     "span": {
+      "start": 0,
+      "end": 11
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {},
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    },
+    {
+     "id": "m2",
+     "type": "PER",
+     "name": "Daniel Reed",
+     "span": {
+      "start": 31,
+      "end": 42
+     },
+     "score": 0.9,
+     "source": "gliner2",
+     "sources": [],
+     "metadata": {
+      "role": "Defendant"
+     },
+     "doc_id": null,
+     "chunk_id": null,
+     "sentence_index": null
+    }
+   ],
+   "defined_terms": [
+    {
+     "entity_mention_id": "m1",
+     "defined_term": "PLAINTIFF",
+     "original_term": "Plaintiff",
+     "span": {
+      "start": 0,
+      "end": 25
+     },
+     "confidence": 0.95,
+     "extraction_method": "pattern:parenthetical_quoted"
+    },
+    {
+     "entity_mention_id": "m2",
+     "defined_term": "DEFENDANT",
+     "original_term": "Defendant",
+     "span": {
+      "start": 31,
+      "end": 42
+     },
+     "confidence": 0.9,
+     "extraction_method": "metadata:role"
+    }
+   ]
+  }
+ ]
+}

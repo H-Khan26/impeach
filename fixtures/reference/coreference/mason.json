@@ -1,0 +1,377 @@
+{
+ "scenario": "mason",
+ "documents": [
+  {
+   "input": "Mason_billy.jsonl",
+   "doc_id": "001",
+   "raw_coref": [
+    {
+     "clusters": [
+      {
+       "id": "001_cluster_0",
+       "mentions": [
+        {
+         "start_char": 0,
+         "end_char": 5,
+         "text": "Mason",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 68,
+         "end_char": 70,
+         "text": "He",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 98,
+         "end_char": 100,
+         "text": "he",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 154,
+         "end_char": 159,
+         "text": "Mason",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 207,
+         "end_char": 210,
+         "text": "His",
+         "is_pronoun": true
+        }
+       ]
+      },
+      {
+       "id": "001_cluster_1",
+       "mentions": [
+        {
+         "start_char": 105,
+         "end_char": 111,
+         "text": "struck",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 234,
+         "end_char": 244,
+         "text": "the injury",
+         "is_pronoun": false
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "coref_clusters": [
+    {
+     "id": "001_cluster_0",
+     "member_mention_ids": [
+      "ent_001_0_1",
+      "ent_001_0_0"
+     ],
+     "pronoun_spans": [
+      {
+       "start": 68,
+       "end": 70
+      },
+      {
+       "start": 98,
+       "end": 100
+      },
+      {
+       "start": 207,
+       "end": 210
+      }
+     ]
+    }
+   ],
+   "canonical_mention_for_cluster": {
+    "001_cluster_0": "ent_001_0_1"
+   },
+   "canonical_text_for_mention": {
+    "ent_001_0_1": "Mason",
+    "ent_001_0_0": "Mason",
+    "synth_pronoun_001_cluster_0_68_70": "Mason",
+    "synth_pronoun_001_cluster_0_98_100": "Mason",
+    "synth_pronoun_001_cluster_0_207_210": "Mason"
+   },
+   "synthetic_pronoun_mentions": {
+    "synth_pronoun_001_cluster_0_68_70": "ent_001_0_1",
+    "synth_pronoun_001_cluster_0_98_100": "ent_001_0_1",
+    "synth_pronoun_001_cluster_0_207_210": "ent_001_0_1"
+   },
+   "doc_mention_count": 13,
+   "added_mentions": [
+    {
+     "id": "synth_pronoun_001_cluster_0_68_70",
+     "type": "PER",
+     "name": "Mason",
+     "span": {
+      "start": 68,
+      "end": 70
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "He",
+      "cluster_id": "001_cluster_0",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Mason"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_0_98_100",
+     "type": "PER",
+     "name": "Mason",
+     "span": {
+      "start": 98,
+      "end": 100
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "he",
+      "cluster_id": "001_cluster_0",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Mason"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_001_cluster_0_207_210",
+     "type": "PER",
+     "name": "Mason",
+     "span": {
+      "start": 207,
+      "end": 210
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "His",
+      "cluster_id": "001_cluster_0",
+      "canonical_mention_id": "ent_001_0_1",
+      "canonical_name": "Mason"
+     },
+     "doc_id": "001",
+     "chunk_id": "001_0",
+     "sentence_index": null
+    }
+   ],
+   "mentions_by_chunk": {
+    "2": [
+     "ent_001_0_1",
+     "ent_001_0_3",
+     "ent_001_0_4",
+     "span-d2e368f8",
+     "ent_001_0_6",
+     "ent_001_0_2",
+     "ent_001_0_0",
+     "ent_001_0_5",
+     "ent_001_0_9",
+     "span-b475db25",
+     "synth_pronoun_001_cluster_0_68_70",
+     "synth_pronoun_001_cluster_0_98_100",
+     "synth_pronoun_001_cluster_0_207_210"
+    ]
+   }
+  },
+  {
+   "input": "Mason_watson.jsonl",
+   "doc_id": "002",
+   "raw_coref": [
+    {
+     "clusters": [
+      {
+       "id": "002_cluster_0",
+       "mentions": [
+        {
+         "start_char": 0,
+         "end_char": 5,
+         "text": "Mason",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 68,
+         "end_char": 70,
+         "text": "He",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 97,
+         "end_char": 99,
+         "text": "he",
+         "is_pronoun": true
+        },
+        {
+         "start_char": 154,
+         "end_char": 159,
+         "text": "Mason",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 189,
+         "end_char": 192,
+         "text": "His",
+         "is_pronoun": true
+        }
+       ]
+      },
+      {
+       "id": "002_cluster_1",
+       "mentions": [
+        {
+         "start_char": 169,
+         "end_char": 187,
+         "text": "a minor concussion",
+         "is_pronoun": false
+        },
+        {
+         "start_char": 216,
+         "end_char": 226,
+         "text": "the injury",
+         "is_pronoun": false
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "coref_clusters": [
+    {
+     "id": "002_cluster_0",
+     "member_mention_ids": [
+      "ent_002_0_1",
+      "ent_002_0_0"
+     ],
+     "pronoun_spans": [
+      {
+       "start": 68,
+       "end": 70
+      },
+      {
+       "start": 97,
+       "end": 99
+      },
+      {
+       "start": 189,
+       "end": 192
+      }
+     ]
+    }
+   ],
+   "canonical_mention_for_cluster": {
+    "002_cluster_0": "ent_002_0_1"
+   },
+   "canonical_text_for_mention": {
+    "ent_002_0_1": "Mason",
+    "ent_002_0_0": "Mason",
+    "synth_pronoun_002_cluster_0_68_70": "Mason",
+    "synth_pronoun_002_cluster_0_97_99": "Mason",
+    "synth_pronoun_002_cluster_0_189_192": "Mason"
+   },
+   "synthetic_pronoun_mentions": {
+    "synth_pronoun_002_cluster_0_68_70": "ent_002_0_1",
+    "synth_pronoun_002_cluster_0_97_99": "ent_002_0_1",
+    "synth_pronoun_002_cluster_0_189_192": "ent_002_0_1"
+   },
+   "doc_mention_count": 13,
+   "added_mentions": [
+    {
+     "id": "synth_pronoun_002_cluster_0_68_70",
+     "type": "PER",
+     "name": "Mason",
+     "span": {
+      "start": 68,
+      "end": 70
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "He",
+      "cluster_id": "002_cluster_0",
+      "canonical_mention_id": "ent_002_0_1",
+      "canonical_name": "Mason"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_0_97_99",
+     "type": "PER",
+     "name": "Mason",
+     "span": {
+      "start": 97,
+      "end": 99
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "he",
+      "cluster_id": "002_cluster_0",
+      "canonical_mention_id": "ent_002_0_1",
+      "canonical_name": "Mason"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_0",
+     "sentence_index": null
+    },
+    {
+     "id": "synth_pronoun_002_cluster_0_189_192",
+     "type": "PER",
+     "name": "Mason",
+     "span": {
+      "start": 189,
+      "end": 192
+     },
+     "score": 0.85,
+     "source": "coref_pronoun_synthesis",
+     "sources": [],
+     "metadata": {
+      "synthetic_pronoun": true,
+      "original_pronoun_text": "His",
+      "cluster_id": "002_cluster_0",
+      "canonical_mention_id": "ent_002_0_1",
+      "canonical_name": "Mason"
+     },
+     "doc_id": "002",
+     "chunk_id": "002_0",
+     "sentence_index": null
+    }
+   ],
+   "mentions_by_chunk": {
+    "21": [
+     "ent_002_0_1",
+     "ent_002_0_3",
+     "ent_002_0_4",
+     "span-ad30d4dd",
+     "ent_002_0_6",
+     "ent_002_0_2",
+     "ent_002_0_0",
+     "ent_002_0_5",
+     "ent_002_0_9",
+     "span-abd22427",
+     "synth_pronoun_002_cluster_0_68_70",
+     "synth_pronoun_002_cluster_0_97_99",
+     "synth_pronoun_002_cluster_0_189_192"
+    ]
+   }
+  }
+ ]
+}
