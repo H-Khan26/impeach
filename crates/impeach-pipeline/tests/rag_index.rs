@@ -107,15 +107,17 @@ fn chunk_and_span_counts_per_fixture() {
 }
 
 #[test]
-fn small_document_is_one_trimmed_chunk() {
+fn small_document_is_one_untrimmed_chunk() {
     let harness = Harness::new(default_config());
     let document = read_fixture("Mason_billy.jsonl");
     let result = index_payload(&harness, document.clone());
-    let trimmed = document.text.trim_end();
-    assert_eq!(boundaries(&result), [(0, trimmed.chars().count())]);
-    assert_eq!(result.chunks[0].chunk.text, trimmed);
+    // Chonkie keeps the trailing whitespace: the chunk is the whole text.
+    let text = document.text.as_str();
+    assert_ne!(text.trim_end(), text);
+    assert_eq!(boundaries(&result), [(0, text.chars().count())]);
+    assert_eq!(result.chunks[0].chunk.text, text);
     let span = harness.store.node_snapshot(result.spans[0].span_id.as_str()).expect("span").1;
-    assert_eq!(span["SurfaceText"], json!(trimmed));
+    assert_eq!(span["SurfaceText"], json!(text));
     assert_eq!(span["SpanType"], json!("SENTENCE"));
     assert_eq!(span["ChunkId"], json!(result.chunks[0].helix_id.as_str()));
     let doc = harness.store.node_snapshot(result.document.helix_id.as_str()).expect("doc").1;

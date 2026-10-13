@@ -312,22 +312,31 @@ impl NerModel for MockNer {
     }
 }
 
-/// Coreference resolver returning fixed clusters for every text.
+/// Coreference resolver returning fixed clusters: scripted ones for specific texts, the
+/// default clusters for every other text.
 #[derive(Debug, Default)]
 pub struct MockCoref {
     clusters: Vec<CorefCluster>,
+    by_text: HashMap<String, Vec<CorefCluster>>,
 }
 
 impl MockCoref {
-    /// A resolver returning `clusters`.
+    /// A resolver returning `clusters` for every text.
     pub fn new(clusters: Vec<CorefCluster>) -> Self {
-        Self { clusters }
+        Self { clusters, by_text: HashMap::new() }
+    }
+
+    /// Returns `clusters` for exactly `text`.
+    #[must_use]
+    pub fn with_text(mut self, text: impl Into<String>, clusters: Vec<CorefCluster>) -> Self {
+        self.by_text.insert(text.into(), clusters);
+        self
     }
 }
 
 impl Coref for MockCoref {
-    fn resolve(&self, _text: &str) -> Result<Vec<CorefCluster>, ModelError> {
-        Ok(self.clusters.clone())
+    fn resolve(&self, text: &str) -> Result<Vec<CorefCluster>, ModelError> {
+        Ok(self.by_text.get(text).unwrap_or(&self.clusters).clone())
     }
 }
 
@@ -344,6 +353,15 @@ mod tests {
         let norm: f32 = a[1].iter().map(|x| x * x).sum::<f32>().sqrt();
         assert!((norm - 1.0).abs() < 1e-5);
         assert_eq!(e.calls(), 1);
+    }
+
+    #[test]
+    fn mock_coref_scripts_clusters_per_text() {
+        let default = vec![CorefCluster { spans: vec![(0, 1)] }];
+        let scripted = vec![CorefCluster { spans: vec![(0, 3), (8, 10)] }];
+        let coref = MockCoref::new(default.clone()).with_text("Ann met her.", scripted.clone());
+        assert_eq!(coref.resolve("Ann met her.").expect("scripted"), scripted);
+        assert_eq!(coref.resolve("Other text").expect("default"), default);
     }
 
     #[test]

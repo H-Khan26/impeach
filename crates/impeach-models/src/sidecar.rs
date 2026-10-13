@@ -7,6 +7,30 @@
 //!
 //! A response object with an `"error"` member is reported as [`ModelError::Inference`].
 //! A process that exits or times out is restarted on the next request.
+//!
+//! # fastcoref from the Python prototype's environment
+//!
+//! [`SidecarCoref`] sends `{"op": "coref", "text": ...}` and expects
+//! `{"clusters": [[[start, end], ...], ...]}` with character offsets (end exclusive). To run
+//! fastcoref (`biu-nlp/f-coref`) from the Python prototype's virtualenv, save a script like the
+//! one below and set `models.coref.backend: fastcoref` with
+//! `models.coref.command: ["<prototype>/.venv/Scripts/python.exe", "<path>/fastcoref_sidecar.py"]`
+//! (`.venv/bin/python` on Unix); export `HF_HUB_OFFLINE=1` when the model is already in the
+//! Hugging Face cache. The script keeps library output off stdout, which carries the protocol.
+//!
+//! ```text
+//! import json, sys
+//! out, sys.stdout = sys.stdout, sys.stderr
+//! from fastcoref import FCoref
+//! model = FCoref(model_name_or_path="biu-nlp/f-coref", device="cpu")
+//! for line in sys.stdin:
+//!     try:
+//!         pred = model.predict(texts=[json.loads(line)["text"]])[0]
+//!         response = {"clusters": [[list(s) for s in c] for c in pred.get_clusters(as_strings=False)]}
+//!     except Exception as exc:
+//!         response = {"error": repr(exc)}
+//!     out.write(json.dumps(response) + "\n"); out.flush()
+//! ```
 
 use std::ffi::OsString;
 use std::fmt;

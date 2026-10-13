@@ -1,26 +1,35 @@
 //! Text chunking (Python `services/rag/chunkers/{sentence,recursive}.py`).
 //!
-//! Both strategies split with `text-splitter`'s [`TextSplitter`] sized in characters (Unicode
-//! scalar values, Python `len`). Boundaries differ from the Chonkie chunkers of the Python
-//! prototype but are deterministic. Every offset is a character offset into the document text.
+//! Every offset is a character offset (Unicode scalar values, Python `str` indices) into the
+//! document text.
 //!
-//! # Chunk-boundary rule
+//! # `sentence`: Chonkie's `SentenceChunker` with the character tokenizer
 //!
-//! `TextSplitter` splits the text at the highest semantic level whose pieces fit in
-//! `chunk_size` characters and then merges neighbouring pieces greedily, left to right, while
-//! the merged chunk still fits. Levels, highest first: runs of line breaks (longer runs rank
-//! higher), Unicode sentence boundaries (UAX #29), Unicode word boundaries, grapheme clusters,
-//! characters. A chunk never crosses a boundary of a higher level than the one it was merged at.
+//! 1. Split: the text is cut after every `". "`, `"! "`, `"? "` and `"\n"` (the delimiter
+//!    stays with the piece before it), giving pieces that partition the text.
+//! 2. Short pieces: walking left to right, a piece is appended to the previous one when
+//!    either of the two is shorter than 12 UTF-8 bytes (Chonkie's
+//!    `min_characters_per_sentence`, which `chonkie-core` counts in bytes).
+//! 3. Packing: from the current sentence, sentences are added while the chunk stays within
+//!    `chunk_size` characters (always at least one sentence; an oversized sentence is a chunk
+//!    of its own). Chunks are not trimmed: a chunk is the exact text of its sentences.
+//! 4. Overlap: when `chunk_overlap > 0`, the next chunk starts at the last sentences of the
+//!    previous one, walking back from its last sentence (never to its first) while the
+//!    running total of `characters + 1` per sentence stays within `chunk_overlap`.
 //!
-//! - `sentence`: chunks are trimmed of surrounding whitespace, at most `chunk_size` characters
-//!   long, and consecutive chunks overlap by up to `chunk_overlap` characters of whole pieces
-//!   (`chunk_overlap < chunk_size` is required). Each chunk is also its own sentence span, as
-//!   in the Python sentence chunker.
-//! - `recursive`: the splitter runs untrimmed and without overlap, so the pieces partition the
-//!   text exactly. Every chunk after the first is then extended backwards by `chunk_overlap`
-//!   characters (clamped at 0) with its end unchanged, as in the Python recursive chunker.
-//!   Sentence spans are the matches of `[^.!?]+[.!?]?` inside each chunk, stripped of
-//!   whitespace, skipping empty ones.
+//! A blank text gives no chunks. Each chunk is also its own sentence span, as in the Python
+//! sentence chunker.
+//!
+//! # `recursive`
+//!
+//! `text-splitter`'s [`TextSplitter`] sized in characters splits the text at the highest
+//! semantic level whose pieces fit in `chunk_size` (runs of line breaks, Unicode sentence and
+//! word boundaries, graphemes, characters) and merges neighbouring pieces greedily. Boundaries
+//! differ from Chonkie's recursive chunker but are deterministic. The splitter runs untrimmed
+//! and without overlap, so the pieces partition the text; every chunk after the first is then
+//! extended backwards by `chunk_overlap` characters (clamped at 0) with its end unchanged, as
+//! in the Python recursive chunker. Sentence spans are the matches of `[^.!?]+[.!?]?` inside
+//! each chunk, stripped of whitespace, skipping empty ones.
 
 use impeach_config::pipeline::{ChunkingConfig, ChunkingStrategy};
 use impeach_core::util::saturating_i64;
@@ -91,25 +100,24 @@ impl Chunker {
     }
 
     fn sentence_chunks(&self, document: &DocumentPayload) -> ChunkingResult {
-        let config = ChunkConfig::new(self.chunk_size)
-            .with_overlap(self.chunk_overlap)
-            .expect("Chunker::new checks chunk_overlap < chunk_size for the sentence strategy")
-            .with_trim(true);
-        let splitter = TextSplitter::new(config);
+        let text = &document.text;
         let mut result = ChunkingResult::default();
-        for (sequence, piece) in splitter.chunk_char_indices(&document.text).enumerate() {
-            let start = piece.char_offset;
-            let length = piece.chunk.chars().count();
-            let end = start + length;
-            let metadata = chunk_metadata(document, sequence, "sentence", None, length);
-            let mut chunk = Chunk::new(document.doc_id.clone(), piece.chunk, sequence, start, end);
+        let ranges = sentence_chunk_ranges(text, self.chunk_size, self.chunk_overlap);
+        if ranges.is_empty() {
+            return result;
+        }
+        let byte_at = char_byte_offsets(text);
+        for (sequence, (start, end)) in ranges.into_iter().enumerate() {
+            let chunk_text = &text[byte_at[start]..byte_at[end]];
+            let metadata = chunk_metadata(document, sequence, "sentence", None, end - start);
+            let mut chunk = Chunk::new(document.doc_id.clone(), chunk_text, sequence, start, end);
             chunk.sentence_spans = vec![Span::new(start, end)];
             if self.include_sentence_spans {
                 result.sentence_spans.push(SentenceSpan {
                     chunk_sequence: sequence,
                     start_char: start,
                     end_char: end,
-                    text: piece.chunk.to_owned(),
+                    text: chunk_text.to_owned(),
                     metadata: span_metadata(sequence, &metadata),
                 });
             }
@@ -156,6 +164,92 @@ impl Chunker {
         }
         result
     }
+}
+
+/// Chonkie's `min_characters_per_sentence`, compared against UTF-8 byte lengths.
+const MIN_SENTENCE_BYTES: usize = 12;
+
+/// Byte ranges of Chonkie sentences: the text cut after every `". "`, `"! "`, `"? "` and
+/// `"\n"`, then each piece appended to the previous one when either is shorter than
+/// [`MIN_SENTENCE_BYTES`]. The ranges partition `text`.
+fn chonkie_sentences(text: &str) -> Vec<(usize, usize)> {
+    let bytes = text.as_bytes();
+    let mut pieces = Vec::new();
+    let (mut start, mut i) = (0, 0);
+    while i < bytes.len() {
+        let cut = match bytes[i] {
+            b'\n' => Some(i + 1),
+            b'.' | b'!' | b'?' if bytes.get(i + 1) == Some(&b' ') => Some(i + 2),
+            _ => None,
+        };
+        match cut {
+            Some(end) => {
+                pieces.push((start, end));
+                start = end;
+                i = end;
+            }
+            None => i += 1,
+        }
+    }
+    if start < bytes.len() {
+        pieces.push((start, bytes.len()));
+    }
+    let mut sentences: Vec<(usize, usize)> = Vec::with_capacity(pieces.len());
+    for (start, end) in pieces {
+        match sentences.last_mut() {
+            Some(last)
+                if end - start < MIN_SENTENCE_BYTES || last.1 - last.0 < MIN_SENTENCE_BYTES =>
+            {
+                last.1 = end;
+            }
+            _ => sentences.push((start, end)),
+        }
+    }
+    sentences
+}
+
+/// Character ranges of the Chonkie sentence chunks of `text` (rules in the module docs).
+fn sentence_chunk_ranges(text: &str, chunk_size: usize, overlap: usize) -> Vec<(usize, usize)> {
+    if text.chars().all(impeach_text::normalize::is_py_whitespace) {
+        return Vec::new();
+    }
+    let mut starts = Vec::new();
+    let mut lengths = Vec::new();
+    let mut position = 0;
+    for (start, end) in chonkie_sentences(text) {
+        let length = text[start..end].chars().count();
+        starts.push(position);
+        lengths.push(length);
+        position += length;
+    }
+    let count = lengths.len();
+    let mut ranges = Vec::new();
+    let mut pos = 0;
+    while pos < count {
+        let mut split = pos + 1;
+        let mut total = lengths[pos];
+        while split < count && total + lengths[split] <= chunk_size {
+            total += lengths[split];
+            split += 1;
+        }
+        ranges.push((starts[pos], starts[split - 1] + lengths[split - 1]));
+        if overlap == 0 || split >= count {
+            pos = split;
+            continue;
+        }
+        let mut overlap_total = 0;
+        let mut index = split - 1;
+        while index > pos && overlap_total < overlap {
+            let next = overlap_total + lengths[index] + 1;
+            if next > overlap {
+                break;
+            }
+            overlap_total = next;
+            index -= 1;
+        }
+        pos = index + 1;
+    }
+    ranges
 }
 
 /// Character ranges of the untrimmed, non-overlapping splitter output; they partition `text`.
@@ -429,12 +523,68 @@ mod tests {
             Chunker::new(&config(ChunkingStrategy::Sentence, 40, 0, true)).expect("chunker");
         let result = chunker.chunk(&doc);
         let texts: Vec<_> = result.chunks.iter().map(|c| c.text.as_str()).collect();
-        assert_eq!(texts, ["One sentence here. Two sentence here.", "Three sentence here. Four."]);
+        assert_eq!(texts, ["One sentence here. Two sentence here. ", "Three sentence here. Four."]);
         assert_eq!(result.sentence_spans.len(), 2);
         assert_eq!(result.chunks[1].start_char, text.find("Three").expect("present"));
         assert_eq!(result.chunks[1].sentence_spans, [Span::new(38, 64)]);
         assert_eq!(result.sentence_spans[1].metadata["chunk_sequence"], json!(1));
         assert_eq!(result.chunks[0].metadata["chonkie_chunker"], json!("sentence"));
+    }
+
+    fn texts(text: &str, ranges: &[(usize, usize)]) -> Vec<String> {
+        let chars: Vec<char> = text.chars().collect();
+        ranges.iter().map(|&(s, e)| chars[s..e].iter().collect()).collect()
+    }
+
+    // Cases checked against Chonkie 1.7 / chonkie-core 0.10.
+    #[test]
+    fn chonkie_sentences_merge_short_pieces() {
+        let split = |text: &str| -> Vec<String> {
+            chonkie_sentences(text).iter().map(|&(s, e)| text[s..e].to_owned()).collect()
+        };
+        assert_eq!(
+            split("This is a longer sentence. Hi. Another long sentence here. X."),
+            ["This is a longer sentence. Hi. ", "Another long sentence here. X."]
+        );
+        assert_eq!(
+            split("Hi. Yo. Ab. Cd. Long sentence number two. "),
+            ["Hi. Yo. Ab. Cd. ", "Long sentence number two. "]
+        );
+        assert_eq!(
+            split("Hi. Ok. This is a longer sentence. A. B."),
+            ["Hi. Ok. This is a longer sentence. A. B."]
+        );
+        assert_eq!(
+            split("First long sentence. . . . Second long sentence.  Third"),
+            ["First long sentence. . . . ", "Second long sentence.  Third"]
+        );
+        // The minimum is in UTF-8 bytes: "ééééé. " is 7 characters but 12 bytes.
+        assert_eq!(
+            split("ééééé. ééééééééééé. aaaa. bbbbbbbbbbbbbbbb"),
+            ["ééééé. ", "ééééééééééé. aaaa. ", "bbbbbbbbbbbbbbbb"]
+        );
+        assert_eq!(split("Long one!\n\nAnother long sentence.\n\n\n").len(), 1);
+    }
+
+    #[test]
+    fn sentence_chunks_pack_and_overlap_like_chonkie() {
+        let text = "Sentence number one. Sentence number two. Sentence number three. Final one.";
+        // Sentences of 21, 21 and 33 characters ("Final one." merges into the third).
+        assert_eq!(sentence_chunk_ranges(text, 45, 0), [(0, 42), (42, 75)]);
+        assert_eq!(sentence_chunk_ranges(text, 45, 22), [(0, 42), (21, 42), (42, 75)]);
+        assert_eq!(sentence_chunk_ranges(text, 45, 21), [(0, 42), (42, 75)]);
+        // An oversized sentence is a chunk of its own.
+        assert_eq!(sentence_chunk_ranges(text, 10, 9), [(0, 21), (21, 42), (42, 75)]);
+
+        // Sentences of 20, 19, 22 and 20 characters; the overlap never reaches a chunk's
+        // first sentence.
+        let text =
+            "Alpha sentence one. Beta sentence two. Gamma sentence three. Delta sentence four.";
+        assert_eq!(sentence_chunk_ranges(text, 45, 0), [(0, 39), (39, 81)]);
+        assert_eq!(sentence_chunk_ranges(text, 45, 20), [(0, 39), (20, 61), (61, 81)]);
+        assert_eq!(sentence_chunk_ranges(text, 60, 40), [(0, 39), (20, 61), (39, 81)]);
+        assert_eq!(texts(text, &[(20, 61)]), ["Beta sentence two. Gamma sentence three. "]);
+        assert!(sentence_chunk_ranges(" \n\t ", 10, 0).is_empty());
     }
 
     #[test]

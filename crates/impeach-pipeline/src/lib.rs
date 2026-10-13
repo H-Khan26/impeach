@@ -34,12 +34,16 @@
 //! ```
 //!
 //! Differences from the Python prototype:
-//! - Chunk boundaries come from `text-splitter` instead of Chonkie (deterministic; rule in
+//! - The `sentence` chunker follows Chonkie's sentence rules and gives the same boundaries; the
+//!   `recursive` chunker uses `text-splitter` instead of Chonkie (deterministic; rules in
 //!   [`rag::chunker`]). The `chonkie_*` chunk metadata keys are kept; `chonkie_chunk_id` is null
 //!   and `chonkie_token_count` is the character count.
-//! - Chunks, spans and embeddings are written with the store's batch methods. A failed span or
-//!   embedding batch falls back to one-by-one writes so a single bad item is skipped (spans) or
-//!   reported in `errors` (embeddings) as in Python.
+//! - Chunks, spans, embeddings, `SpanRefersToEntity` edges, fact nodes and fact edges are
+//!   written with the store's batch methods, and a new entity is written together with its
+//!   vector. A failed batch falls back to one-by-one writes so a single bad item is skipped
+//!   and logged (spans, edges, facts) or reported in `errors` (embeddings) as in Python.
+//!   Entities are still created one mention at a time: a later mention's reuse lookup must see
+//!   the entities created before it.
 //! - When a document node is reused (document cache or explicit `helix_id`), its existing
 //!   chunks, their sentence spans and chunk vectors are deleted in one store call and the new
 //!   chunks and spans are created, so re-indexing leaves exactly one set of each. Python updated
